@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    [x-cloak] { display: none !important; }
+    .loader-spin { animation: spin 1s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+</style>
+
+<div x-data="{ 
+        posts: [], 
+        isGenerating: false,
+        chatInput: ''
+    }" 
+    @update-calendar.window="posts = $event.detail;"
+    class="min-h-screen bg-zinc-50 font-sans flex flex-col">
+    
+    <header class="bg-white border-b border-zinc-200 px-6 py-4 flex flex-col sm:flex-row items-center justify-between sticky top-0 z-10 shadow-sm">
+        <div>
+            <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight">Content Planner</h1>
+            <p class="text-sm text-zinc-500">AI-powered strategy based on your brand data.</p>
+        </div>
+        
+        <form hx-post="{% url 'generate_calendar' %}" 
+              hx-target="#generation-alerts" 
+              @htmx:before-request="isGenerating = true"
+              @htmx:after-request="isGenerating = false"
+              class="flex items-center gap-4 mt-4 sm:mt-0">
+            {% csrf_token %}
+            <div>
+                <label class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">Start Date</label>
+                <input type="date" name="start_date" required class="block w-full rounded-lg border-zinc-300 bg-zinc-50 border p-2 text-sm focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">End Date</label>
+                <input type="date" name="end_date" required class="block w-full rounded-lg border-zinc-300 bg-zinc-50 border p-2 text-sm focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
+            </div>
+            <div class="mt-5">
+                <button type="submit" :disabled="isGenerating" class="inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-semibold rounded-lg text-white bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 transition-colors">
+                    <span x-show="!isGenerating">Generate Strategy</span>
+                    <span x-show="isGenerating" class="flex items-center gap-2" x-cloak>
+                        <svg class="w-4 h-4 loader-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        Thinking...
+                    </span>
+                </button>
+            </div>
+        </form>
+    </header>
+
+    <div id="generation-alerts" class="px-6 pt-4"></div>
+
+  <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+      <div
+        x-show="posts.length === 0 && !isGenerating"
+        class="flex flex-col items-center justify-center h-64 text-zinc-400"
+      >
+        <svg
+          class="w-12 h-12 mb-3"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          ></path>
+        </svg>
+        <p>Select dates and generate to view your calendar.</p>
+      </div>
+
+      <template x-for="(post, index) in posts" :key="index">
+        <div
+          class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow relative"
+        >
+          <div
+            class="flex justify-between items-start mb-4 border-b border-zinc-100 pb-3"
+          >
+            <div class="flex items-center gap-3">
+              <input
+                type="date"
+                x-model="post.date"
+                class="font-bold text-zinc-900 border-none bg-transparent p-0 focus:ring-0 cursor-pointer"
+              />
+              <span
+                class="px-2.5 py-1 bg-zinc-100 text-zinc-600 text-xs font-bold rounded-md uppercase tracking-wide"
+                x-text="post.platform"
+              ></span>
+              <span
+                class="px-2.5 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-md uppercase tracking-wide"
+                x-text="post.post_type"
+              ></span>
+            </div>
+            <button class="text-zinc-400 hover:text-zinc-700">
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                ></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label
+                class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1"
+                >Caption</label
+              >
+              <textarea
+                x-model="post.caption"
+                rows="3"
+                class="w-full text-zinc-800 bg-zinc-50 border border-zinc-200 rounded-lg p-3 text-sm focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-none"
+              ></textarea>
+            </div>
+
+            <div>
+              <label
+                class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1"
+                >Hashtags</label
+              >
+              <input
+                type="text"
+                x-model="post.hashtags"
+                class="w-full text-blue-600 bg-zinc-50 border border-zinc-200 rounded-lg p-2 text-sm focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+              />
+            </div>
+
+            <div
+              class="bg-zinc-50 p-4 rounded-lg border border-zinc-200 flex gap-4 items-start"
+            >
+              <div class="flex-1">
+                <label
+                  class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1"
+                  >Image Prompt (Imagen 4.0)</label
+                >
+                <textarea
+                  x-model="post.image_prompt"
+                  rows="2"
+                  class="w-full bg-white border border-zinc-300 rounded-md p-2 text-sm focus:border-blue-500 outline-none resize-none"
+                ></textarea>
+              </div>
+              <button
+                class="mt-5 inline-flex items-center px-4 py-2 bg-white border border-zinc-300 text-sm font-semibold rounded-lg text-zinc-700 hover:bg-zinc-100 transition-colors"
+              >
+                <svg
+                  class="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  ></path>
+                </svg>
+                Generate
+              </button>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <div
+      class="w-full lg:w-96 bg-white border-l border-zinc-200 flex flex-col h-[calc(100vh-80px)] sticky top-[80px]"
+    >
+      <div class="p-4 border-b border-zinc-100 bg-zinc-50">
+        <h3 class="font-bold text-zinc-900 flex items-center gap-2">
+          <svg
+            class="w-5 h-5 text-blue-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            ></path>
+          </svg>
+          AI Editor
+        </h3>
+        <p class="text-xs text-zinc-500 mt-1">
+          Ask me to tweak the whole calendar!
+        </p>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50/50">
+        <div
+          class="bg-blue-50 border border-blue-100 text-blue-900 p-3 rounded-lg text-sm rounded-tl-none"
+        >
+          I've loaded your onboarding data. What would you like to adjust in the
+          strategy above?
+        </div>
+      </div>
+
+      <div class="p-4 bg-white border-t border-zinc-200">
+        <div class="relative">
+          <input
+            type="text"
+            x-model="chatInput"
+            placeholder='e.g. "Make captions more premium"'
+            class="w-full pl-4 pr-12 py-3 bg-zinc-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+          <button
+            class="absolute right-2 top-1.5 p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <div class="mt-4 flex gap-2">
+          <button
+            class="flex-1 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 transition-colors"
+          >
+            Export Plan
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}

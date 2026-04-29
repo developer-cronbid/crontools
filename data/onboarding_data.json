@@ -1,0 +1,39 @@
+[
+    {
+        "business_profile": {
+            "name": "Fixrupee",
+            "industry": "Finance & Consulting",
+            "website": "https://fixrupee.com/",
+            "target_audience": "People who needs loan, People who needs credit card, People who need best personalized credit card and loan offers, People who want to improve there credit score, People who wants to know there credit score for free, People who needs to check there credit report",
+            "goals": "To get leads, To make people trust that fixrupee is professional aggregator, Spread Awarness about Fixrupee is safe and trustable, and to make sure people get loans and credit card from fixrupee, make people aware we offer them the best personalized offers of loans and credit cards, make people trust we will help them improve there credit score"
+        },
+        "brand_assets": {
+            "logo_url": "/media/onboarding_logos/logo.jpg",
+            "brand_colors": [
+                "#10b7fe",
+                "#ffffff"
+            ],
+            "references": [
+                {
+                    "url": "/media/onboarding_references/credit_card_fixrupee_insta_post.jpg",
+                    "description": "This is a credit card instagram post we have posted"
+                },
+                {
+                    "url": "/media/onboarding_references/fixrupee_ramzan_wishes_facebook_post.jpg",
+                    "description": "Eid wish by Fixrupee"
+                }
+            ],
+            "fonts": "stack",
+            "tone_of_voice": "Professional & Authoritative"
+        },
+        "social_handles": {
+            "instagram": "https://www.instagram.com/fixrupee/",
+            "facebook": "https://www.facebook.com/people/Fixrupee/61583436144624/",
+            "x_twitter": "",
+            "linkedin": "",
+            "discord": "",
+            "youtube": "",
+            "tiktok": ""
+        }
+    }
+]
