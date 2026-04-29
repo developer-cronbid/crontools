@@ -1,1 +1,25 @@
-/venv
+# Virtual environment
+
+venv/
+
+# Environment variables (secrets)
+
+.env
+
+# Python cache
+
+**pycache**/
+*.pyc
+
+# Django local database
+
+db.sqlite3
+
+# Logs
+
+*.log
+
+# OS files
+
+.DS_Store
+Thumbs.db
