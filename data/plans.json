@@ -1,0 +1,94 @@
+[
+    {
+        "id": "20260430130208387207",
+        "created_at": "2026-04-30T13:02:08.387256Z",
+        "start_date": "2026-04-30",
+        "end_date": "2026-05-01",
+        "frequency": "daily",
+        "platforms": [
+            "instagram"
+        ],
+        "summary": "This 2-day plan strategically builds Fixrupee's trust and brand awareness. Day 1 opens with a trust-building post establishing Fixrupee as a safe, professional loan and credit card aggregator. Day 2 anchors on Labour Day with a creative, emotionally resonant festival post that honors the working class while subtly reinforcing Fixrupee's mission of empowering people financially \u2014 tying hard work to smart financial decisions.",
+        "themes": [
+            "Trust & Credibility",
+            "Labour Day \u2014 Financial Empowerment for Every Worker"
+        ],
+        "posts": [
+            {
+                "date": "2026-04-30",
+                "day_of_week": "Thursday",
+                "occasion": "Trust Building",
+                "post_type": "trust",
+                "platforms": [
+                    "instagram"
+                ],
+                "title": "Why 1 Lakh+ Indians Trust Fixrupee",
+                "caption": "Your finances deserve a partner you can trust. \ud83d\udd12\n\n\u2705 100% Safe & Secure Platform\n\u2705 RBI-Compliant Lending Partners\n\u2705 No Hidden Charges \u2014 Ever\n\u2705 Best Personalized Loan & Credit Card Offers\n\u2705 Free Credit Score Check\n\nAt Fixrupee, we don't just match you with offers \u2014 we match you with the RIGHT offers. \ud83d\udc99\n\nYour data is protected. Your trust is earned.\n\n\ud83d\udc49 Check your credit score for FREE today!\n\ud83d\udd17 Link in bio",
+                "hashtags": [
+                    "#Fixrupee",
+                    "#TrustFixrupee",
+                    "#CreditScore",
+                    "#FreeCreditScore",
+                    "#PersonalLoan",
+                    "#CreditCard",
+                    "#FinanceTips",
+                    "#LoanOffers",
+                    "#CreditCardOffers",
+                    "#SafeAndSecure",
+                    "#FinancialFreedom",
+                    "#SmartFinance",
+                    "#IndianFintech",
+                    "#CreditReport"
+                ],
+                "call_to_action": "Check your free credit score at fixrupee.com",
+                "image_prompt": "Professional, ultra-detailed, HD corporate trust-building social media post for Fixrupee brand. Center composition: a glowing blue shield icon (#10b7fe) with a checkmark symbolizing security, surrounded by floating icons of a credit card, loan document, and credit score meter. Clean white (#ffffff) background with subtle geometric patterns. Text overlay: \"YOUR FINANCES ARE SAFE WITH US\" in bold modern sans-serif at top, Fixrupee logo at bottom. Professional & Authoritative tone, photorealistic 3D render style, sharp lighting, corporate blue (#10b7fe) and white (#ffffff) color scheme, 4:5 aspect ratio for Instagram.",
+                "image_aspect_ratio": "4:5",
+                "color_palette_hint": [
+                    "#10b7fe",
+                    "#ffffff"
+                ],
+                "post_id": "20260430130208387207-0",
+                "image_url": "",
+                "image_status": "pending"
+            },
+            {
+                "date": "2026-05-01",
+                "day_of_week": "Friday",
+                "occasion": "Labour Day",
+                "post_type": "festival",
+                "platforms": [
+                    "instagram"
+                ],
+                "title": "Labour Day \u2014 Saluting Every Hardworking Indian",
+                "caption": "Every drop of sweat builds this nation. \ud83c\uddee\ud83c\uddf3\ud83d\udcaa\n\nThis Labour Day, Fixrupee salutes the spirit of every worker \u2014 from factory floors to office desks, from fields to freelancing.\n\nYour hard work deserves smart financial rewards. \ud83d\udc99\n\n\ud83d\udd39 Best credit cards for salaried professionals\n\ud83d\udd39 Personal loans tailored to YOUR needs\n\ud83d\udd39 Free credit score \u2014 because you've earned it\n\nYou work hard for your money. Let us make your money work harder for you. \ud83c\udfd7\ufe0f\n\nHappy Labour Day! \u270a\n\n\ud83d\udd17 fixrupee.com",
+                "hashtags": [
+                    "#LabourDay",
+                    "#MayDay",
+                    "#LabourDay2026",
+                    "#Fixrupee",
+                    "#HappyLabourDay",
+                    "#WorkersDay",
+                    "#FinancialEmpowerment",
+                    "#CreditScore",
+                    "#PersonalLoan",
+                    "#CreditCard",
+                    "#HardWorkPaysOff",
+                    "#IndianWorkers",
+                    "#SmartFinance",
+                    "#FinanceTips"
+                ],
+                "call_to_action": "You deserve the best offers \u2014 visit fixrupee.com today",
+                "image_prompt": "Ultra-detailed, HD, professional Labour Day social media post for Fixrupee brand. Photorealistic 3D illustration: diverse Indian workers \u2014 construction worker with helmet, female office professional, farmer, delivery person \u2014 standing confidently together in heroic low-angle composition. Background: rising sun with golden rays, city skyline silhouette. Brand blue (#10b7fe) gradient overlay blending into white (#ffffff). Bold text overlay at top: \"HAPPY LABOUR DAY\" in white, subtext: \"Your Hard Work Deserves Smart Financial Rewards\" in #10b7fe. Fixrupee logo bottom-center. Professional & Authoritative tone, cinematic lighting, sharp details, 4:5 aspect ratio.",
+                "image_aspect_ratio": "4:5",
+                "color_palette_hint": [
+                    "#10b7fe",
+                    "#ffffff",
+                    "#f5a623"
+                ],
+                "post_id": "20260430130208387207-1",
+                "image_url": "https://cdn.aimlapi.com/generations/openai-image-generation/1777554196358-7e4ac76d-6eac-4d0d-bcdf-675ea1bf712d.png",
+                "image_status": "ready"
+            }
+        ]
+    }
+]

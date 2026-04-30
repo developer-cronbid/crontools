@@ -4,6 +4,11 @@ from . import views
 urlpatterns = [
     path("", views.hub_home, name="hub_home"),
     path("plan/", views.hub_plan, name="hub_plan"),
-    # path('chat-api/', views.chat_api, name='chat_api'),
-    path("plan/generate/", views.generate_calendar, name="generate_calendar"),
+
+    # Plan API
+    path("plan/generate/", views.generate_plan, name="generate_plan"),
+    path("plan/image/", views.generate_post_image, name="generate_post_image"),
+    path("plan/list/", views.list_plans, name="list_plans"),
+    path("plan/<str:plan_id>/", views.get_plan, name="get_plan"),
+    path("plan/<str:plan_id>/delete/", views.delete_plan, name="delete_plan"),
 ]

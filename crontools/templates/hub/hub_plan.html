@@ -3,246 +3,1327 @@
 
 {% block content %}
 <style>
-    [x-cloak] { display: none !important; }
-    .loader-spin { animation: spin 1s linear infinite; }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
+    /* ===== PLAN PAGE — editorial dark + electric blue ===== */
+    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+        --plan-bg: #0a0e14;
+        --plan-bg-2: #0f1520;
+        --plan-surface: #141b29;
+        --plan-surface-2: #1a2336;
+        --plan-border: rgba(255,255,255,0.08);
+        --plan-border-strong: rgba(255,255,255,0.16);
+        --plan-text: #f4f6fb;
+        --plan-text-dim: #8b94a8;
+        --plan-text-faint: #5b6377;
+        --brand: #10b7fe;
+        --brand-glow: rgba(16,183,254,0.25);
+        --accent-warm: #ffb84d;
+        --accent-pink: #ff6b9d;
+        --success: #4ade80;
+        --danger: #ef4444;
+    }
+
+    .plan-root {
+        background: var(--plan-bg);
+        color: var(--plan-text);
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        margin: -1.5rem -15px 0;  /* counter Bootstrap container padding if base.html adds it */
+        padding: 0 0 6rem;
+    }
+
+    .plan-root * { box-sizing: border-box; }
+
+    /* Hero */
+    .plan-hero {
+        position: relative;
+        padding: 5rem 2rem 3rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+    .plan-hero::before {
+        content: "";
+        position: absolute;
+        top: -120px; right: -80px;
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, var(--brand-glow) 0%, transparent 60%);
+        filter: blur(40px);
+        pointer-events: none;
+    }
+    .plan-hero::after {
+        content: "";
+        position: absolute;
+        bottom: -180px; left: -120px;
+        width: 460px; height: 460px;
+        background: radial-gradient(circle, rgba(255,107,157,0.18) 0%, transparent 60%);
+        filter: blur(50px);
+        pointer-events: none;
+    }
+    .plan-eyebrow {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--brand);
+        margin-bottom: 1.25rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        position: relative; z-index: 1;
+    }
+    .plan-eyebrow::before {
+        content: "";
+        width: 28px; height: 1px;
+        background: var(--brand);
+    }
+    .plan-title {
+        font-family: 'Fraunces', serif;
+        font-weight: 500;
+        font-size: clamp(2.5rem, 6vw, 4.5rem);
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+        margin: 0 0 1.5rem;
+        position: relative; z-index: 1;
+    }
+    .plan-title em {
+        font-style: italic;
+        font-weight: 400;
+        background: linear-gradient(120deg, var(--brand) 0%, #7dd9ff 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .plan-subtitle {
+        font-size: 1.05rem;
+        color: var(--plan-text-dim);
+        max-width: 620px;
+        line-height: 1.6;
+        position: relative; z-index: 1;
+    }
+
+    .brand-strip {
+        position: relative; z-index: 1;
+        margin-top: 2.5rem;
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        padding: 1.25rem 1.5rem;
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--plan-border);
+        border-radius: 14px;
+        backdrop-filter: blur(10px);
+    }
+    .brand-strip-item { display: flex; flex-direction: column; gap: 0.25rem; }
+    .brand-strip-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--plan-text-faint);
+    }
+    .brand-strip-value {
+        font-family: 'Fraunces', serif;
+        font-size: 1rem;
+        color: var(--plan-text);
+        font-weight: 500;
+    }
+    .brand-color-dot {
+        display: inline-block;
+        width: 14px; height: 14px;
+        border-radius: 50%;
+        border: 1px solid var(--plan-border-strong);
+        margin-right: 6px;
+        vertical-align: middle;
+    }
+
+    /* Layout */
+    .plan-layout {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        gap: 2rem;
+        align-items: start;
+    }
+    @media (max-width: 1024px) {
+        .plan-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Generator panel */
+    .gen-panel {
+        background: linear-gradient(160deg, var(--plan-surface) 0%, var(--plan-surface-2) 100%);
+        border: 1px solid var(--plan-border);
+        border-radius: 20px;
+        padding: 2rem;
+        position: sticky;
+        top: 1.5rem;
+        box-shadow: 0 30px 60px -20px rgba(0,0,0,0.5);
+    }
+    .gen-panel-title {
+        font-family: 'Fraunces', serif;
+        font-size: 1.6rem;
+        font-weight: 500;
+        margin: 0 0 0.4rem;
+        letter-spacing: -0.01em;
+    }
+    .gen-panel-sub {
+        font-size: 0.85rem;
+        color: var(--plan-text-dim);
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+    }
+    .field-group { margin-bottom: 1.25rem; }
+    .field-label {
+        display: block;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--plan-text-dim);
+        margin-bottom: 0.5rem;
+    }
+    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    input[type="date"], select, textarea {
+        width: 100%;
+        background: rgba(0,0,0,0.3);
+        border: 1px solid var(--plan-border-strong);
+        color: var(--plan-text);
+        padding: 0.7rem 0.85rem;
+        border-radius: 10px;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.92rem;
+        transition: border-color 0.15s, background 0.15s;
+        color-scheme: dark;
+    }
+    input[type="date"]:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: var(--brand);
+        background: rgba(16,183,254,0.05);
+    }
+    textarea { resize: vertical; min-height: 70px; font-size: 0.88rem; }
+
+    .freq-chips, .platform-chips {
+        display: flex; flex-wrap: wrap; gap: 0.4rem;
+    }
+    .chip {
+        padding: 0.5rem 0.85rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--plan-border);
+        color: var(--plan-text-dim);
+        font-size: 0.82rem;
+        cursor: pointer;
+        transition: all 0.15s;
+        user-select: none;
+    }
+    .chip:hover { border-color: var(--plan-border-strong); color: var(--plan-text); }
+    .chip.active {
+        background: rgba(16,183,254,0.12);
+        border-color: var(--brand);
+        color: var(--brand);
+    }
+    .chip .chip-tick { display: none; }
+    .chip.active .chip-tick { display: inline; margin-right: 4px; }
+
+    .gen-btn {
+        width: 100%;
+        margin-top: 0.5rem;
+        padding: 1rem 1.25rem;
+        background: linear-gradient(135deg, var(--brand) 0%, #0d8fd1 100%);
+        border: none;
+        color: #001628;
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 0.95rem;
+        letter-spacing: 0.02em;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s;
+        box-shadow: 0 12px 30px -10px var(--brand-glow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .gen-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 40px -10px var(--brand-glow);
+    }
+    .gen-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .gen-btn .spinner {
+        width: 16px; height: 16px;
+        border: 2px solid rgba(0,22,40,0.3);
+        border-top-color: #001628;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .err-box {
+        margin-top: 1rem;
+        padding: 0.85rem 1rem;
+        background: rgba(239,68,68,0.08);
+        border: 1px solid rgba(239,68,68,0.3);
+        border-radius: 10px;
+        color: #fca5a5;
+        font-size: 0.85rem;
+        display: none;
+    }
+    .err-box.show { display: block; }
+
+    /* Right column */
+    .results-col { min-width: 0; }
+
+    .empty-state {
+        background: linear-gradient(160deg, var(--plan-surface) 0%, var(--plan-surface-2) 100%);
+        border: 1px solid var(--plan-border);
+        border-radius: 20px;
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+    .empty-illustration {
+        width: 80px; height: 80px;
+        margin: 0 auto 1.5rem;
+        border: 1px dashed var(--plan-border-strong);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--brand);
+        font-family: 'Fraunces', serif;
+        font-size: 2.2rem;
+    }
+    .empty-state h3 {
+        font-family: 'Fraunces', serif;
+        font-weight: 500;
+        font-size: 1.5rem;
+        margin: 0 0 0.5rem;
+    }
+    .empty-state p {
+        color: var(--plan-text-dim);
+        font-size: 0.95rem;
+        max-width: 420px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* Loading state */
+    .loader-card {
+        background: linear-gradient(160deg, var(--plan-surface) 0%, var(--plan-surface-2) 100%);
+        border: 1px solid var(--plan-border);
+        border-radius: 20px;
+        padding: 3rem 2rem;
+        text-align: center;
+    }
+    .loader-pulse {
+        width: 60px; height: 60px;
+        margin: 0 auto 1.5rem;
+        position: relative;
+    }
+    .loader-pulse::before, .loader-pulse::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: var(--brand);
+        opacity: 0.25;
+        animation: pulse 1.6s ease-out infinite;
+    }
+    .loader-pulse::after { animation-delay: 0.8s; }
+    @keyframes pulse {
+        0% { transform: scale(0.5); opacity: 0.6; }
+        100% { transform: scale(1.8); opacity: 0; }
+    }
+    .loader-pulse-core {
+        position: absolute; inset: 18px;
+        background: var(--brand);
+        border-radius: 50%;
+        box-shadow: 0 0 30px var(--brand-glow);
+    }
+    .loader-card h3 {
+        font-family: 'Fraunces', serif;
+        font-weight: 500;
+        font-size: 1.4rem;
+        margin: 0 0 0.4rem;
+    }
+    .loader-card p {
+        color: var(--plan-text-dim);
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    .loader-steps {
+        margin-top: 2rem;
+        display: flex; justify-content: center; gap: 0.5rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        color: var(--plan-text-faint);
+        letter-spacing: 0.1em;
+    }
+    .loader-steps span { padding: 0.3rem 0.6rem; border: 1px solid var(--plan-border); border-radius: 4px; }
+    .loader-steps span.active { color: var(--brand); border-color: var(--brand); }
+
+    /* Plan summary banner */
+    .plan-summary {
+        background: linear-gradient(135deg, rgba(16,183,254,0.07) 0%, rgba(16,183,254,0.02) 100%);
+        border: 1px solid var(--plan-border);
+        border-left: 3px solid var(--brand);
+        border-radius: 16px;
+        padding: 1.5rem 1.75rem;
+        margin-bottom: 1.5rem;
+    }
+    .plan-summary-meta {
+        display: flex; gap: 1.5rem; flex-wrap: wrap;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--plan-text-faint);
+        margin-bottom: 1rem;
+    }
+    .plan-summary-meta strong { color: var(--brand); font-weight: 500; }
+    .plan-summary-text {
+        font-family: 'Fraunces', serif;
+        font-size: 1.15rem;
+        line-height: 1.5;
+        color: var(--plan-text);
+        font-weight: 400;
+    }
+    .plan-themes {
+        margin-top: 1rem;
+        display: flex; flex-wrap: wrap; gap: 0.4rem;
+    }
+    .plan-themes .chip { cursor: default; pointer-events: none; }
+
+    /* Timeline / posts */
+    .timeline-header {
+        display: flex; justify-content: space-between; align-items: baseline;
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--plan-border);
+    }
+    .timeline-header h2 {
+        font-family: 'Fraunces', serif;
+        font-weight: 500;
+        font-size: 1.5rem;
+        letter-spacing: -0.01em;
+        margin: 0;
+    }
+    .timeline-header .count {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        color: var(--plan-text-dim);
+        letter-spacing: 0.1em;
+    }
+
+    .post-card {
+        background: var(--plan-surface);
+        border: 1px solid var(--plan-border);
+        border-radius: 18px;
+        margin-bottom: 1rem;
+        overflow: hidden;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+    .post-card:hover { border-color: var(--plan-border-strong); }
+
+    .post-head {
+        display: grid;
+        grid-template-columns: 90px 1fr auto;
+        gap: 1.25rem;
+        padding: 1.25rem 1.5rem;
+        align-items: center;
+        cursor: pointer;
+    }
+    .post-date {
+        text-align: center;
+        padding: 0.6rem 0.5rem;
+        background: rgba(0,0,0,0.25);
+        border: 1px solid var(--plan-border);
+        border-radius: 12px;
+    }
+    .post-date .day {
+        font-family: 'Fraunces', serif;
+        font-size: 1.6rem;
+        font-weight: 500;
+        line-height: 1;
+        color: var(--plan-text);
+    }
+    .post-date .month {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--brand);
+        margin-top: 0.3rem;
+    }
+    .post-date .dow {
+        font-size: 0.7rem;
+        color: var(--plan-text-faint);
+        margin-top: 0.2rem;
+    }
+    .post-info { min-width: 0; }
+    .post-info .title {
+        font-family: 'Fraunces', serif;
+        font-weight: 500;
+        font-size: 1.15rem;
+        margin: 0 0 0.4rem;
+        letter-spacing: -0.01em;
+    }
+    .post-info .badges { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        padding: 0.25rem 0.55rem;
+        border-radius: 4px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 500;
+    }
+    .badge.type-festival { background: rgba(255,184,77,0.12); color: var(--accent-warm); }
+    .badge.type-educational { background: rgba(125,217,255,0.12); color: #7dd9ff; }
+    .badge.type-offer { background: rgba(74,222,128,0.12); color: var(--success); }
+    .badge.type-trust { background: rgba(255,107,157,0.12); color: var(--accent-pink); }
+    .badge.type-engagement { background: rgba(167,139,250,0.15); color: #c4b5fd; }
+    .badge.platform { background: rgba(255,255,255,0.05); color: var(--plan-text-dim); }
+    .badge.occasion { background: rgba(16,183,254,0.1); color: var(--brand); }
+
+    .post-toggle {
+        width: 36px; height: 36px;
+        border: 1px solid var(--plan-border-strong);
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--plan-text-dim);
+        background: rgba(0,0,0,0.2);
+        transition: transform 0.2s, color 0.2s;
+    }
+    .post-card.expanded .post-toggle {
+        transform: rotate(180deg);
+        color: var(--brand);
+        border-color: var(--brand);
+    }
+
+    .post-body {
+        display: none;
+        padding: 0 1.5rem 1.5rem;
+        border-top: 1px solid var(--plan-border);
+    }
+    .post-card.expanded .post-body { display: block; }
+
+    .post-grid {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 1.5rem;
+        padding-top: 1.5rem;
+    }
+    @media (max-width: 768px) {
+        .post-grid { grid-template-columns: 1fr; }
+        .post-head { grid-template-columns: 70px 1fr auto; gap: 0.75rem; padding: 1rem; }
+    }
+
+    .post-section { margin-bottom: 1.25rem; }
+    .post-section-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--plan-text-faint);
+        margin-bottom: 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .copy-btn {
+        background: none;
+        border: 1px solid var(--plan-border);
+        color: var(--plan-text-dim);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        padding: 0.25rem 0.6rem;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.15s;
+        text-transform: uppercase;
+    }
+    .copy-btn:hover { color: var(--brand); border-color: var(--brand); }
+    .copy-btn.copied { color: var(--success); border-color: var(--success); }
+
+    .caption-text {
+        background: rgba(0,0,0,0.2);
+        border: 1px solid var(--plan-border);
+        border-radius: 10px;
+        padding: 1rem 1.1rem;
+        font-size: 0.92rem;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        color: var(--plan-text);
+    }
+    .hashtag-list {
+        display: flex; flex-wrap: wrap; gap: 0.3rem;
+    }
+    .hashtag {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        color: var(--brand);
+        background: rgba(16,183,254,0.07);
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+    }
+    .cta-text {
+        font-style: italic;
+        color: var(--plan-text-dim);
+        font-size: 0.9rem;
+    }
+
+    /* Image panel */
+    .image-panel {
+        background: rgba(0,0,0,0.25);
+        border: 1px solid var(--plan-border);
+        border-radius: 14px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .image-preview {
+        width: 100%;
+        aspect-ratio: 1/1;
+        background: linear-gradient(135deg, rgba(16,183,254,0.05), rgba(16,183,254,0.02));
+        border: 1px dashed var(--plan-border-strong);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .image-preview img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+    .image-placeholder {
+        text-align: center;
+        color: var(--plan-text-faint);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        padding: 1rem;
+    }
+    .image-placeholder svg { margin-bottom: 0.6rem; opacity: 0.5; }
+
+    .image-loading {
+        position: absolute; inset: 0;
+        background: rgba(10,14,20,0.85);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 0.75rem;
+    }
+    .image-loading .bar {
+        width: 60%;
+        height: 3px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 2px;
+        overflow: hidden;
+        position: relative;
+    }
+    .image-loading .bar::before {
+        content: "";
+        position: absolute; left: -40%; top: 0; bottom: 0;
+        width: 40%;
+        background: var(--brand);
+        animation: slide 1.4s ease-in-out infinite;
+    }
+    @keyframes slide {
+        0% { left: -40%; }
+        100% { left: 100%; }
+    }
+    .image-loading .text {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        color: var(--brand);
+        text-transform: uppercase;
+    }
+
+    .img-actions { display: flex; gap: 0.5rem; }
+    .img-btn {
+        flex: 1;
+        padding: 0.6rem 0.75rem;
+        background: rgba(16,183,254,0.1);
+        border: 1px solid rgba(16,183,254,0.3);
+        color: var(--brand);
+        border-radius: 8px;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.82rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+    }
+    .img-btn:hover { background: rgba(16,183,254,0.18); }
+    .img-btn.secondary {
+        background: rgba(255,255,255,0.04);
+        border-color: var(--plan-border-strong);
+        color: var(--plan-text-dim);
+    }
+    .img-btn.secondary:hover { color: var(--plan-text); }
+    .img-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .prompt-toggle {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        color: var(--plan-text-dim);
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        text-decoration: underline;
+        text-decoration-style: dotted;
+        text-underline-offset: 3px;
+    }
+    .prompt-toggle:hover { color: var(--brand); }
+    .prompt-box {
+        display: none;
+        background: rgba(0,0,0,0.3);
+        border: 1px solid var(--plan-border);
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        line-height: 1.5;
+        color: var(--plan-text-dim);
+        white-space: pre-wrap;
+        max-height: 220px;
+        overflow-y: auto;
+    }
+    .prompt-box.show { display: block; }
+
+    /* Past plans drawer */
+    .past-plans {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px dashed var(--plan-border);
+    }
+    .past-plans-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--plan-text-faint);
+        margin-bottom: 0.75rem;
+    }
+    .past-plan-item {
+        padding: 0.75rem;
+        background: rgba(0,0,0,0.2);
+        border: 1px solid var(--plan-border);
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: border-color 0.15s;
+        display: flex; justify-content: space-between; align-items: center;
+        gap: 0.5rem;
+    }
+    .past-plan-item:hover { border-color: var(--brand); }
+    .past-plan-item .pp-dates {
+        font-family: 'Fraunces', serif;
+        font-size: 0.95rem;
+    }
+    .past-plan-item .pp-meta {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        color: var(--plan-text-faint);
+        letter-spacing: 0.08em;
+    }
+    .past-plan-delete {
+        background: none;
+        border: none;
+        color: var(--plan-text-faint);
+        cursor: pointer;
+        padding: 4px;
+        opacity: 0.6;
+    }
+    .past-plan-delete:hover { color: var(--danger); opacity: 1; }
+
+    /* Toast */
+    .toast {
+        position: fixed;
+        bottom: 2rem; right: 2rem;
+        padding: 0.85rem 1.25rem;
+        background: var(--plan-surface-2);
+        border: 1px solid var(--plan-border-strong);
+        border-radius: 10px;
+        color: var(--plan-text);
+        font-size: 0.9rem;
+        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+        z-index: 1000;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.2s, transform 0.2s;
+        pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-left: 3px solid var(--success); }
+    .toast.error { border-left: 3px solid var(--danger); }
 </style>
 
-<div x-data="{ 
-        posts: [], 
-        isGenerating: false,
-        chatInput: ''
-    }" 
-    @update-calendar.window="posts = $event.detail;"
-    class="min-h-screen bg-zinc-50 font-sans flex flex-col">
-    
-    <header class="bg-white border-b border-zinc-200 px-6 py-4 flex flex-col sm:flex-row items-center justify-between sticky top-0 z-10 shadow-sm">
-        <div>
-            <h1 class="text-2xl font-extrabold text-zinc-900 tracking-tight">Content Planner</h1>
-            <p class="text-sm text-zinc-500">AI-powered strategy based on your brand data.</p>
+<div class="plan-root">
+    <!-- HERO -->
+    <header class="plan-hero">
+        <div class="plan-eyebrow">Hub · Content Calendar</div>
+        <h1 class="plan-title">Plan posts that <em>land</em>.</h1>
+        <p class="plan-subtitle">Pick a date range. Get a culturally-aware, festival-anchored social plan with captions, hashtags, and on-brand images — generated for {{ brand.business_profile.name|default:"your brand" }}.</p>
+
+        {% if has_brand %}
+        <div class="brand-strip">
+            <div class="brand-strip-item">
+                <span class="brand-strip-label">Brand</span>
+                <span class="brand-strip-value">{{ brand.business_profile.name }}</span>
+            </div>
+            <div class="brand-strip-item">
+                <span class="brand-strip-label">Industry</span>
+                <span class="brand-strip-value">{{ brand.business_profile.industry }}</span>
+            </div>
+            <div class="brand-strip-item">
+                <span class="brand-strip-label">Voice</span>
+                <span class="brand-strip-value">{{ brand.brand_assets.tone_of_voice }}</span>
+            </div>
+            <div class="brand-strip-item">
+                <span class="brand-strip-label">Palette</span>
+                <span class="brand-strip-value">
+                    {% for c in brand.brand_assets.brand_colors %}<span class="brand-color-dot" style="background-color: {{ c|safe|escapejs }}"></span>{% endfor %}
+                </span>
+            </div>
         </div>
-        
-        <form hx-post="{% url 'generate_calendar' %}" 
-              hx-target="#generation-alerts" 
-              @htmx:before-request="isGenerating = true"
-              @htmx:after-request="isGenerating = false"
-              class="flex items-center gap-4 mt-4 sm:mt-0">
-            {% csrf_token %}
-            <div>
-                <label class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">Start Date</label>
-                <input type="date" name="start_date" required class="block w-full rounded-lg border-zinc-300 bg-zinc-50 border p-2 text-sm focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1">End Date</label>
-                <input type="date" name="end_date" required class="block w-full rounded-lg border-zinc-300 bg-zinc-50 border p-2 text-sm focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
-            </div>
-            <div class="mt-5">
-                <button type="submit" :disabled="isGenerating" class="inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-semibold rounded-lg text-white bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 transition-colors">
-                    <span x-show="!isGenerating">Generate Strategy</span>
-                    <span x-show="isGenerating" class="flex items-center gap-2" x-cloak>
-                        <svg class="w-4 h-4 loader-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        Thinking...
-                    </span>
-                </button>
-            </div>
-        </form>
+        {% endif %}
     </header>
 
-    <div id="generation-alerts" class="px-6 pt-4"></div>
+    <!-- LAYOUT -->
+    <main class="plan-layout">
+        <!-- LEFT — generator -->
+        <aside class="gen-panel">
+            <h2 class="gen-panel-title">Generate a plan</h2>
+            <p class="gen-panel-sub">Festivals, finance moments, and your brand voice — all baked in.</p>
 
-  <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
-    <div class="flex-1 overflow-y-auto p-6 space-y-6">
-      <div
-        x-show="posts.length === 0 && !isGenerating"
-        class="flex flex-col items-center justify-center h-64 text-zinc-400"
-      >
-        <svg
-          class="w-12 h-12 mb-3"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-          ></path>
-        </svg>
-        <p>Select dates and generate to view your calendar.</p>
-      </div>
-
-      <template x-for="(post, index) in posts" :key="index">
-        <div
-          class="bg-white border border-zinc-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow relative"
-        >
-          <div
-            class="flex justify-between items-start mb-4 border-b border-zinc-100 pb-3"
-          >
-            <div class="flex items-center gap-3">
-              <input
-                type="date"
-                x-model="post.date"
-                class="font-bold text-zinc-900 border-none bg-transparent p-0 focus:ring-0 cursor-pointer"
-              />
-              <span
-                class="px-2.5 py-1 bg-zinc-100 text-zinc-600 text-xs font-bold rounded-md uppercase tracking-wide"
-                x-text="post.platform"
-              ></span>
-              <span
-                class="px-2.5 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-md uppercase tracking-wide"
-                x-text="post.post_type"
-              ></span>
+            <div class="field-group">
+                <label class="field-label">Date range</label>
+                <div class="date-row">
+                    <input type="date" id="start-date" />
+                    <input type="date" id="end-date" />
+                </div>
             </div>
-            <button class="text-zinc-400 hover:text-zinc-700">
-              <svg
-                class="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                ></path>
-              </svg>
+
+            <div class="field-group">
+                <label class="field-label">Frequency</label>
+                <div class="freq-chips" id="freq-chips">
+                    <div class="chip" data-value="daily"><span class="chip-tick">✓</span>Daily</div>
+                    <div class="chip active" data-value="alternate"><span class="chip-tick">✓</span>Alternate</div>
+                    <div class="chip" data-value="weekly_3"><span class="chip-tick">✓</span>3×/week</div>
+                    <div class="chip" data-value="weekly_2"><span class="chip-tick">✓</span>2×/week</div>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">Platforms</label>
+                <div class="platform-chips" id="platform-chips">
+                    <div class="chip active" data-value="instagram"><span class="chip-tick">✓</span>Instagram</div>
+                    <div class="chip active" data-value="facebook"><span class="chip-tick">✓</span>Facebook</div>
+                    <div class="chip" data-value="linkedin"><span class="chip-tick">✓</span>LinkedIn</div>
+                    <div class="chip" data-value="x_twitter"><span class="chip-tick">✓</span>X / Twitter</div>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">Extra notes (optional)</label>
+                <textarea id="notes" placeholder="e.g. push festival offer on credit cards, soft tone around women's day"></textarea>
+            </div>
+
+            <button class="gen-btn" id="generate-btn">
+                <span class="btn-label">Generate plan</span>
             </button>
-          </div>
 
-          <div class="space-y-4">
-            <div>
-              <label
-                class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1"
-                >Caption</label
-              >
-              <textarea
-                x-model="post.caption"
-                rows="3"
-                class="w-full text-zinc-800 bg-zinc-50 border border-zinc-200 rounded-lg p-3 text-sm focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none resize-none"
-              ></textarea>
+            <div class="err-box" id="err-box"></div>
+
+            <div class="past-plans" id="past-plans-wrap" {% if not plans %}style="display:none;"{% endif %}>
+                <div class="past-plans-title">Past plans</div>
+                <div id="past-plans-list">
+                    {% for p in plans reversed %}
+                    <div class="past-plan-item" data-plan-id="{{ p.id }}">
+                        <div>
+                            <div class="pp-dates">{{ p.start_date }} → {{ p.end_date }}</div>
+                            <div class="pp-meta">{{ p.posts|length }} posts · {{ p.frequency }}</div>
+                        </div>
+                        <button class="past-plan-delete" data-plan-id="{{ p.id }}" title="Delete">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-2 14H7L5 6"></path><path d="M10 11v6M14 11v6"></path></svg>
+                        </button>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
+        </aside>
 
-            <div>
-              <label
-                class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1"
-                >Hashtags</label
-              >
-              <input
-                type="text"
-                x-model="post.hashtags"
-                class="w-full text-blue-600 bg-zinc-50 border border-zinc-200 rounded-lg p-2 text-sm focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
-              />
+        <!-- RIGHT — results -->
+        <section class="results-col" id="results-col">
+            <div class="empty-state" id="empty-state">
+                <div class="empty-illustration">✦</div>
+                <h3>No plan yet</h3>
+                <p>Pick a date range on the left to generate your first AI-built social calendar. Indian festivals, financial moments, and your brand tone will be considered automatically.</p>
             </div>
-
-            <div
-              class="bg-zinc-50 p-4 rounded-lg border border-zinc-200 flex gap-4 items-start"
-            >
-              <div class="flex-1">
-                <label
-                  class="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-1"
-                  >Image Prompt (Imagen 4.0)</label
-                >
-                <textarea
-                  x-model="post.image_prompt"
-                  rows="2"
-                  class="w-full bg-white border border-zinc-300 rounded-md p-2 text-sm focus:border-blue-500 outline-none resize-none"
-                ></textarea>
-              </div>
-              <button
-                class="mt-5 inline-flex items-center px-4 py-2 bg-white border border-zinc-300 text-sm font-semibold rounded-lg text-zinc-700 hover:bg-zinc-100 transition-colors"
-              >
-                <svg
-                  class="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  ></path>
-                </svg>
-                Generate
-              </button>
-            </div>
-          </div>
-        </div>
-      </template>
-    </div>
-
-    <div
-      class="w-full lg:w-96 bg-white border-l border-zinc-200 flex flex-col h-[calc(100vh-80px)] sticky top-[80px]"
-    >
-      <div class="p-4 border-b border-zinc-100 bg-zinc-50">
-        <h3 class="font-bold text-zinc-900 flex items-center gap-2">
-          <svg
-            class="w-5 h-5 text-blue-500"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 10V3L4 14h7v7l9-11h-7z"
-            ></path>
-          </svg>
-          AI Editor
-        </h3>
-        <p class="text-xs text-zinc-500 mt-1">
-          Ask me to tweak the whole calendar!
-        </p>
-      </div>
-
-      <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50/50">
-        <div
-          class="bg-blue-50 border border-blue-100 text-blue-900 p-3 rounded-lg text-sm rounded-tl-none"
-        >
-          I've loaded your onboarding data. What would you like to adjust in the
-          strategy above?
-        </div>
-      </div>
-
-      <div class="p-4 bg-white border-t border-zinc-200">
-        <div class="relative">
-          <input
-            type="text"
-            x-model="chatInput"
-            placeholder='e.g. "Make captions more premium"'
-            class="w-full pl-4 pr-12 py-3 bg-zinc-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-          />
-          <button
-            class="absolute right-2 top-1.5 p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <svg
-              class="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M14 5l7 7m0 0l-7 7m7-7H3"
-              ></path>
-            </svg>
-          </button>
-        </div>
-        <div class="mt-4 flex gap-2">
-          <button
-            class="flex-1 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 transition-colors"
-          >
-            Export Plan
-          </button>
-        </div>
-      </div>
-    </div>
-  </main>
+        </section>
+    </main>
 </div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+    'use strict';
+
+    // ---- State ----
+    const state = {
+        frequency: 'alternate',
+        platforms: ['instagram', 'facebook'],
+        currentPlan: null,
+    };
+
+    // ---- Elements ----
+    const $ = (s, root) => (root || document).querySelector(s);
+    const $$ = (s, root) => Array.from((root || document).querySelectorAll(s));
+
+    const startDate = $('#start-date');
+    const endDate = $('#end-date');
+    const generateBtn = $('#generate-btn');
+    const errBox = $('#err-box');
+    const resultsCol = $('#results-col');
+    const toast = $('#toast');
+
+    // ---- Date defaults: tomorrow + 14 days ----
+    const today = new Date();
+    const tomorrow = new Date(today.getTime() + 86400000);
+    const twoWeeksOut = new Date(tomorrow.getTime() + 13 * 86400000);
+    const fmt = d => d.toISOString().slice(0, 10);
+    startDate.value = fmt(tomorrow);
+    endDate.value = fmt(twoWeeksOut);
+    startDate.min = fmt(today);
+
+    // ---- Chip handlers ----
+    $('#freq-chips').addEventListener('click', e => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        $$('#freq-chips .chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        state.frequency = chip.dataset.value;
+    });
+
+    $('#platform-chips').addEventListener('click', e => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        chip.classList.toggle('active');
+        state.platforms = $$('#platform-chips .chip.active').map(c => c.dataset.value);
+    });
+
+    // ---- Toast ----
+    let toastTimer;
+    function showToast(msg, type = 'success') {
+        toast.textContent = msg;
+        toast.className = `toast ${type} show`;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+    }
+
+    // ---- Error box ----
+    function showError(msg) {
+        errBox.textContent = msg;
+        errBox.classList.add('show');
+    }
+    function clearError() {
+        errBox.classList.remove('show');
+        errBox.textContent = '';
+    }
+
+    // ---- CSRF ----
+    function getCookie(name) {
+        const m = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return m ? decodeURIComponent(m[2]) : '';
+    }
+    const csrfToken = getCookie('csrftoken');
+
+    async function apiPost(url, body) {
+        const r = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify(body),
+            credentials: 'same-origin',
+        });
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+        return data;
+    }
+
+    // ---- Loader UI ----
+    function renderLoading() {
+        resultsCol.innerHTML = `
+            <div class="loader-card">
+                <div class="loader-pulse"><div class="loader-pulse-core"></div></div>
+                <h3>Crafting your plan…</h3>
+                <p>Analyzing your brand, mapping festivals, writing captions, and designing image briefs.</p>
+                <div class="loader-steps">
+                    <span class="active">SCAN BRAND</span>
+                    <span class="active">MAP FESTIVALS</span>
+                    <span class="active">WRITE</span>
+                    <span class="active">BRIEF IMAGES</span>
+                </div>
+            </div>`;
+    }
+
+    function renderEmpty() {
+        resultsCol.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-illustration">✦</div>
+                <h3>No plan yet</h3>
+                <p>Pick a date range on the left to generate your first AI-built social calendar.</p>
+            </div>`;
+    }
+
+    // ---- Render plan ----
+    const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    const DOW_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+    function escapeHtml(s) {
+        if (s == null) return '';
+        return String(s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function postCardHTML(post) {
+        const d = new Date(post.date + 'T00:00:00');
+        const day = d.getDate();
+        const month = MONTHS[d.getMonth()];
+        const dow = post.day_of_week || DOW_SHORT[d.getDay()];
+
+        const platformBadges = (post.platforms || []).map(p =>
+            `<span class="badge platform">${escapeHtml(p)}</span>`).join('');
+
+        const hashtags = (post.hashtags || []).map(h =>
+            `<span class="hashtag">${escapeHtml(h.startsWith('#') ? h : '#' + h)}</span>`).join('');
+
+        const hasImage = post.image_url && post.image_status === 'ready';
+        const isGenerating = post.image_status === 'generating';
+
+        return `
+        <article class="post-card" data-post-id="${escapeHtml(post.post_id)}">
+            <header class="post-head">
+                <div class="post-date">
+                    <div class="day">${day}</div>
+                    <div class="month">${month}</div>
+                    <div class="dow">${dow}</div>
+                </div>
+                <div class="post-info">
+                    <h3 class="title">${escapeHtml(post.title || post.occasion || 'Post')}</h3>
+                    <div class="badges">
+                        ${post.occasion ? `<span class="badge occasion">${escapeHtml(post.occasion)}</span>` : ''}
+                        <span class="badge type-${escapeHtml(post.post_type || 'educational')}">${escapeHtml(post.post_type || 'post')}</span>
+                        ${platformBadges}
+                    </div>
+                </div>
+                <div class="post-toggle">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+            </header>
+            <div class="post-body">
+                <div class="post-grid">
+                    <div>
+                        <div class="post-section">
+                            <div class="post-section-label">
+                                <span>Caption</span>
+                                <button class="copy-btn" data-copy="caption">Copy</button>
+                            </div>
+                            <div class="caption-text" data-caption>${escapeHtml(post.caption || '')}</div>
+                        </div>
+                        ${hashtags ? `
+                        <div class="post-section">
+                            <div class="post-section-label">
+                                <span>Hashtags</span>
+                                <button class="copy-btn" data-copy="hashtags">Copy</button>
+                            </div>
+                            <div class="hashtag-list" data-hashtags>${hashtags}</div>
+                        </div>` : ''}
+                        ${post.call_to_action ? `
+                        <div class="post-section">
+                            <div class="post-section-label"><span>Call to action</span></div>
+                            <div class="cta-text">→ ${escapeHtml(post.call_to_action)}</div>
+                        </div>` : ''}
+                    </div>
+                    <div>
+                        <div class="image-panel">
+                            <div class="image-preview" data-preview>
+                                ${hasImage ? `<img src="${escapeHtml(post.image_url)}" alt="${escapeHtml(post.title || '')}" />` : `
+                                <div class="image-placeholder">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                    <div>NO IMAGE YET</div>
+                                </div>`}
+                                ${isGenerating ? `
+                                <div class="image-loading">
+                                    <div class="bar"></div>
+                                    <div class="text">RENDERING</div>
+                                </div>` : ''}
+                            </div>
+                            <div class="img-actions">
+                                <button class="img-btn" data-action="generate-image">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l3.5 7L24 13l-7.5 3L13 23l-3.5-7L2 13l7.5-3z"></path></svg>
+                                    ${hasImage ? 'Regenerate' : 'Generate image'}
+                                </button>
+                                ${hasImage ? `<a class="img-btn secondary" href="${escapeHtml(post.image_url)}" target="_blank" download>Download</a>` : ''}
+                            </div>
+                            <button class="prompt-toggle" data-action="toggle-prompt">View image prompt ↓</button>
+                            <div class="prompt-box" data-prompt-box>${escapeHtml(post.image_prompt || '')}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>`;
+    }
+
+    function renderPlan(plan) {
+        state.currentPlan = plan;
+
+        const meta = `
+            <div class="plan-summary">
+                <div class="plan-summary-meta">
+                    <span><strong>${plan.start_date}</strong> → <strong>${plan.end_date}</strong></span>
+                    <span><strong>${plan.posts.length}</strong> posts</span>
+                    <span>Frequency: <strong>${plan.frequency}</strong></span>
+                </div>
+                <div class="plan-summary-text">${escapeHtml(plan.summary || '')}</div>
+                ${plan.themes && plan.themes.length ? `
+                <div class="plan-themes">
+                    ${plan.themes.map(t => `<span class="chip active">${escapeHtml(t)}</span>`).join('')}
+                </div>` : ''}
+            </div>`;
+
+        const header = `
+            <div class="timeline-header">
+                <h2>Your calendar</h2>
+                <span class="count">${plan.posts.length} POSTS · ${plan.start_date} → ${plan.end_date}</span>
+            </div>`;
+
+        const cards = plan.posts.map(postCardHTML).join('');
+
+        resultsCol.innerHTML = meta + header + cards;
+        attachPostHandlers();
+    }
+
+    // ---- Per-card handlers ----
+    function attachPostHandlers() {
+        $$('.post-card').forEach(card => {
+            const head = card.querySelector('.post-head');
+            head.addEventListener('click', e => {
+                if (e.target.closest('.post-toggle') || e.target === head || e.target.closest('.post-info') || e.target.closest('.post-date')) {
+                    card.classList.toggle('expanded');
+                }
+            });
+
+            // Stop body clicks from collapsing
+            card.querySelector('.post-body').addEventListener('click', e => e.stopPropagation());
+
+            const postId = card.dataset.postId;
+            const post = state.currentPlan.posts.find(p => p.post_id === postId);
+
+            // Copy buttons
+            card.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const which = btn.dataset.copy;
+                    let text = '';
+                    if (which === 'caption') text = post.caption || '';
+                    else if (which === 'hashtags') text = (post.hashtags || []).map(h => h.startsWith('#') ? h : '#' + h).join(' ');
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        btn.textContent = 'Copied';
+                        btn.classList.add('copied');
+                        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+                    } catch (err) {
+                        showToast('Copy failed', 'error');
+                    }
+                });
+            });
+
+            // Prompt toggle
+            const promptToggle = card.querySelector('[data-action="toggle-prompt"]');
+            const promptBox = card.querySelector('[data-prompt-box]');
+            if (promptToggle && promptBox) {
+                promptToggle.addEventListener('click', () => {
+                    const open = promptBox.classList.toggle('show');
+                    promptToggle.textContent = open ? 'Hide image prompt ↑' : 'View image prompt ↓';
+                });
+            }
+
+            // Image generate
+            const genBtn = card.querySelector('[data-action="generate-image"]');
+            if (genBtn) {
+                genBtn.addEventListener('click', () => generateImage(card, post));
+            }
+        });
+    }
+
+    async function generateImage(card, post) {
+        const preview = card.querySelector('[data-preview]');
+        const genBtn = card.querySelector('[data-action="generate-image"]');
+
+        // Add loading overlay
+        const oldOverlay = preview.querySelector('.image-loading');
+        if (oldOverlay) oldOverlay.remove();
+        const overlay = document.createElement('div');
+        overlay.className = 'image-loading';
+        overlay.innerHTML = '<div class="bar"></div><div class="text">RENDERING</div>';
+        preview.appendChild(overlay);
+        genBtn.disabled = true;
+
+        try {
+            const res = await apiPost('/hub/plan/image/', {
+                plan_id: state.currentPlan.id,
+                post_id: post.post_id,
+            });
+
+            // Update post in memory
+            post.image_url = res.image_url;
+            post.image_status = 'ready';
+
+            // Replace preview content
+            preview.innerHTML = `<img src="${res.image_url}" alt="${escapeHtml(post.title || '')}" />`;
+
+            // Update buttons
+            genBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l3.5 7L24 13l-7.5 3L13 23l-3.5-7L2 13l7.5-3z"></path></svg> Regenerate`;
+            const actions = card.querySelector('.img-actions');
+            if (!actions.querySelector('.img-btn.secondary')) {
+                const dl = document.createElement('a');
+                dl.className = 'img-btn secondary';
+                dl.href = res.image_url;
+                dl.target = '_blank';
+                dl.setAttribute('download', '');
+                dl.textContent = 'Download';
+                actions.appendChild(dl);
+            } else {
+                actions.querySelector('.img-btn.secondary').href = res.image_url;
+            }
+            showToast('Image generated', 'success');
+        } catch (err) {
+            console.error(err);
+            const ovl = preview.querySelector('.image-loading');
+            if (ovl) ovl.remove();
+            showToast(err.message || 'Image generation failed', 'error');
+        } finally {
+            genBtn.disabled = false;
+        }
+    }
+
+    // ---- Generate plan ----
+    generateBtn.addEventListener('click', async () => {
+        clearError();
+
+        if (!startDate.value || !endDate.value) {
+            showError('Please pick both dates.');
+            return;
+        }
+        if (startDate.value > endDate.value) {
+            showError('End date must be on or after start date.');
+            return;
+        }
+        if (state.platforms.length === 0) {
+            showError('Pick at least one platform.');
+            return;
+        }
+
+        const btnLabel = generateBtn.querySelector('.btn-label');
+        const oldLabel = btnLabel.textContent;
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '<span class="spinner"></span><span class="btn-label">Generating…</span>';
+
+        renderLoading();
+
+        try {
+            const plan = await apiPost('/hub/plan/generate/', {
+                start_date: startDate.value,
+                end_date: endDate.value,
+                frequency: state.frequency,
+                platforms: state.platforms,
+                notes: $('#notes').value.trim(),
+            });
+            renderPlan(plan);
+            showToast(`Plan ready · ${plan.posts.length} posts`, 'success');
+            await refreshPastPlans();
+        } catch (err) {
+            console.error(err);
+            renderEmpty();
+            showError(err.message || 'Could not generate plan. Try again.');
+        } finally {
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = `<span class="btn-label">${oldLabel}</span>`;
+        }
+    });
+
+    // ---- Past plans ----
+    async function refreshPastPlans() {
+        try {
+            const r = await fetch('/hub/plan/list/', { credentials: 'same-origin' });
+            const data = await r.json();
+            const wrap = $('#past-plans-wrap');
+            const list = $('#past-plans-list');
+            if (!data.plans || !data.plans.length) {
+                wrap.style.display = 'none';
+                return;
+            }
+            wrap.style.display = 'block';
+            list.innerHTML = data.plans.slice().reverse().map(p => `
+                <div class="past-plan-item" data-plan-id="${escapeHtml(p.id)}">
+                    <div>
+                        <div class="pp-dates">${p.start_date} → ${p.end_date}</div>
+                        <div class="pp-meta">${p.post_count} posts · ${p.frequency || ''}</div>
+                    </div>
+                    <button class="past-plan-delete" data-plan-id="${escapeHtml(p.id)}" title="Delete">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-2 14H7L5 6"></path><path d="M10 11v6M14 11v6"></path></svg>
+                    </button>
+                </div>`).join('');
+        } catch (err) { /* silent */ }
+    }
+
+    document.addEventListener('click', async e => {
+        const delBtn = e.target.closest('.past-plan-delete');
+        if (delBtn) {
+            e.stopPropagation();
+            if (!confirm('Delete this plan?')) return;
+            try {
+                await apiPost(`/hub/plan/${delBtn.dataset.planId}/delete/`, {});
+                await refreshPastPlans();
+                showToast('Plan deleted', 'success');
+            } catch (err) {
+                showToast('Delete failed', 'error');
+            }
+            return;
+        }
+        const item = e.target.closest('.past-plan-item');
+        if (item) {
+            await loadPastPlan(item.dataset.planId);
+        }
+    });
+
+    async function loadPastPlan(planId) {
+        try {
+            renderLoading();
+            const r = await fetch(`/hub/plan/${planId}/`, { credentials: 'same-origin' });
+            if (!r.ok) throw new Error('Could not load plan');
+            const plan = await r.json();
+            renderPlan(plan);
+            showToast('Plan loaded', 'success');
+        } catch (err) {
+            renderEmpty();
+            showToast(err.message || 'Load failed', 'error');
+        }
+    }
+})();
+</script>
 {% endblock %}
