@@ -6,12 +6,16 @@ import mimetypes
 from datetime import datetime, timedelta, date
 
 import requests
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import HubUser, BusinessProfile, GeneratedPlan, GeneratedPost
 
 
 # ============================================================
@@ -25,9 +29,82 @@ AIML_IMAGE_MODEL = "google/nano-banana-pro"
 
 
 # ============================================================
-# HUB HOME (UNCHANGED — kept exactly as you had it)
+# AUTH VIEWS
 # ============================================================
+def register_view(request):
+    if request.user.is_authenticated:
+        return redirect('hub_home')
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip().lower()
+        phone = request.POST.get('phone_number', '').strip()
+        password = request.POST.get('password', '')
+        confirm = request.POST.get('confirm_password', '')
+
+        errors = []
+        if not email:
+            errors.append('Email is required.')
+        if not password:
+            errors.append('Password is required.')
+        if password != confirm:
+            errors.append('Passwords do not match.')
+        if HubUser.objects.filter(email=email).exists():
+            errors.append('An account with this email already exists.')
+
+        if errors:
+            for e in errors:
+                messages.error(request, e)
+            return render(request, 'hub/register.html', {'email': email, 'phone_number': phone})
+
+        username = email.split('@')[0]
+        # ensure unique username
+        base = username
+        counter = 1
+        while HubUser.objects.filter(username=username).exists():
+            username = f"{base}{counter}"
+            counter += 1
+
+        HubUser.objects.create_user(
+            username=username, email=email, password=password, phone_number=phone
+        )
+        messages.success(request, 'Account created successfully! Please sign in.')
+        return redirect('login')
+
+    return render(request, 'hub/register.html')
+
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('hub_home')
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip().lower()
+        password = request.POST.get('password', '')
+
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            login(request, user)
+            next_url = request.GET.get('next', 'hub_home')
+            return redirect(next_url)
+        else:
+            messages.error(request, 'Invalid email or password.')
+            return render(request, 'hub/login.html', {'email': email})
+
+    return render(request, 'hub/login.html')
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+
+# ============================================================
+# HUB HOME — requires login, saves to DB
+# ============================================================
+@login_required
 def hub_home(request):
+    # If user already completed onboarding, skip to plan
+    if hasattr(request.user, 'business_profile'):
+        return redirect('hub_plan')
+
     if request.method == 'POST':
         fs = FileSystemStorage()
 
@@ -49,62 +126,29 @@ def hub_home(request):
             desc = ref_descriptions[index] if index < len(ref_descriptions) else ""
             references_data.append({"url": img_url, "description": desc})
 
-        # 3. Structure the Data Dictionary
-        data = {
-            "business_profile": {
-                "name": request.POST.get('name', ''),
-                "industry": request.POST.get('industry', ''),
-                "website": request.POST.get('website', ''),
-                "target_audience": request.POST.get('target_audience', ''),
-                "goals": request.POST.get('goals', '')
-            },
-            "brand_assets": {
-                "logo_url": logo_path,
-                "brand_colors": request.POST.getlist('brand_colors'),
-                "references": references_data,
-                "fonts": request.POST.get('fonts', ''),
-                "tone_of_voice": request.POST.get('tone_of_voice', '')
-            },
-            "social_handles": {
-                "instagram": request.POST.get('instagram', ''),
-                "facebook": request.POST.get('facebook', ''),
-                "x_twitter": request.POST.get('x_twitter', ''),
-                "linkedin": request.POST.get('linkedin', ''),
-                "discord": request.POST.get('discord', ''),
-                "youtube": request.POST.get('youtube', ''),
-                "tiktok": request.POST.get('tiktok', '')
-            }
-        }
+        # 3. Save to Database
+        BusinessProfile.objects.create(
+            user=request.user,
+            business_name=request.POST.get('name', ''),
+            industry=request.POST.get('industry', ''),
+            website=request.POST.get('website', ''),
+            target_audience=request.POST.get('target_audience', ''),
+            goals=request.POST.get('goals', ''),
+            logo_url=logo_path,
+            brand_colors=request.POST.getlist('brand_colors'),
+            references=references_data,
+            fonts=request.POST.get('fonts', ''),
+            tone_of_voice=request.POST.get('tone_of_voice', ''),
+            instagram=request.POST.get('instagram', ''),
+            facebook=request.POST.get('facebook', ''),
+            x_twitter=request.POST.get('x_twitter', ''),
+            linkedin=request.POST.get('linkedin', ''),
+            discord=request.POST.get('discord', ''),
+            youtube=request.POST.get('youtube', ''),
+            tiktok=request.POST.get('tiktok', ''),
+        )
 
-        # 4. Save to JSON File
-        json_dir = os.path.join(settings.BASE_DIR, 'data')
-        os.makedirs(json_dir, exist_ok=True)
-        json_path = os.path.join(json_dir, 'onboarding_data.json')
-
-        existing_data = []
-        if os.path.exists(json_path):
-            with open(json_path, 'r') as f:
-                try:
-                    existing_data = json.load(f)
-                except json.JSONDecodeError:
-                    pass
-
-        existing_data.append(data)
-
-        with open(json_path, 'w') as f:
-            json.dump(existing_data, f, indent=4)
-
-        return HttpResponse('''
-            <div class="flex flex-col items-center justify-center p-12 bg-white rounded-2xl shadow-2xl border border-gray-100 animate-fade-in-up">
-                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                    <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                </div>
-                <h3 class="text-3xl font-extrabold text-gray-900">Onboarding Complete!</h3>
-                <p class="mt-3 text-gray-500 text-center max-w-md">Your business profile is set up. We've securely saved your brand assets and information.</p>
-            </div>
-        ''')
+        return redirect('hub_plan')
 
     return render(request, "hub/hub_home.html")
 
@@ -319,9 +363,12 @@ def _observances_in_range(start: date, end: date):
 # ============================================================
 # HUB PLAN — page render
 # ============================================================
+@login_required
 def hub_plan(request):
-    brand = _load_brand_data()
-    plans = _load_plans()
+    profile = getattr(request.user, 'business_profile', None)
+    brand = profile.to_brand_dict() if profile else None
+    db_plans = GeneratedPlan.objects.filter(user=request.user)
+    plans = [p.to_dict() for p in db_plans]
     return render(request, "hub/hub_plan.html", {
         "brand": brand,
         "plans": plans,
@@ -362,9 +409,13 @@ def generate_plan(request):
     if (end_d - start_d).days > 92:
         return JsonResponse({"error": "Range too large. Please pick up to 90 days."}, status=400)
 
-    brand = _load_brand_data()
-    if not brand:
+    # Load brand from authenticated user's DB profile
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Login required."}, status=401)
+    profile = getattr(request.user, 'business_profile', None)
+    if not profile:
         return JsonResponse({"error": "No brand data found. Complete onboarding first."}, status=400)
+    brand = profile.to_brand_dict()
 
     observances = _observances_in_range(start_d, end_d)
     total_days = (end_d - start_d).days + 1
@@ -487,30 +538,44 @@ Respond with a single JSON object of this shape (and NOTHING else):
             "raw": raw[:1500],
         }, status=502)
 
-    # Stamp + persist
-    plan_record = {
-        "id": datetime.utcnow().strftime("%Y%m%d%H%M%S%f"),
-        "created_at": datetime.utcnow().isoformat() + "Z",
-        "start_date": start_str,
-        "end_date": end_str,
-        "frequency": frequency,
-        "platforms": platforms,
-        "summary": parsed.get("summary", ""),
-        "themes": parsed.get("themes", []),
-        "posts": parsed.get("posts", []),
-    }
+    # Stamp + persist to DB
+    plan_id = datetime.utcnow().strftime("%Y%m%d%H%M%S%f")
+    
+    plan_record = GeneratedPlan.objects.create(
+        user=request.user,
+        plan_id=plan_id,
+        start_date=start_d,
+        end_date=end_d,
+        frequency=frequency,
+        platforms=platforms,
+        summary=parsed.get("summary", ""),
+        themes=parsed.get("themes", [])
+    )
 
-    # Give every post a stable id and an empty image slot
-    for i, p in enumerate(plan_record["posts"]):
-        p["post_id"] = f"{plan_record['id']}-{i}"
-        p.setdefault("image_url", "")
-        p.setdefault("image_status", "pending")  # pending | generating | ready | failed
+    posts_data = parsed.get("posts", [])
+    for i, p in enumerate(posts_data):
+        post_id = f"{plan_id}-{i}"
+        GeneratedPost.objects.create(
+            plan=plan_record,
+            post_id=post_id,
+            sort_order=i,
+            date=p.get("date", ""),
+            day_of_week=p.get("day_of_week", ""),
+            occasion=p.get("occasion", ""),
+            post_type=p.get("post_type", ""),
+            platforms=p.get("platforms", []),
+            title=p.get("title", ""),
+            caption=p.get("caption", ""),
+            hashtags=p.get("hashtags", []),
+            call_to_action=p.get("call_to_action", ""),
+            image_prompt=p.get("image_prompt", ""),
+            image_aspect_ratio=p.get("image_aspect_ratio", "1:1"),
+            color_palette_hint=p.get("color_palette_hint", []),
+            image_url="",
+            image_status="pending"
+        )
 
-    plans = _load_plans()
-    plans.append(plan_record)
-    _save_plans(plans)
-
-    return JsonResponse(plan_record)
+    return JsonResponse(plan_record.to_dict())
 
 
 # ============================================================
@@ -531,21 +596,22 @@ def generate_post_image(request):
     if not plan_id or not post_id:
         return JsonResponse({"error": "plan_id and post_id required"}, status=400)
 
-    plans = _load_plans()
-    plan = next((p for p in plans if p["id"] == plan_id), None)
-    if not plan:
+    try:
+        plan = GeneratedPlan.objects.get(plan_id=plan_id, user=request.user)
+    except GeneratedPlan.DoesNotExist:
         return JsonResponse({"error": "Plan not found"}, status=404)
 
-    post = next((p for p in plan["posts"] if p.get("post_id") == post_id), None)
-    if not post:
+    try:
+        post = plan.posts.get(post_id=post_id)
+    except GeneratedPost.DoesNotExist:
         return JsonResponse({"error": "Post not found"}, status=404)
 
-    prompt = custom_prompt or post.get("image_prompt", "")
+    prompt = custom_prompt or post.image_prompt
     if not prompt:
         return JsonResponse({"error": "No image prompt available"}, status=400)
 
     # Map aspect ratio
-    ar = post.get("image_aspect_ratio", "1:1")
+    ar = post.image_aspect_ratio or "1:1"
     valid_ar = {"21:9", "1:1", "4:3", "3:2", "2:3", "5:4", "3:4", "16:9", "9:16"}
     if ar not in valid_ar:
         ar = "1:1"
@@ -553,24 +619,24 @@ def generate_post_image(request):
     try:
         img_url = _call_image_gen(prompt, aspect_ratio=ar, resolution="2K")
     except requests.HTTPError as e:
-        post["image_status"] = "failed"
-        _save_plans(plans)
+        post.image_status = "failed"
+        post.save()
         return JsonResponse({"error": f"Image API error: {e.response.text[:300]}"}, status=502)
     except requests.RequestException as e:
-        post["image_status"] = "failed"
-        _save_plans(plans)
+        post.image_status = "failed"
+        post.save()
         return JsonResponse({"error": f"Network error: {str(e)}"}, status=502)
 
     if not img_url:
-        post["image_status"] = "failed"
-        _save_plans(plans)
+        post.image_status = "failed"
+        post.save()
         return JsonResponse({"error": "No image returned"}, status=502)
 
-    post["image_url"] = img_url
-    post["image_status"] = "ready"
+    post.image_url = img_url
+    post.image_status = "ready"
     if custom_prompt:
-        post["image_prompt"] = custom_prompt
-    _save_plans(plans)
+        post.image_prompt = custom_prompt
+    post.save()
 
     return JsonResponse({
         "post_id": post_id,
@@ -582,35 +648,38 @@ def generate_post_image(request):
 # ============================================================
 # LIST / GET / DELETE PLANS
 # ============================================================
+@login_required
 def list_plans(request):
-    plans = _load_plans()
+    plans = GeneratedPlan.objects.filter(user=request.user)
     # Lightweight list (without full posts payload)
     summary = [{
-        "id": p["id"],
-        "created_at": p.get("created_at"),
-        "start_date": p["start_date"],
-        "end_date": p["end_date"],
-        "frequency": p.get("frequency"),
-        "post_count": len(p.get("posts", [])),
-        "summary": p.get("summary", "")[:200],
+        "id": p.plan_id,
+        "created_at": p.created_at.isoformat() + "Z" if p.created_at else "",
+        "start_date": str(p.start_date),
+        "end_date": str(p.end_date),
+        "frequency": p.frequency,
+        "post_count": p.posts.count(),
+        "summary": p.summary[:200],
     } for p in plans]
     return JsonResponse({"plans": summary})
 
 
+@login_required
 def get_plan(request, plan_id):
-    plans = _load_plans()
-    plan = next((p for p in plans if p["id"] == plan_id), None)
-    if not plan:
+    try:
+        plan = GeneratedPlan.objects.get(plan_id=plan_id, user=request.user)
+        return JsonResponse(plan.to_dict())
+    except GeneratedPlan.DoesNotExist:
         return JsonResponse({"error": "Plan not found"}, status=404)
-    return JsonResponse(plan)
 
 
+@login_required
 @require_POST
 @csrf_exempt
 def delete_plan(request, plan_id):
-    plans = _load_plans()
-    new_plans = [p for p in plans if p["id"] != plan_id]
-    if len(new_plans) == len(plans):
+    try:
+        plan = GeneratedPlan.objects.get(plan_id=plan_id, user=request.user)
+        plan.delete()
+        return JsonResponse({"ok": True})
+    except GeneratedPlan.DoesNotExist:
         return JsonResponse({"error": "Plan not found"}, status=404)
-    _save_plans(new_plans)
-    return JsonResponse({"ok": True})

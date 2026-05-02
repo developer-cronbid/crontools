@@ -90,5 +90,62 @@
                 "image_status": "ready"
             }
         ]
+    },
+    {
+        "id": "20260502074214829358",
+        "created_at": "2026-05-02T07:42:14.829358Z",
+        "start_date": "2026-05-02",
+        "end_date": "2026-05-02",
+        "frequency": "alternate",
+        "platforms": [
+            "instagram",
+            "facebook"
+        ],
+        "summary": "This single-day plan for MHE Bazaar focuses on an educational post designed to establish authority in the material handling equipment space. By debunking common myths about warehouse equipment selection, we position MHE Bazaar as a trusted knowledge partner for startups, SMEs, and local businesses looking to optimize their operations and scale efficiently.",
+        "themes": [
+            "Warehouse Efficiency & Equipment Education"
+        ],
+        "posts": [
+            {
+                "date": "2026-05-02",
+                "day_of_week": "Saturday",
+                "occasion": "Educational",
+                "post_type": "educational",
+                "platforms": [
+                    "instagram",
+                    "facebook"
+                ],
+                "title": "5 Myths About Material Handling Equipment Busted",
+                "caption": "\ud83d\ude9c Still believing these MHE myths? Let's set the record straight!\n\nMyth 1: \"Only large warehouses need MHE.\"\nMyth 2: \"Manual handling is always cheaper.\"\nMyth 3: \"All forklifts are the same.\"\nMyth 4: \"Used equipment is unreliable.\"\nMyth 5: \"Electric MHE can't handle heavy loads.\"\n\n\u274c Wrong on all counts.\n\nWhether you're a startup scaling up or an SME optimizing operations \u2014 the RIGHT equipment saves time, money & manpower.\n\n\ud83d\udca1 Don't let myths hold your business back.\n\ud83d\udc49 Explore smart MHE solutions at mhebazar.in\n\n#MHEBazaar #MaterialHandling #WarehouseMyths #MHEFacts #ForkliftSolutions #SmartWarehousing #LogisticsIndia #WarehouseEfficiency #StartupLogistics #SMEGrowth #ElectricForklifts #IndustrialEquipment #SupplyChainIndia #MHEExperts",
+                "hashtags": [
+                    "#MHEBazaar",
+                    "#MaterialHandling",
+                    "#WarehouseMyths",
+                    "#MHEFacts",
+                    "#ForkliftSolutions",
+                    "#SmartWarehousing",
+                    "#LogisticsIndia",
+                    "#WarehouseEfficiency",
+                    "#StartupLogistics",
+                    "#SMEGrowth",
+                    "#ElectricForklifts",
+                    "#IndustrialEquipment",
+                    "#SupplyChainIndia",
+                    "#MHEExperts"
+                ],
+                "call_to_action": "Explore the right MHE solutions for your business at mhebazar.in",
+                "image_prompt": "Professional infographic-style carousel cover image for MHE Bazaar. Clean white warehouse background with five material handling equipment icons (forklift, pallet truck, reach truck, conveyor, electric stacker) arranged in a grid. Bold text overlay: \"5 MHE MYTHS BUSTED\" in white on a vibrant #3cb80f green banner. Brand name \"MHE Bazaar\" with logo in top corner. Professional & Authoritative tone. Modern flat illustration style with subtle 3D depth, green (#3cb80f) and white color scheme, industrial lighting mood. Ultra-detailed, sharp, HD, professional. Aspect ratio 1:1.",
+                "image_aspect_ratio": "1:1",
+                "color_palette_hint": [
+                    "#3cb80f",
+                    "#ffffff",
+                    "#1a1a1a",
+                    "#f5f5f5"
+                ],
+                "post_id": "20260502074214829358-0",
+                "image_url": "https://cdn.aimlapi.com/generations/openai-image-generation/1777707841474-3334d27d-ff68-4d37-bdfe-d39a118c192c.png",
+                "image_status": "ready"
+            }
+        ]
     }
 ]

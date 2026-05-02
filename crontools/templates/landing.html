@@ -11,9 +11,16 @@
             <div class="hidden md:flex space-x-8 items-center">
                 <a href="#platform" class="text-xs uppercase tracking-widest text-gray-400 hover:text-white transition">Platform</a>
                 <a href="#solutions" class="text-xs uppercase tracking-widest text-gray-400 hover:text-white transition">Solutions</a>
+                {% if user.is_authenticated %}
                 <a href="/hub/" class="border border-yellow-600/50 text-yellow-500 hover:bg-yellow-600 hover:text-black px-5 py-2 rounded transition duration-300 text-xs uppercase tracking-widest font-semibold">
                     Go to Hub
                 </a>
+                {% else %}
+                <a href="{% url 'login' %}" class="text-xs uppercase tracking-widest text-gray-400 hover:text-white transition">Login</a>
+                <a href="{% url 'register' %}" class="border border-yellow-600/50 text-yellow-500 hover:bg-yellow-600 hover:text-black px-5 py-2 rounded transition duration-300 text-xs uppercase tracking-widest font-semibold">
+                    Get Started
+                </a>
+                {% endif %}
             </div>
         </div>
     </nav>

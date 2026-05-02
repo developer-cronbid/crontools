@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'hub',
     'crontools',
     'django_htmx'
 ]
@@ -131,4 +132,9 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
+AUTH_USER_MODEL = 'hub.HubUser'
+AUTHENTICATION_BACKENDS = ['hub.backends.EmailBackend']
+LOGIN_URL = '/hub/login/'
+LOGIN_REDIRECT_URL = '/hub/'
