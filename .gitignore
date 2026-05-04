@@ -1,25 +1,44 @@
 # Virtual environment
-
 venv/
-
-# Environment variables (secrets)
-
+.env/
 .env
 
 # Python cache
+__pycache__/
+*.py[cod]
+*$py.class
 
-**pycache**/
-*.pyc
-
-# Django local database
-
-db.sqlite3
-
-# Logs
-
+# Django stuff
 *.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Static files (if you collect them)
+staticfiles/
+media/
+
+# Migrations (optional — usually KEEP these!)
+# */migrations/*
+# !*/migrations/__init__.py
 
 # OS files
-
 .DS_Store
 Thumbs.db
+
+# IDE/editor
+.vscode/
+.idea/
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# Coverage / testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Node (if using frontend tools)
+node_modules/

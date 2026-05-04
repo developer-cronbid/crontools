@@ -792,7 +792,7 @@
             <div class="brand-strip-item">
                 <span class="brand-strip-label">Palette</span>
                 <span class="brand-strip-value">
-                    {% for c in brand.brand_assets.brand_colors %}<span class="brand-color-dot" style="background-color: {{ c|safe|escapejs }}"></span>{% endfor %}
+                    {% for c in brand.brand_assets.brand_colors %}<span class="brand-color-dot" style="background-color: {{ c|safe }}"></span>{% endfor %}
                 </span>
             </div>
         </div>
