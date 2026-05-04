@@ -771,28 +771,28 @@
 <div class="plan-root">
     <!-- HERO -->
     <header class="plan-hero">
-        <div class="plan-eyebrow">Hub · Content Calendar</div>
-        <h1 class="plan-title">Plan posts that <em>land</em>.</h1>
-        <p class="plan-subtitle">Pick a date range. Get a culturally-aware, festival-anchored social plan with captions, hashtags, and on-brand images — generated for {{ brand.business_profile.name|default:"your brand" }}.</p>
+        <div class="plan-eyebrow">Video Studio · Content Calendar</div>
+        <h1 class="plan-title">Plan videos that <em>convert</em>.</h1>
+        <p class="plan-subtitle">Pick a date range. Get a culturally-aware, festival-anchored video plan with scripts, captions, hashtags, and AI video prompts — generated for {{ brand_obj.brand_name|default:"your brand" }}.</p>
 
         {% if has_brand %}
         <div class="brand-strip">
             <div class="brand-strip-item">
                 <span class="brand-strip-label">Brand</span>
-                <span class="brand-strip-value">{{ brand.business_profile.name }}</span>
+                <span class="brand-strip-value">{{ brand_obj.brand_name }}</span>
             </div>
             <div class="brand-strip-item">
                 <span class="brand-strip-label">Industry</span>
-                <span class="brand-strip-value">{{ brand.business_profile.industry }}</span>
+                <span class="brand-strip-value">{{ brand_obj.industry }}</span>
             </div>
             <div class="brand-strip-item">
-                <span class="brand-strip-label">Voice</span>
-                <span class="brand-strip-value">{{ brand.brand_assets.tone_of_voice }}</span>
+                <span class="brand-strip-label">Style</span>
+                <span class="brand-strip-value">{{ brand_obj.video_style }} · {{ brand_obj.tone }}</span>
             </div>
             <div class="brand-strip-item">
                 <span class="brand-strip-label">Palette</span>
                 <span class="brand-strip-value">
-                    {% for c in brand.brand_assets.brand_colors %}<span class="brand-color-dot" style="--bg: {{ c|default:'#000' }}; background-color: var(--bg);"></span>{% endfor %}
+                    {% for c in brand_obj.brand_colors %}<span class="brand-color-dot" style="--bg: {{ c|default:'#000' }}; background-color: var(--bg);"></span>{% endfor %}
                 </span>
             </div>
         </div>
@@ -803,8 +803,8 @@
     <main class="plan-layout">
         <!-- LEFT — generator -->
         <aside class="gen-panel">
-            <h2 class="gen-panel-title">Generate a plan</h2>
-            <p class="gen-panel-sub">Festivals, finance moments, and your brand voice — all baked in.</p>
+            <h2 class="gen-panel-title">Generate video plan</h2>
+            <p class="gen-panel-sub">Festivals, cultural moments, and your brand style — all scripted for video.</p>
 
             <div class="field-group">
                 <label class="field-label">Date range</label>
@@ -828,19 +828,19 @@
                 <label class="field-label">Platforms</label>
                 <div class="platform-chips" id="platform-chips">
                     <div class="chip active" data-value="instagram"><span class="chip-tick">✓</span>Instagram</div>
-                    <div class="chip active" data-value="facebook"><span class="chip-tick">✓</span>Facebook</div>
-                    <div class="chip" data-value="linkedin"><span class="chip-tick">✓</span>LinkedIn</div>
-                    <div class="chip" data-value="x_twitter"><span class="chip-tick">✓</span>X / Twitter</div>
+                    <div class="chip" data-value="youtube"><span class="chip-tick">✓</span>YouTube</div>
+                    <div class="chip" data-value="tiktok"><span class="chip-tick">✓</span>TikTok</div>
+                    <div class="chip" data-value="facebook"><span class="chip-tick">✓</span>Facebook</div>
                 </div>
             </div>
 
             <div class="field-group">
                 <label class="field-label">Extra notes (optional)</label>
-                <textarea id="notes" placeholder="e.g. push festival offer on credit cards, soft tone around women's day"></textarea>
+                <textarea id="notes" placeholder="e.g. focus on product demos, behind-the-scenes, cinematic transitions for Diwali"></textarea>
             </div>
 
             <button class="gen-btn" id="generate-btn">
-                <span class="btn-label">Generate plan</span>
+                <span class="btn-label">Generate video plan</span>
             </button>
 
             <div class="err-box" id="err-box"></div>
@@ -868,7 +868,7 @@
             <div class="empty-state" id="empty-state">
                 <div class="empty-illustration">✦</div>
                 <h3>No plan yet</h3>
-                <p>Pick a date range on the left to generate your first AI-built social calendar. Indian festivals, financial moments, and your brand tone will be considered automatically.</p>
+                <p>Pick a date range on the left to generate your first AI-built video calendar. Indian festivals, trending moments, and your brand style will shape every video prompt.</p>
             </div>
         </section>
     </main>
@@ -883,7 +883,7 @@
     // ---- State ----
     const state = {
         frequency: 'alternate',
-        platforms: ['instagram', 'facebook'],
+        platforms: ['instagram'],
         currentPlan: null,
     };
 
@@ -969,13 +969,13 @@
         resultsCol.innerHTML = `
             <div class="loader-card">
                 <div class="loader-pulse"><div class="loader-pulse-core"></div></div>
-                <h3>Crafting your plan…</h3>
-                <p>Analyzing your brand, mapping festivals, writing captions, and designing image briefs.</p>
+                <h3>Scripting your video plan…</h3>
+                <p>Analyzing your brand, mapping festivals, writing scripts, and designing video prompts.</p>
                 <div class="loader-steps">
                     <span class="active">SCAN BRAND</span>
                     <span class="active">MAP FESTIVALS</span>
-                    <span class="active">WRITE</span>
-                    <span class="active">BRIEF IMAGES</span>
+                    <span class="active">WRITE SCRIPTS</span>
+                    <span class="active">VIDEO PROMPTS</span>
                 </div>
             </div>`;
     }
@@ -1012,8 +1012,8 @@
         const hashtags = (post.hashtags || []).map(h =>
             `<span class="hashtag">${escapeHtml(h.startsWith('#') ? h : '#' + h)}</span>`).join('');
 
-        const hasImage = post.image_url && post.image_status === 'ready';
-        const isGenerating = post.image_status === 'generating';
+        const hasVideo = post.video_url && post.video_status === 'ready';
+        const isGenerating = post.video_status === 'generating' || post.video_status === 'processing';
 
         return `
         <article class="post-card" data-post-id="${escapeHtml(post.post_id)}">
@@ -1062,26 +1062,31 @@
                     <div>
                         <div class="image-panel">
                             <div class="image-preview" data-preview>
-                                ${hasImage ? `<img src="${escapeHtml(post.image_url)}" alt="${escapeHtml(post.title || '')}" />` : `
+                                ${hasVideo ? `<video src="${escapeHtml(post.video_url)}" controls style="width:100%;border-radius:10px;"></video>` : `
                                 <div class="image-placeholder">
-                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                    <div>NO IMAGE YET</div>
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                    <div>NO VIDEO YET</div>
                                 </div>`}
                                 ${isGenerating ? `
                                 <div class="image-loading">
                                     <div class="bar"></div>
-                                    <div class="text">RENDERING</div>
+                                    <div class="text">GENERATING VIDEO</div>
                                 </div>` : ''}
                             </div>
                             <div class="img-actions">
-                                <button class="img-btn" data-action="generate-image">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l3.5 7L24 13l-7.5 3L13 23l-3.5-7L2 13l7.5-3z"></path></svg>
-                                    ${hasImage ? 'Regenerate' : 'Generate image'}
+                                <button class="img-btn" data-action="generate-video">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                    ${hasVideo ? 'Regenerate' : 'Generate video'}
                                 </button>
-                                ${hasImage ? `<a class="img-btn secondary" href="${escapeHtml(post.image_url)}" target="_blank" download>Download</a>` : ''}
+                                ${hasVideo ? `<a class="img-btn secondary" href="${escapeHtml(post.video_url)}" target="_blank" download>Download</a>` : ''}
                             </div>
-                            <button class="prompt-toggle" data-action="toggle-prompt">View image prompt ↓</button>
-                            <div class="prompt-box" data-prompt-box>${escapeHtml(post.image_prompt || '')}</div>
+                            <button class="prompt-toggle" data-action="toggle-prompt">View video prompt ↓</button>
+                            <div class="prompt-box" data-prompt-box>${escapeHtml(post.video_prompt || '')}</div>
+                            ${post.script ? `
+                            <div style="margin-top:0.5rem">
+                                <button class="prompt-toggle" data-action="toggle-script">View script ↓</button>
+                                <div class="prompt-box" data-script-box>${escapeHtml(post.script)}</div>
+                            </div>` : ''}
                         </div>
                     </div>
                 </div>
@@ -1162,63 +1167,95 @@
                 });
             }
 
-            // Image generate
-            const genBtn = card.querySelector('[data-action="generate-image"]');
+            // Video generate
+            const genBtn = card.querySelector('[data-action="generate-video"]');
             if (genBtn) {
-                genBtn.addEventListener('click', () => generateImage(card, post));
+                genBtn.addEventListener('click', () => generateVideo(card, post));
+            }
+
+            // Script toggle
+            const scriptToggle = card.querySelector('[data-action="toggle-script"]');
+            const scriptBox = card.querySelector('[data-script-box]');
+            if (scriptToggle && scriptBox) {
+                scriptToggle.addEventListener('click', () => {
+                    const open = scriptBox.classList.toggle('show');
+                    scriptToggle.textContent = open ? 'Hide script ↑' : 'View script ↓';
+                });
             }
         });
     }
 
-    async function generateImage(card, post) {
+    async function generateVideo(card, post) {
         const preview = card.querySelector('[data-preview]');
-        const genBtn = card.querySelector('[data-action="generate-image"]');
+        const genBtn = card.querySelector('[data-action="generate-video"]');
 
-        // Add loading overlay
         const oldOverlay = preview.querySelector('.image-loading');
         if (oldOverlay) oldOverlay.remove();
         const overlay = document.createElement('div');
         overlay.className = 'image-loading';
-        overlay.innerHTML = '<div class="bar"></div><div class="text">RENDERING</div>';
+        overlay.innerHTML = '<div class="bar"></div><div class="text">GENERATING VIDEO</div>';
         preview.appendChild(overlay);
         genBtn.disabled = true;
 
         try {
-            const res = await apiPost('/hub/plan/image/', {
+            const res = await apiPost('/video/plan/generate-video/', {
                 plan_id: state.currentPlan.id,
                 post_id: post.post_id,
             });
 
-            // Update post in memory
-            post.image_url = res.image_url;
-            post.image_status = 'ready';
+            post.video_status = res.video_status || 'processing';
+            post.generation_task_id = res.generation_task_id || '';
 
-            // Replace preview content
-            preview.innerHTML = `<img src="${res.image_url}" alt="${escapeHtml(post.title || '')}" />`;
-
-            // Update buttons
-            genBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l3.5 7L24 13l-7.5 3L13 23l-3.5-7L2 13l7.5-3z"></path></svg> Regenerate`;
-            const actions = card.querySelector('.img-actions');
-            if (!actions.querySelector('.img-btn.secondary')) {
-                const dl = document.createElement('a');
-                dl.className = 'img-btn secondary';
-                dl.href = res.image_url;
-                dl.target = '_blank';
-                dl.setAttribute('download', '');
-                dl.textContent = 'Download';
-                actions.appendChild(dl);
+            if (res.video_url && res.video_status === 'ready') {
+                post.video_url = res.video_url;
+                preview.innerHTML = `<video src="${res.video_url}" controls style="width:100%;border-radius:10px;"></video>`;
+                showToast('Video ready!', 'success');
             } else {
-                actions.querySelector('.img-btn.secondary').href = res.image_url;
+                showToast('Video generation started. Polling for result...', 'success');
+                pollVideoStatus(card, post);
             }
-            showToast('Image generated', 'success');
         } catch (err) {
             console.error(err);
             const ovl = preview.querySelector('.image-loading');
             if (ovl) ovl.remove();
-            showToast(err.message || 'Image generation failed', 'error');
+            showToast(err.message || 'Video generation failed', 'error');
         } finally {
             genBtn.disabled = false;
         }
+    }
+
+    async function pollVideoStatus(card, post) {
+        const preview = card.querySelector('[data-preview]');
+        const maxAttempts = 60;
+        let attempts = 0;
+        const interval = setInterval(async () => {
+            attempts++;
+            try {
+                const r = await fetch(`/video/plan/${state.currentPlan.id}/post/${post.post_id}/status/`, { credentials: 'same-origin' });
+                const data = await r.json();
+                if (data.video_status === 'ready' && data.video_url) {
+                    clearInterval(interval);
+                    post.video_url = data.video_url;
+                    post.video_status = 'ready';
+                    preview.innerHTML = `<video src="${data.video_url}" controls style="width:100%;border-radius:10px;"></video>`;
+                    const actions = card.querySelector('.img-actions');
+                    const genBtn = card.querySelector('[data-action="generate-video"]');
+                    if (genBtn) genBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Regenerate';
+                    if (!actions.querySelector('.img-btn.secondary')) {
+                        const dl = document.createElement('a');
+                        dl.className = 'img-btn secondary'; dl.href = data.video_url; dl.target = '_blank'; dl.setAttribute('download', ''); dl.textContent = 'Download';
+                        actions.appendChild(dl);
+                    }
+                    showToast('Video ready!', 'success');
+                } else if (data.video_status === 'failed') {
+                    clearInterval(interval);
+                    const ovl = preview.querySelector('.image-loading');
+                    if (ovl) ovl.remove();
+                    showToast('Video generation failed', 'error');
+                }
+            } catch (_) {}
+            if (attempts >= maxAttempts) clearInterval(interval);
+        }, 10000);
     }
 
     // ---- Generate plan ----
@@ -1246,7 +1283,7 @@
         renderLoading();
 
         try {
-            const plan = await apiPost('/hub/plan/generate/', {
+            const plan = await apiPost('/video/plan/generate/', {
                 start_date: startDate.value,
                 end_date: endDate.value,
                 frequency: state.frequency,
@@ -1269,7 +1306,7 @@
     // ---- Past plans ----
     async function refreshPastPlans() {
         try {
-            const r = await fetch('/hub/plan/list/', { credentials: 'same-origin' });
+            const r = await fetch('/video/plan/list/', { credentials: 'same-origin' });
             const data = await r.json();
             const wrap = $('#past-plans-wrap');
             const list = $('#past-plans-list');
@@ -1297,7 +1334,7 @@
             e.stopPropagation();
             if (!confirm('Delete this plan?')) return;
             try {
-                await apiPost(`/hub/plan/${delBtn.dataset.planId}/delete/`, {});
+                await apiPost(`/video/plan/${delBtn.dataset.planId}/delete/`, {});
                 await refreshPastPlans();
                 showToast('Plan deleted', 'success');
             } catch (err) {
@@ -1314,7 +1351,7 @@
     async function loadPastPlan(planId) {
         try {
             renderLoading();
-            const r = await fetch(`/hub/plan/${planId}/`, { credentials: 'same-origin' });
+            const r = await fetch(`/video/plan/${planId}/`, { credentials: 'same-origin' });
             if (!r.ok) throw new Error('Could not load plan');
             const plan = await r.json();
             renderPlan(plan);

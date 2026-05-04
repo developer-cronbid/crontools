@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'hub',
+    'video',
     'crontools',
     'django_htmx'
 ]

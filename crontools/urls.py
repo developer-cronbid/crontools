@@ -21,6 +21,7 @@ from .views import landing
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("hub/", include("hub.urls")),
+    path("video/", include("video.urls")),
     path("", landing, name="landing"), 
 
 ]
