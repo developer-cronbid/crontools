@@ -148,7 +148,6 @@ class GeneratedPost(models.Model):
             "image_prompt": self.image_prompt,
             "image_aspect_ratio": self.image_aspect_ratio,
             "color_palette_hint": self.color_palette_hint,
-            "post_id": self.post_id,
             "image_url": self.image_url,
             "image_status": self.image_status,
         }

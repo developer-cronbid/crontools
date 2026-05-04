@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .auth-root {
+        min-height: 100vh;
+        background: #fafafa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Inter', -apple-system, sans-serif;
+        padding: 2rem 1rem;
+    }
+    .auth-card {
+        width: 100%;
+        max-width: 420px;
+        background: #fff;
+        border: 1px solid #e4e4e7;
+        border-radius: 16px;
+        padding: 2.5rem 2rem;
+    }
+    .auth-brand {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #18181b;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.25rem;
+    }
+    .auth-brand span { color: #ca8a04; }
+    .auth-subtitle {
+        font-size: 0.875rem;
+        color: #71717a;
+        margin-bottom: 2rem;
+    }
+    .auth-label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #3f3f46;
+        margin-bottom: 0.4rem;
+    }
+    .auth-input {
+        display: block;
+        width: 100%;
+        padding: 0.7rem 0.85rem;
+        border: 1px solid #d4d4d8;
+        border-radius: 10px;
+        background: #fafafa;
+        font-size: 0.9rem;
+        color: #18181b;
+        outline: none;
+        transition: border-color 0.15s, background 0.15s;
+        box-sizing: border-box;
+    }
+    .auth-input:focus {
+        border-color: #3b82f6;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+    }
+    .auth-field { margin-bottom: 1.25rem; }
+    .auth-btn {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        background: #18181b;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+        margin-top: 0.5rem;
+    }
+    .auth-btn:hover { background: #27272a; }
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+        color: #71717a;
+    }
+    .auth-footer a {
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .auth-footer a:hover { text-decoration: underline; }
+    .auth-alert {
+        padding: 0.7rem 1rem;
+        border-radius: 10px;
+        font-size: 0.82rem;
+        margin-bottom: 1.25rem;
+    }
+    .auth-alert.error {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+    }
+    .auth-alert.success {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #15803d;
+    }
+</style>
+
+<div class="auth-root">
+    <div class="auth-card">
+        <div class="auth-brand">Video<span>Studio</span></div>
+        <p class="auth-subtitle">Sign in to your account</p>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="auth-alert {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="post" action="{% url 'video_login' %}">
+            {% csrf_token %}
+            <div class="auth-field">
+                <label class="auth-label" for="email">Email</label>
+                <input class="auth-input" type="email" id="email" name="email" value="{{ email|default:'' }}" placeholder="you@example.com" required autofocus>
+            </div>
+            <div class="auth-field">
+                <label class="auth-label" for="password">Password</label>
+                <input class="auth-input" type="password" id="password" name="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="auth-btn">Sign In</button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account? <a href="{% url 'video_register' %}">Create one</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
