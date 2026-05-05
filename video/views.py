@@ -3,7 +3,10 @@ import os
 import re
 import uuid
 import requests
+import tempfile
 from datetime import datetime, timedelta, date
+
+from moviepy import VideoFileClip, concatenate_videoclips
 
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
@@ -14,65 +17,16 @@ from django.conf import settings
 from django.contrib import messages
 
 from hub.views import _call_claude, _extract_json_block, AIML_API_KEY, INDIAN_FESTIVALS_2026, RECURRING_FINANCE_DAYS
-from .models import VideoProfile, GeneratedVideoPlan, GeneratedVideoPost, VideoUser
-from .decorators import video_login_required
-
-# ============================================================
-# VIDEO AUTHENTICATION
-# ============================================================
-def video_login(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        try:
-            user = VideoUser.objects.get(email=email)
-            if user.verify_password(password):
-                request.session['video_user_id'] = user.id
-                return redirect('video_onboarding')
-            else:
-                messages.error(request, "Invalid password.")
-        except VideoUser.DoesNotExist:
-            messages.error(request, "User does not exist.")
-    return render(request, 'video/login.html')
-
-def video_register(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        phone = request.POST.get('phone_number', '')
-        password = request.POST.get('password')
-        confirm = request.POST.get('confirm_password')
-
-        if password != confirm:
-            messages.error(request, "Passwords do not match.")
-            return render(request, 'video/register.html', {"email": email, "phone_number": phone})
-        
-        if VideoUser.objects.filter(email=email).exists():
-            messages.error(request, "Email already registered in video hub.")
-            return render(request, 'video/register.html', {"email": email, "phone_number": phone})
-        
-        user = VideoUser(email=email, phone_number=phone)
-        user.set_password(password)
-        user.save()
-        
-        # Log them in
-        request.session['video_user_id'] = user.id
-        return redirect('video_onboarding')
-
-    return render(request, 'video/register.html')
-
-def video_logout(request):
-    if 'video_user_id' in request.session:
-        del request.session['video_user_id']
-    return redirect('video_login')
-
+from .models import VideoProfile, GeneratedVideoPlan, GeneratedVideoPost
+from django.contrib.auth.decorators import login_required
 
 # ============================================================
 # VIDEO ONBOARDING — identical to hub_home
 # ============================================================
-@video_login_required
+@login_required
 def video_onboarding(request):
     """Multi-step brand setup form for video. Redirects to video_plan if already set up."""
-    if hasattr(request.video_user, 'video_profile'):
+    if hasattr(request.user, 'video_profile'):
         return redirect('video_plan')
 
     if request.method == 'POST':
@@ -86,7 +40,7 @@ def video_onboarding(request):
             logo_path = fs.url(filename)
 
         profile = VideoProfile.objects.create(
-            user=request.video_user,
+            user=request.user,
             brand_name=request.POST.get('brand_name', ''),
             industry=request.POST.get('industry', ''),
             target_audience=request.POST.get('target_audience', ''),
@@ -116,15 +70,15 @@ def video_onboarding(request):
 # ============================================================
 # VIDEO PLAN — dashboard (mirrors hub_plan)
 # ============================================================
-@video_login_required
+@login_required
 def video_plan(request):
     """Main video studio dashboard — shows form + past plans."""
-    if not hasattr(request.video_user, 'video_profile'):
+    if not hasattr(request.user, 'video_profile'):
         return redirect('video_onboarding')
 
-    profile = request.video_user.video_profile
+    profile = request.user.video_profile
     brand = profile.to_brand_dict()
-    db_plans = GeneratedVideoPlan.objects.filter(user=request.video_user)
+    db_plans = GeneratedVideoPlan.objects.filter(user=request.user)
     plans = [p.to_dict() for p in db_plans]
     plans_json = json.dumps(plans)
 
@@ -166,6 +120,7 @@ def _video_observances_in_range(start: date, end: date):
 # ============================================================
 # GENERATE VIDEO PLAN — POST endpoint (mirrors generate_plan)
 # ============================================================
+@login_required
 @require_POST
 @csrf_exempt
 def generate_video_plan(request):
@@ -174,14 +129,6 @@ def generate_video_plan(request):
     Calls Claude to generate a date-by-date video content plan.
     Persists to DB and returns full plan JSON.
     """
-    if 'video_user_id' not in request.session:
-        return JsonResponse({"error": "Login required."}, status=401)
-        
-    try:
-        video_user = VideoUser.objects.get(id=request.session['video_user_id'])
-    except VideoUser.DoesNotExist:
-        return JsonResponse({"error": "Login required."}, status=401)
-
     try:
         body = json.loads(request.body.decode("utf-8"))
     except json.JSONDecodeError:
@@ -208,7 +155,7 @@ def generate_video_plan(request):
     if (end_d - start_d).days > 92:
         return JsonResponse({"error": "Range too large. Pick up to 90 days."}, status=400)
 
-    profile = getattr(video_user, 'video_profile', None)
+    profile = getattr(request.user, 'video_profile', None)
     if not profile:
         return JsonResponse({"error": "Complete video onboarding first."}, status=400)
 
@@ -246,7 +193,7 @@ Goals: {bp.get('goals','')}
 Video Style: {bp.get('video_style','')}
 Tone: {bp.get('tone','')}
 Brand Colors: {', '.join(bp.get('brand_colors', []))}
-Preferred Duration: 8 seconds (Google Veo 3 max — options: 4 | 6 | 8)
+Preferred Duration: 30 seconds (3 segments of 10 seconds each)
 Music Preference: {bp.get('music_preference','')}
 Voiceover Required: {bp.get('voiceover', False)}
 Active platforms: {', '.join([k for k,v in sh.items() if v])}
@@ -276,16 +223,16 @@ Extra notes: {extra_notes or '(none)'}
    - Engagement hook (trending reel format)
 3. For each video post, write captions that are platform-native.
 4. Hashtags: 8–15 relevant ones, mix branded + niche + broad.
-5. The video_prompt MUST be a complete, self-contained Google Veo 3 prompt optimised for
-   its 4K cinematic output with native audio generation.
+5. The video_prompt MUST be a complete, self-contained prompt for a 30-second cinematic video.
+   It MUST describe 3 sequential 10-second segments (Segment 1, Segment 2, Segment 3).
    Describe: scene setting, camera movement (pan, zoom, dolly, drone shot),
    subject action, lighting (golden hour, studio, neon), mood, color palette using
    brand colors {', '.join(bp.get('brand_colors', []))}, visual style ({bp.get('video_style','cinematic')}),
-   any spoken dialogue or voiceover text for Veo 3's native audio synthesis,
+   any spoken dialogue or voiceover text for native audio synthesis,
    ambient sound design (music genre, sound effects), and any text overlays needed.
    Mention brand name "{bp.get('brand_name','')}" and tone "{bp.get('tone','')}".
-   Include "ultra-detailed, cinematic, 4K, 8 seconds, professional" directives.
-   Keep prompts 80–150 words.
+   Include "ultra-detailed, cinematic, 4K, 30 seconds total (3 segments), professional" directives.
+   Keep prompts 150–250 words.
 6. The script field should be a short voiceover or on-screen text script (2–5 sentences max).
 7. Each post object MUST follow this exact schema:
    {{
@@ -332,7 +279,7 @@ Respond with a single JSON object (NOTHING else):
     plan_id = datetime.utcnow().strftime("%Y%m%d%H%M%S%f")
 
     plan_record = GeneratedVideoPlan.objects.create(
-        user=video_user,
+        user=request.user,
         plan_id=plan_id,
         start_date=start_d,
         end_date=end_d,
@@ -373,6 +320,7 @@ Respond with a single JSON object (NOTHING else):
 # GENERATE ACTUAL VIDEO for a specific post
 # Uses Google Veo 3 — best quality, 15-second, native audio
 # ============================================================
+@login_required
 @require_POST
 @csrf_exempt
 def generate_post_video(request):
@@ -380,14 +328,6 @@ def generate_post_video(request):
     Triggers Google Veo 3 video generation for a single post.
     Body: {plan_id, post_id, custom_prompt (optional)}
     """
-    if 'video_user_id' not in request.session:
-        return JsonResponse({"error": "Login required."}, status=401)
-        
-    try:
-        video_user = VideoUser.objects.get(id=request.session['video_user_id'])
-    except VideoUser.DoesNotExist:
-        return JsonResponse({"error": "Login required."}, status=401)
-
     try:
         body = json.loads(request.body.decode("utf-8"))
     except json.JSONDecodeError:
@@ -401,7 +341,7 @@ def generate_post_video(request):
         return JsonResponse({"error": "plan_id and post_id required"}, status=400)
 
     try:
-        plan = GeneratedVideoPlan.objects.get(plan_id=plan_id, user=video_user)
+        plan = GeneratedVideoPlan.objects.get(plan_id=plan_id, user=request.user)
     except GeneratedVideoPlan.DoesNotExist:
         return JsonResponse({"error": "Plan not found"}, status=404)
 
@@ -422,37 +362,40 @@ def generate_post_video(request):
     post.save()
 
     # -------------------------------------------------------
-    # Call Google Veo 3 via AIML API
-    # Model: google/veo3 — 4K, native audio, best quality
-    # Endpoint: POST /v2/generate/video/google/generation
+    # Call Minimax via AIML API
+    # Model: minimax — High quality, 10-second segments
+    # Endpoint: POST /v2/generate/video/minimax
     # -------------------------------------------------------
-    api_url = "https://api.aimlapi.com/v2/generate/video/google/generation"
+    api_url = "https://api.aimlapi.com/v2/generate/video/minimax"
     headers = {
         "Authorization": f"Bearer {AIML_API_KEY}",
         "Content-Type": "application/json"
     }
     payload = {
-        "model": "google/veo3",
+        "model": "minimax",
         "prompt": prompt,
-        "duration": 8,             # Max supported duration by Veo 3 API (4 | 6 | 8)
+        "duration": 10,
         "aspect_ratio": aspect_ratio,
-        "generate_audio": True,    # Veo 3 native synchronized audio
-        "enhance_prompt": True,    # AI prompt enhancement for best output quality
     }
 
     try:
-        api_res = requests.post(api_url, json=payload, headers=headers, timeout=60)
-        api_data = api_res.json()
+        task_ids = []
+        for _ in range(3):
+            api_res = requests.post(api_url, json=payload, headers=headers, timeout=60)
+            api_data = api_res.json()
+            
+            # Veo 3 returns the task id under "id"; fall back to "generation_id" just in case
+            task_id = api_data.get("id") or api_data.get("generation_id") or ""
+            if task_id:
+                task_ids.append(task_id)
 
-        # Veo 3 returns the task id under "id"; fall back to "generation_id" just in case
-        task_id = api_data.get("id") or api_data.get("generation_id") or ""
-
-        if not task_id:
+        if not task_ids:
             post.video_status = "failed"
             post.save()
-            return JsonResponse({"error": "AIML did not return a task ID: " + str(api_data)}, status=500)
+            return JsonResponse({"error": f"AIML did not return any task IDs. Raw response: {api_data}"}, status=500)
 
-        post.generation_task_id = task_id
+        post.sub_task_ids = task_ids
+        post.generation_task_id = task_ids[0] # Legacy tracking field
         if custom_prompt:
             post.video_prompt = custom_prompt
         post.save()
@@ -468,47 +411,94 @@ def generate_post_video(request):
 # ============================================================
 # POLL VIDEO STATUS for a specific post
 # ============================================================
-@video_login_required
+@login_required
 def video_post_status(request, plan_id, post_id):
     """Frontend polls this to check if the video is ready."""
     try:
-        plan = GeneratedVideoPlan.objects.get(plan_id=plan_id, user=request.video_user)
+        plan = GeneratedVideoPlan.objects.get(plan_id=plan_id, user=request.user)
         post = plan.video_posts.get(post_id=post_id)
     except (GeneratedVideoPlan.DoesNotExist, GeneratedVideoPost.DoesNotExist):
         return JsonResponse({"error": "Not found"}, status=404)
 
-    if post.video_status == "processing" and post.generation_task_id:
-        # Universal AIML polling endpoint — works for Veo 3 and all video models
+    if post.video_status == "processing" and post.sub_task_ids:
         api_url = "https://api.aimlapi.com/v2/video/generations"
         headers = {"Authorization": f"Bearer {AIML_API_KEY}"}
-        try:
-            res = requests.get(
-                api_url,
-                params={"generation_id": post.generation_task_id},
-                headers=headers,
-                timeout=30
-            )
-            if res.status_code == 200:
-                data = res.json()
-                api_status = data.get("status", "").lower()
-
-                if api_status in ['completed', 'success', 'ready', 'finished']:
-                    post.video_status = 'ready'
-                    # Veo 3 response shape: {"video": {"url": "..."}}
-                    # Also handle legacy/fallback shapes for safety
-                    post.video_url = (
-                        (data.get("video") or {}).get("url") or
-                        data.get("file_url") or
-                        data.get("video_url") or
-                        (data.get("output") or {}).get("video_url") or
-                        (data.get("output") or {}).get("url") or ""
-                    )
-                    post.save()
-                elif api_status in ['failed', 'error']:
-                    post.video_status = 'failed'
-                    post.save()
-        except Exception:
-            pass
+        
+        all_ready = True
+        has_failed = False
+        video_urls = []
+        
+        for t_id in post.sub_task_ids:
+            try:
+                res = requests.get(api_url, params={"generation_id": t_id}, headers=headers, timeout=30)
+                if res.status_code == 200:
+                    data = res.json()
+                    api_status = data.get("status", "").lower()
+                    
+                    if api_status in ['completed', 'success', 'ready', 'finished']:
+                        url = (
+                            (data.get("video") or {}).get("url") or
+                            data.get("file_url") or
+                            data.get("video_url") or
+                            (data.get("output") or {}).get("video_url") or
+                            (data.get("output") or {}).get("url") or ""
+                        )
+                        if url:
+                            video_urls.append(url)
+                        else:
+                            all_ready = False
+                    elif api_status in ['failed', 'error']:
+                        has_failed = True
+                    else:
+                        all_ready = False
+                else:
+                    all_ready = False
+            except Exception:
+                all_ready = False
+                
+        if has_failed:
+            post.video_status = 'failed'
+            post.save()
+            return JsonResponse(post.to_dict())
+            
+        elif all_ready and len(video_urls) == len(post.sub_task_ids):
+            # All clips are ready! Time to download and merge.
+            import os
+            try:
+                temp_dir = tempfile.mkdtemp()
+                clips = []
+                for idx, v_url in enumerate(video_urls):
+                    local_path = os.path.join(temp_dir, f"clip_{idx}.mp4")
+                    r = requests.get(v_url, stream=True)
+                    with open(local_path, 'wb') as f:
+                        for chunk in r.iter_content(chunk_size=8192):
+                            f.write(chunk)
+                    clips.append(VideoFileClip(local_path))
+                
+                final_clip = concatenate_videoclips(clips, method="compose")
+                
+                # Ensure media directory exists
+                media_root = os.path.join(settings.BASE_DIR, 'media', 'videos')
+                os.makedirs(media_root, exist_ok=True)
+                
+                output_filename = f"merged_{post.post_id.replace('-', '_')}.mp4"
+                output_path = os.path.join(media_root, output_filename)
+                
+                # Write final merged video
+                final_clip.write_videofile(output_path, codec='libx264', audio_codec='aac', logger=None)
+                
+                # Cleanup clips
+                for clip in clips:
+                    clip.close()
+                
+                post.video_status = 'ready'
+                post.is_merged = True
+                post.video_url = f"{settings.MEDIA_URL}videos/{output_filename}"
+                post.save()
+            except Exception as e:
+                post.video_status = 'failed'
+                post.save()
+                print(f"Error merging videos: {e}")
 
     return JsonResponse(post.to_dict())
 
@@ -516,9 +506,9 @@ def video_post_status(request, plan_id, post_id):
 # ============================================================
 # LIST / GET / DELETE PLANS
 # ============================================================
-@video_login_required
+@login_required
 def list_video_plans(request):
-    plans = GeneratedVideoPlan.objects.filter(user=request.video_user)
+    plans = GeneratedVideoPlan.objects.filter(user=request.user)
     summary = [{
         "id": p.plan_id,
         "created_at": p.created_at.isoformat() + "Z" if p.created_at else "",
@@ -531,21 +521,21 @@ def list_video_plans(request):
     return JsonResponse({"plans": summary})
 
 
-@video_login_required
+@login_required
 def get_video_plan(request, plan_id):
     try:
-        plan = GeneratedVideoPlan.objects.get(plan_id=plan_id, user=request.video_user)
+        plan = GeneratedVideoPlan.objects.get(plan_id=plan_id, user=request.user)
         return JsonResponse(plan.to_dict())
     except GeneratedVideoPlan.DoesNotExist:
         return JsonResponse({"error": "Plan not found"}, status=404)
 
 
-@video_login_required
+@login_required
 @require_POST
 @csrf_exempt
 def delete_video_plan(request, plan_id):
     try:
-        plan = GeneratedVideoPlan.objects.get(plan_id=plan_id, user=request.video_user)
+        plan = GeneratedVideoPlan.objects.get(plan_id=plan_id, user=request.user)
         plan.delete()
         return JsonResponse({"ok": True})
     except GeneratedVideoPlan.DoesNotExist:

@@ -3,9 +3,6 @@ from . import views
 
 urlpatterns = [
     path("", views.hub_home, name="hub_home"),
-    path("login/", views.login_view, name="login"),
-    path("register/", views.register_view, name="register"),
-    path("logout/", views.logout_view, name="logout"),
     path("plan/", views.hub_plan, name="hub_plan"),
 
     # Plan API

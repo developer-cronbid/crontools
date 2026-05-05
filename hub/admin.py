@@ -1,13 +1,5 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from .models import HubUser, BusinessProfile, GeneratedPlan, GeneratedPost
-
-
-@admin.register(HubUser)
-class HubUserAdmin(UserAdmin):
-    list_display = ('email', 'phone_number', 'is_active', 'date_joined')
-    search_fields = ('email', 'phone_number')
-    ordering = ('-date_joined',)
+from .models import BusinessProfile, GeneratedPlan, GeneratedPost
 
 
 @admin.register(BusinessProfile)

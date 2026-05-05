@@ -2,11 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Auth
-    path("login/", views.video_login, name="video_login"),
-    path("register/", views.video_register, name="video_register"),
-    path("logout/", views.video_logout, name="video_logout"),
-
     # Onboarding
     path("onboarding/", views.video_onboarding, name="video_onboarding"),
 

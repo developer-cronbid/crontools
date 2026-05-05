@@ -15,86 +15,16 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import HubUser, BusinessProfile, GeneratedPlan, GeneratedPost
-
+from .models import BusinessProfile, GeneratedPlan, GeneratedPost
 
 # ============================================================
 # AIML API CONFIG
 # ============================================================
-AIML_API_KEY = "6081d4afffd640d18ea529f1e4747f90"
+AIML_API_KEY = "1caa12b3cd1787b67fc7c2c6b60d065b"
 AIML_CHAT_URL = "https://api.aimlapi.com/v1/chat/completions"
 AIML_IMAGE_URL = "https://api.aimlapi.com/v1/images/generations"
 AIML_TEXT_MODEL = "anthropic/claude-opus-4-6"
 AIML_IMAGE_MODEL = "google/nano-banana-pro"
-
-
-# ============================================================
-# AUTH VIEWS
-# ============================================================
-def register_view(request):
-    if request.user.is_authenticated:
-        return redirect('hub_home')
-    if request.method == 'POST':
-        email = request.POST.get('email', '').strip().lower()
-        phone = request.POST.get('phone_number', '').strip()
-        password = request.POST.get('password', '')
-        confirm = request.POST.get('confirm_password', '')
-
-        errors = []
-        if not email:
-            errors.append('Email is required.')
-        if not password:
-            errors.append('Password is required.')
-        if password != confirm:
-            errors.append('Passwords do not match.')
-        if HubUser.objects.filter(email=email).exists():
-            errors.append('An account with this email already exists.')
-
-        if errors:
-            for e in errors:
-                messages.error(request, e)
-            return render(request, 'hub/register.html', {'email': email, 'phone_number': phone})
-
-        username = email.split('@')[0]
-        # ensure unique username
-        base = username
-        counter = 1
-        while HubUser.objects.filter(username=username).exists():
-            username = f"{base}{counter}"
-            counter += 1
-
-        HubUser.objects.create_user(
-            username=username, email=email, password=password, phone_number=phone
-        )
-        messages.success(request, 'Account created successfully! Please sign in.')
-        return redirect('login')
-
-    return render(request, 'hub/register.html')
-
-
-def login_view(request):
-    if request.user.is_authenticated:
-        return redirect('hub_home')
-    if request.method == 'POST':
-        email = request.POST.get('email', '').strip().lower()
-        password = request.POST.get('password', '')
-
-        user = authenticate(request, username=email, password=password)
-        if user is not None:
-            login(request, user)
-            next_url = request.GET.get('next', 'hub_home')
-            return redirect(next_url)
-        else:
-            messages.error(request, 'Invalid email or password.')
-            return render(request, 'hub/login.html', {'email': email})
-
-    return render(request, 'hub/login.html')
-
-
-def logout_view(request):
-    logout(request)
-    return redirect('login')
-
 
 # ============================================================
 # HUB HOME — requires login, saves to DB

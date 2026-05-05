@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'hub',
     'video',
+    'accounts',
     'crontools',
     'django_htmx'
 ]
@@ -135,7 +136,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
-AUTH_USER_MODEL = 'hub.HubUser'
-AUTHENTICATION_BACKENDS = ['hub.backends.EmailBackend']
-LOGIN_URL = '/hub/login/'
-LOGIN_REDIRECT_URL = '/hub/'
+AUTH_USER_MODEL = 'accounts.User'
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'landing'
+LOGOUT_REDIRECT_URL = 'landing'

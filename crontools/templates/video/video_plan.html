@@ -771,6 +771,10 @@
 <div class="plan-root">
     <!-- HERO -->
     <header class="plan-hero">
+        <div style="position: absolute; top: 1.5rem; right: 2rem; display: flex; gap: 1rem; align-items: center; z-index: 10;">
+            <span style="color: var(--plan-text-dim); font-size: 0.8rem;">{{ user.email }}</span>
+            <a href="{% url 'logout' %}" style="color: var(--brand); font-size: 0.8rem; text-decoration: none; border: 1px solid var(--plan-border); padding: 0.4rem 0.8rem; border-radius: 6px;">Logout</a>
+        </div>
         <div class="plan-eyebrow">Video Studio · Content Calendar</div>
         <h1 class="plan-title">Plan videos that <em>convert</em>.</h1>
         <p class="plan-subtitle">Pick a date range. Get a culturally-aware, festival-anchored video plan with scripts, captions, hashtags, and AI video prompts — generated for {{ brand_obj.brand_name|default:"your brand" }}.</p>

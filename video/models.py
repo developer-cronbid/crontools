@@ -1,27 +1,9 @@
 from django.db import models
-from django.contrib.auth.hashers import make_password, check_password
-
-
-class VideoUser(models.Model):
-    """Completely separate user model for video hub — NOT linked to HubUser."""
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=128)  # hashed
-    phone_number = models.CharField(max_length=20, blank=True, default='')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def set_password(self, raw_password):
-        self.password = make_password(raw_password)
-
-    def verify_password(self, raw_password):
-        return check_password(raw_password, self.password)
-
-    def __str__(self):
-        return self.email
-
+from django.conf import settings
 
 class VideoProfile(models.Model):
-    """Stores video onboarding form data, linked one-to-one with a VideoUser."""
-    user = models.OneToOneField(VideoUser, on_delete=models.CASCADE, related_name='video_profile')
+    """Stores video onboarding form data, linked one-to-one with a unified User."""
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='video_profile')
 
     brand_name = models.CharField(max_length=255, blank=True, default='')
     industry = models.CharField(max_length=255, blank=True, default='')
@@ -77,7 +59,7 @@ class VideoProfile(models.Model):
 
 class GeneratedVideoPlan(models.Model):
     """A full AI-generated video plan for a date range — mirrors GeneratedPlan."""
-    user = models.ForeignKey(VideoUser, on_delete=models.CASCADE, related_name='generated_video_plans')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='generated_video_plans')
     plan_id = models.CharField(max_length=30, unique=True)
 
     start_date = models.DateField()
@@ -140,6 +122,8 @@ class GeneratedVideoPost(models.Model):
     video_url = models.URLField(max_length=1000, blank=True, default='')
     video_status = models.CharField(max_length=20, default='pending')  # pending | processing | ready | failed
     generation_task_id = models.CharField(max_length=150, blank=True, default='')
+    sub_task_ids = models.JSONField(default=list, blank=True)
+    is_merged = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.post_id}: {self.title}"

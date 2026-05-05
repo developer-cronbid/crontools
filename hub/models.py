@@ -1,22 +1,9 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
-
-
-class HubUser(AbstractUser):
-    """Custom user model using email as the login field."""
-    email = models.EmailField(unique=True)
-    phone_number = models.CharField(max_length=20, blank=True, default='')
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
-
-    def __str__(self):
-        return self.email
-
+from django.conf import settings
 
 class BusinessProfile(models.Model):
     """Stores onboarding form data, linked one-to-one with a user."""
-    user = models.OneToOneField(HubUser, on_delete=models.CASCADE, related_name='business_profile')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='business_profile')
 
     # Business Profile
     business_name = models.CharField(max_length=255, blank=True, default='')
@@ -78,7 +65,7 @@ class BusinessProfile(models.Model):
 
 class GeneratedPlan(models.Model):
     """Stores each plan generation, linked to the user."""
-    user = models.ForeignKey(HubUser, on_delete=models.CASCADE, related_name='generated_plans')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='generated_plans')
     plan_id = models.CharField(max_length=30, unique=True)  # e.g. 20260430130208387207
     start_date = models.DateField()
     end_date = models.DateField()
@@ -136,6 +123,7 @@ class GeneratedPost(models.Model):
 
     def to_dict(self):
         return {
+            "post_id": self.post_id,
             "date": self.date,
             "day_of_week": self.day_of_week,
             "occasion": self.occasion,
