@@ -746,6 +746,403 @@
     }
     .past-plan-delete:hover { color: var(--danger); opacity: 1; }
 
+    /* ===== PHOTO COUNT PER PLATFORM ===== */
+    .platform-count-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 0.6rem;
+    }
+    .platform-count-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.55rem 0.75rem;
+        background: rgba(0,0,0,0.2);
+        border: 1px solid var(--plan-border);
+        border-radius: 9px;
+        transition: border-color 0.15s;
+    }
+    .platform-count-item.hidden { display: none; }
+    .platform-count-item:hover { border-color: var(--plan-border-strong); }
+    .platform-count-label {
+        flex: 1;
+        font-size: 0.82rem;
+        color: var(--plan-text-dim);
+        font-family: 'Inter', sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .platform-count-label .picon {
+        width: 18px; height: 18px;
+        border-radius: 4px;
+        background: rgba(255,255,255,0.07);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.72rem;
+    }
+    .count-stepper {
+        display: flex; align-items: center; gap: 0.4rem;
+    }
+    .count-stepper button {
+        width: 24px; height: 24px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid var(--plan-border-strong);
+        color: var(--plan-text);
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.9rem;
+        line-height: 1;
+        transition: background 0.12s, border-color 0.12s;
+    }
+    .count-stepper button:hover { background: rgba(16,183,254,0.15); border-color: var(--brand); color: var(--brand); }
+    .count-stepper .count-val {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        color: var(--plan-text);
+        min-width: 20px;
+        text-align: center;
+    }
+
+    /* ===== PENDING / 24HR STATE ===== */
+    .pending-state {
+        background: linear-gradient(160deg, var(--plan-surface) 0%, var(--plan-surface-2) 100%);
+        border: 1px solid var(--plan-border);
+        border-radius: 20px;
+        padding: 4rem 2rem 3.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .pending-state::before {
+        content: "";
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse at 50% -20%, rgba(16,183,254,0.08) 0%, transparent 60%);
+        pointer-events: none;
+    }
+    .pending-orbit {
+        width: 88px; height: 88px;
+        margin: 0 auto 2rem;
+        position: relative;
+    }
+    .pending-orbit-ring {
+        position: absolute; inset: 0;
+        border: 1.5px solid var(--plan-border-strong);
+        border-radius: 50%;
+        animation: orbitSpin 6s linear infinite;
+    }
+    .pending-orbit-ring::after {
+        content: "";
+        position: absolute;
+        top: -4px; left: 50%;
+        width: 8px; height: 8px;
+        background: var(--brand);
+        border-radius: 50%;
+        box-shadow: 0 0 12px var(--brand);
+        margin-left: -4px;
+    }
+    .pending-orbit-inner {
+        position: absolute; inset: 18px;
+        border: 1.5px dashed rgba(16,183,254,0.25);
+        border-radius: 50%;
+        animation: orbitSpin 3.5s linear infinite reverse;
+    }
+    .pending-orbit-core {
+        position: absolute; inset: 34px;
+        background: rgba(16,183,254,0.12);
+        border-radius: 50%;
+        border: 1px solid rgba(16,183,254,0.3);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem;
+    }
+    @keyframes orbitSpin { to { transform: rotate(360deg); } }
+    .pending-state h3 {
+        font-family: 'Fraunces', serif;
+        font-weight: 500;
+        font-size: 1.8rem;
+        margin: 0 0 0.6rem;
+    }
+    .pending-state p {
+        color: var(--plan-text-dim);
+        font-size: 0.95rem;
+        max-width: 440px;
+        margin: 0 auto 2rem;
+        line-height: 1.6;
+    }
+    .pending-timer {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.6rem 1.2rem;
+        background: rgba(16,183,254,0.06);
+        border: 1px solid rgba(16,183,254,0.25);
+        border-radius: 999px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        letter-spacing: 0.12em;
+        color: var(--brand);
+        margin-bottom: 2rem;
+    }
+    .pending-timer .dot {
+        width: 6px; height: 6px;
+        background: var(--brand);
+        border-radius: 50%;
+        animation: timerBlink 1.2s ease-in-out infinite;
+    }
+    @keyframes timerBlink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .pending-plan-summary {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    .pending-stat {
+        padding: 0.6rem 1rem;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--plan-border);
+        border-radius: 10px;
+        text-align: center;
+    }
+    .pending-stat .ps-val {
+        font-family: 'Fraunces', serif;
+        font-size: 1.3rem;
+        color: var(--plan-text);
+        display: block;
+    }
+    .pending-stat .ps-lbl {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--plan-text-faint);
+    }
+
+    /* ===== DUMMY ADMIN APPROVE BAR ===== */
+    .admin-bar {
+        display: none;
+        margin-bottom: 1.25rem;
+        padding: 1rem 1.25rem;
+        background: rgba(255,184,77,0.07);
+        border: 1px solid rgba(255,184,77,0.3);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .admin-bar-icon {
+        width: 36px; height: 36px;
+        background: rgba(255,184,77,0.15);
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    .admin-bar-text { flex: 1; min-width: 0; }
+    .admin-bar-text strong {
+        display: block;
+        font-size: 0.88rem;
+        color: var(--accent-warm);
+        margin-bottom: 0.15rem;
+    }
+    .admin-bar-text span {
+        font-size: 0.78rem;
+        color: var(--plan-text-faint);
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: 0.05em;
+    }
+    .admin-approve-btn {
+        padding: 0.55rem 1.2rem;
+        background: linear-gradient(135deg, #ffb84d 0%, #f59e0b 100%);
+        border: none;
+        border-radius: 8px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 0.82rem;
+        color: #1a1000;
+        cursor: pointer;
+        transition: transform 0.12s, box-shadow 0.12s;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .admin-approve-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px -6px rgba(255,184,77,0.5); }
+    .admin-approve-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* ===== POST APPROVAL ACTIONS ===== */
+    .post-approval {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--plan-border);
+    }
+    .approval-btn {
+        flex: 1;
+        padding: 0.7rem 1rem;
+        border-radius: 10px;
+        border: none;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+    }
+    .approval-btn.approve {
+        background: rgba(74,222,128,0.12);
+        border: 1.5px solid rgba(74,222,128,0.35);
+        color: var(--success);
+    }
+    .approval-btn.approve:hover {
+        background: rgba(74,222,128,0.2);
+        border-color: var(--success);
+        transform: translateY(-1px);
+    }
+    .approval-btn.approve.active {
+        background: rgba(74,222,128,0.2);
+        border-color: var(--success);
+        box-shadow: 0 4px 16px -6px rgba(74,222,128,0.4);
+    }
+    .approval-btn.reject {
+        background: rgba(239,68,68,0.08);
+        border: 1.5px solid rgba(239,68,68,0.25);
+        color: #fca5a5;
+    }
+    .approval-btn.reject:hover {
+        background: rgba(239,68,68,0.15);
+        border-color: var(--danger);
+        transform: translateY(-1px);
+    }
+    .approval-btn.reject.active {
+        background: rgba(239,68,68,0.15);
+        border-color: var(--danger);
+    }
+    /* Card-level approval status ring */
+    .post-card.approved { border-color: rgba(74,222,128,0.4); }
+    .post-card.rejected { border-color: rgba(239,68,68,0.3); }
+    .approval-status-badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        margin-left: 0.35rem;
+    }
+    .approval-status-badge.approved { background: rgba(74,222,128,0.12); color: var(--success); }
+    .approval-status-badge.rejected { background: rgba(239,68,68,0.1); color: #fca5a5; }
+
+    /* ===== FEEDBACK POPUP ===== */
+    .feedback-overlay {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.7);
+        backdrop-filter: blur(6px);
+        z-index: 500;
+        display: flex; align-items: center; justify-content: center;
+        padding: 1.5rem;
+        opacity: 0; pointer-events: none;
+        transition: opacity 0.2s;
+    }
+    .feedback-overlay.show { opacity: 1; pointer-events: all; }
+    .feedback-modal {
+        background: var(--plan-surface-2);
+        border: 1px solid var(--plan-border-strong);
+        border-radius: 20px;
+        padding: 2rem;
+        max-width: 460px;
+        width: 100%;
+        box-shadow: 0 40px 80px -20px rgba(0,0,0,0.7);
+        transform: translateY(20px) scale(0.97);
+        transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .feedback-overlay.show .feedback-modal {
+        transform: translateY(0) scale(1);
+    }
+    .feedback-modal-head {
+        display: flex; justify-content: space-between; align-items: flex-start;
+        margin-bottom: 1.25rem;
+    }
+    .feedback-modal-title {
+        font-family: 'Fraunces', serif;
+        font-size: 1.35rem;
+        font-weight: 500;
+        margin: 0 0 0.3rem;
+    }
+    .feedback-modal-sub {
+        font-size: 0.82rem;
+        color: var(--plan-text-dim);
+    }
+    .feedback-close {
+        width: 32px; height: 32px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--plan-border-strong);
+        border-radius: 8px;
+        color: var(--plan-text-dim);
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.1rem;
+        line-height: 1;
+        flex-shrink: 0;
+        margin-left: 1rem;
+        transition: color 0.15s, background 0.15s;
+    }
+    .feedback-close:hover { color: var(--plan-text); background: rgba(255,255,255,0.1); }
+    .feedback-chips {
+        display: flex; flex-wrap: wrap; gap: 0.4rem;
+        margin-bottom: 1rem;
+    }
+    .feedback-chip {
+        padding: 0.4rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--plan-border);
+        color: var(--plan-text-dim);
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.12s;
+    }
+    .feedback-chip:hover { border-color: var(--plan-border-strong); color: var(--plan-text); }
+    .feedback-chip.active {
+        background: rgba(239,68,68,0.1);
+        border-color: rgba(239,68,68,0.4);
+        color: #fca5a5;
+    }
+    .feedback-textarea {
+        width: 100%;
+        background: rgba(0,0,0,0.3);
+        border: 1px solid var(--plan-border-strong);
+        color: var(--plan-text);
+        padding: 0.75rem 0.9rem;
+        border-radius: 10px;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.88rem;
+        resize: vertical;
+        min-height: 90px;
+        margin-bottom: 1rem;
+        transition: border-color 0.15s;
+        outline: none;
+    }
+    .feedback-textarea:focus { border-color: var(--danger); }
+    .feedback-textarea::placeholder { color: var(--plan-text-faint); }
+    .feedback-submit {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: transform 0.12s, box-shadow 0.12s;
+    }
+    .feedback-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(239,68,68,0.5); }
+
     /* Toast */
     .toast {
         position: fixed;
@@ -829,12 +1226,65 @@
             </div>
 
             <div class="field-group">
-                <label class="field-label">Platforms</label>
+                <label class="field-label">Platforms &amp; photos per post</label>
                 <div class="platform-chips" id="platform-chips">
                     <div class="chip active" data-value="instagram"><span class="chip-tick">✓</span>Instagram</div>
                     <div class="chip active" data-value="facebook"><span class="chip-tick">✓</span>Facebook</div>
                     <div class="chip" data-value="linkedin"><span class="chip-tick">✓</span>LinkedIn</div>
                     <div class="chip" data-value="x_twitter"><span class="chip-tick">✓</span>X / Twitter</div>
+                    <div class="chip" data-value="youtube"><span class="chip-tick">✓</span>YouTube</div>
+                    <div class="chip" data-value="tiktok"><span class="chip-tick">✓</span>TikTok</div>
+                </div>
+                <!-- Per-platform photo count -->
+                <div class="platform-count-row" id="platform-count-row">
+                    <div class="platform-count-item" data-platform="instagram">
+                        <div class="platform-count-label"><span class="picon">📷</span>Instagram photos</div>
+                        <div class="count-stepper">
+                            <button type="button" class="count-dec" data-platform="instagram">−</button>
+                            <span class="count-val" data-platform="instagram">1</span>
+                            <button type="button" class="count-inc" data-platform="instagram">+</button>
+                        </div>
+                    </div>
+                    <div class="platform-count-item" data-platform="facebook">
+                        <div class="platform-count-label"><span class="picon">👍</span>Facebook photos</div>
+                        <div class="count-stepper">
+                            <button type="button" class="count-dec" data-platform="facebook">−</button>
+                            <span class="count-val" data-platform="facebook">1</span>
+                            <button type="button" class="count-inc" data-platform="facebook">+</button>
+                        </div>
+                    </div>
+                    <div class="platform-count-item hidden" data-platform="linkedin">
+                        <div class="platform-count-label"><span class="picon">💼</span>LinkedIn photos</div>
+                        <div class="count-stepper">
+                            <button type="button" class="count-dec" data-platform="linkedin">−</button>
+                            <span class="count-val" data-platform="linkedin">1</span>
+                            <button type="button" class="count-inc" data-platform="linkedin">+</button>
+                        </div>
+                    </div>
+                    <div class="platform-count-item hidden" data-platform="x_twitter">
+                        <div class="platform-count-label"><span class="picon">✖</span>X / Twitter photos</div>
+                        <div class="count-stepper">
+                            <button type="button" class="count-dec" data-platform="x_twitter">−</button>
+                            <span class="count-val" data-platform="x_twitter">1</span>
+                            <button type="button" class="count-inc" data-platform="x_twitter">+</button>
+                        </div>
+                    </div>
+                    <div class="platform-count-item hidden" data-platform="youtube">
+                        <div class="platform-count-label"><span class="picon">▶</span>YouTube photos</div>
+                        <div class="count-stepper">
+                            <button type="button" class="count-dec" data-platform="youtube">−</button>
+                            <span class="count-val" data-platform="youtube">1</span>
+                            <button type="button" class="count-inc" data-platform="youtube">+</button>
+                        </div>
+                    </div>
+                    <div class="platform-count-item hidden" data-platform="tiktok">
+                        <div class="platform-count-label"><span class="picon">🎵</span>TikTok photos</div>
+                        <div class="count-stepper">
+                            <button type="button" class="count-dec" data-platform="tiktok">−</button>
+                            <span class="count-val" data-platform="tiktok">1</span>
+                            <button type="button" class="count-inc" data-platform="tiktok">+</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -869,6 +1319,8 @@
 
         <!-- RIGHT — results -->
         <section class="results-col" id="results-col">
+            <div id="pending-container"></div>
+
             <div class="empty-state" id="empty-state">
                 <div class="empty-illustration">✦</div>
                 <h3>No plan yet</h3>
@@ -876,6 +1328,31 @@
             </div>
         </section>
     </main>
+</div>
+
+<!-- Feedback popup modal -->
+<div class="feedback-overlay" id="feedback-overlay">
+    <div class="feedback-modal">
+        <div class="feedback-modal-head">
+            <div>
+                <div class="feedback-modal-title">What needs improvement?</div>
+                <div class="feedback-modal-sub" id="feedback-post-title">Post feedback</div>
+            </div>
+            <button class="feedback-close" id="feedback-close">✕</button>
+        </div>
+        <div class="feedback-chips" id="feedback-chips">
+            <div class="feedback-chip" data-val="caption">Caption tone</div>
+            <div class="feedback-chip" data-val="image">Image doesn't match</div>
+            <div class="feedback-chip" data-val="hashtags">Wrong hashtags</div>
+            <div class="feedback-chip" data-val="platform">Wrong platform fit</div>
+            <div class="feedback-chip" data-val="timing">Bad timing / date</div>
+            <div class="feedback-chip" data-val="brand">Off-brand</div>
+            <div class="feedback-chip" data-val="cta">CTA unclear</div>
+            <div class="feedback-chip" data-val="other">Other</div>
+        </div>
+        <textarea class="feedback-textarea" id="feedback-notes" placeholder="Add specific notes… e.g. 'Use a warmer tone, avoid formal language for this festival post'"></textarea>
+        <button class="feedback-submit" id="feedback-submit">Submit feedback</button>
+    </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -888,7 +1365,10 @@
     const state = {
         frequency: 'alternate',
         platforms: ['instagram', 'facebook'],
+        photoCounts: { instagram: 1, facebook: 1, linkedin: 1, x_twitter: 1, youtube: 1, tiktok: 1 },
         currentPlan: null,
+        planApproved: false,
+        feedbackPostId: null,
     };
 
     // ---- Elements ----
@@ -911,20 +1391,43 @@
     endDate.value = fmt(twoWeeksOut);
     startDate.min = fmt(today);
 
-    // ---- Chip handlers ----
-    $('#freq-chips').addEventListener('click', e => {
-        const chip = e.target.closest('.chip');
-        if (!chip) return;
-        $$('#freq-chips .chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        state.frequency = chip.dataset.value;
-    });
+    // ---- Global click delegation for panel ----
+    document.addEventListener('click', e => {
+        // 1. Frequency chips
+        const freqChip = e.target.closest('#freq-chips .chip');
+        if (freqChip) {
+            $$('#freq-chips .chip').forEach(c => c.classList.remove('active'));
+            freqChip.classList.add('active');
+            state.frequency = freqChip.dataset.value;
+            return;
+        }
 
-    $('#platform-chips').addEventListener('click', e => {
-        const chip = e.target.closest('.chip');
-        if (!chip) return;
-        chip.classList.toggle('active');
-        state.platforms = $$('#platform-chips .chip.active').map(c => c.dataset.value);
+        // 2. Platform chips
+        const platChip = e.target.closest('#platform-chips .chip');
+        if (platChip) {
+            platChip.classList.toggle('active');
+            state.platforms = $$('#platform-chips .chip.active').map(c => c.dataset.value);
+            // Sync count row visibility
+            document.querySelectorAll('.platform-count-item').forEach(row => {
+                const p = row.dataset.platform;
+                row.classList.toggle('hidden', !state.platforms.includes(p));
+            });
+            return;
+        }
+
+        // 3. Plus/Minus steppers
+        const stepBtn = e.target.closest('.count-inc, .count-dec');
+        if (stepBtn) {
+            const platform = stepBtn.dataset.platform;
+            const valEl = document.querySelector(`.count-val[data-platform="${platform}"]`);
+            if (!valEl) return;
+            let cur = state.photoCounts[platform] || 1;
+            if (stepBtn.classList.contains('count-inc')) cur = Math.min(10, cur + 1);
+            else cur = Math.max(1, cur - 1);
+            state.photoCounts[platform] = cur;
+            valEl.textContent = cur;
+            return;
+        }
     });
 
     // ---- Toast ----
@@ -970,21 +1473,66 @@
 
     // ---- Loader UI ----
     function renderLoading() {
+        const bar = $('#admin-bar');
+        if (bar) bar.style.display = 'none';
         resultsCol.innerHTML = `
             <div class="loader-card">
                 <div class="loader-pulse"><div class="loader-pulse-core"></div></div>
                 <h3>Crafting your plan…</h3>
                 <p>Analyzing your brand, mapping festivals, writing captions, and designing image briefs.</p>
                 <div class="loader-steps">
-                    <span class="active">SCAN BRAND</span>
-                    <span class="active">MAP FESTIVALS</span>
-                    <span class="active">WRITE</span>
-                    <span class="active">BRIEF IMAGES</span>
+                    <span class="active">SUBMITTING</span>
+                    <span>QUEUEING</span>
+                    <span>AWAITING ADMIN</span>
                 </div>
             </div>`;
     }
 
+    function renderPending(req) {
+        if (!req) return;
+        state.currentPlan = null;
+        state.planApproved = false;
+        
+        const status = (req.status || 'pending').toUpperCase();
+        const requestId = req.request_id || 'N/A';
+        const isRejected = status === 'REJECTED';
+
+        // Build pending UI inside results col
+        resultsCol.innerHTML = `
+            <div class="pending-state ${isRejected ? 'rejected' : ''}" id="pending-view">
+                <div class="pending-orbit">
+                    <div class="pending-orbit-ring"></div>
+                    <div class="pending-orbit-inner"></div>
+                    <div class="pending-orbit-core">${isRejected ? '!' : '⏳'}</div>
+                </div>
+                <h3>${isRejected ? 'Plan Needs Revision' : 'Your request is in the queue'}</h3>
+                <p>
+                    ${isRejected 
+                        ? `Our agency admin has reviewed your brief and requested some changes. <br><br><strong>Message:</strong> <span style="color:#ffb3ba;">${req.admin_note || 'Please contact support.'}</span>`
+                        : "Our agency admins have received your brief. We're crafting a tailored social media strategy for your brand. You'll see your full calendar here once it's approved — typically within 24 hours."
+                    }
+                </p>
+                <div class="pending-timer">
+                    <span class="dot"></span>
+                    STATUS: ${status} · ${isRejected ? 'RE-EDIT YOUR BRIEF' : 'AWAITING ADMIN'}
+                </div>
+                <div class="pending-plan-summary">
+                    <div class="pending-stat">
+                        <span class="ps-val">ID</span>
+                        <span class="ps-lbl">${requestId}</span>
+                    </div>
+                </div>
+                ${isRejected ? `
+                    <div style="margin-top:2rem;">
+                        <button class="plan-btn" onclick="location.reload()">Edit My Brief</button>
+                    </div>
+                ` : ''}
+            </div>`;
+    }
+
     function renderEmpty() {
+        const bar = $('#admin-bar');
+        if (bar) bar.style.display = 'none';
         resultsCol.innerHTML = `
             <div class="empty-state">
                 <div class="empty-illustration">✦</div>
@@ -1004,7 +1552,7 @@
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
-    function postCardHTML(post) {
+    function postCardHTML(post, showApproval) {
         const d = new Date(post.date + 'T00:00:00');
         const day = d.getDate();
         const month = MONTHS[d.getMonth()];
@@ -1018,6 +1566,24 @@
 
         const hasImage = post.image_url && post.image_status === 'ready';
         const isGenerating = post.image_status === 'generating';
+
+        // Social media links (placeholder — use their platform handles)
+        const platformLinks = (post.platforms || []).map(p => {
+            const labels = { instagram: 'Instagram', facebook: 'Facebook', linkedin: 'LinkedIn', x_twitter: 'X / Twitter', youtube: 'YouTube', tiktok: 'TikTok' };
+            return `<a class="social-link-btn platform-${p}" href="#" data-platform="${p}" data-post-id="${escapeHtml(post.post_id)}" title="Post to ${labels[p] || p}">
+                ${platformIcon(p)} ${labels[p] || p}
+            </a>`;
+        }).join('');
+
+        const approvalSection = showApproval ? `
+            <div class="post-approval">
+                <button class="approval-btn approve" data-action="post-approve" data-post-id="${escapeHtml(post.post_id)}" title="Approve — click to go to social media">
+                    ✅ Approve
+                </button>
+                <button class="approval-btn reject" data-action="post-reject" data-post-id="${escapeHtml(post.post_id)}" title="Request changes">
+                    ❌ Needs changes
+                </button>
+            </div>` : '';
 
         return `
         <article class="post-card" data-post-id="${escapeHtml(post.post_id)}">
@@ -1062,6 +1628,7 @@
                             <div class="post-section-label"><span>Call to action</span></div>
                             <div class="cta-text">→ ${escapeHtml(post.call_to_action)}</div>
                         </div>` : ''}
+                        ${approvalSection}
                     </div>
                     <div>
                         <div class="image-panel">
@@ -1078,10 +1645,7 @@
                                 </div>` : ''}
                             </div>
                             <div class="img-actions">
-                                <button class="img-btn" data-action="generate-image">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l3.5 7L24 13l-7.5 3L13 23l-3.5-7L2 13l7.5-3z"></path></svg>
-                                    ${hasImage ? 'Regenerate' : 'Generate image'}
-                                </button>
+                               
                                 ${hasImage ? `<a class="img-btn secondary" href="${escapeHtml(post.image_url)}" target="_blank" download>Download</a>` : ''}
                             </div>
                             <button class="prompt-toggle" data-action="toggle-prompt">View image prompt ↓</button>
@@ -1093,7 +1657,15 @@
         </article>`;
     }
 
-    function renderPlan(plan) {
+    function platformIcon(p) {
+        const icons = {
+            instagram: '📷', facebook: '👍', linkedin: '💼',
+            x_twitter: '✖', youtube: '▶', tiktok: '🎵'
+        };
+        return icons[p] || '🔗';
+    }
+
+    function renderPlan(plan, showApproval) {
         state.currentPlan = plan;
 
         const meta = `
@@ -1116,14 +1688,88 @@
                 <span class="count">${plan.posts.length} POSTS · ${plan.start_date} → ${plan.end_date}</span>
             </div>`;
 
-        const cards = plan.posts.map(postCardHTML).join('');
+        const cards = plan.posts.map(p => postCardHTML(p, showApproval)).join('');
 
-        resultsCol.innerHTML = meta + header + cards;
-        attachPostHandlers();
+        // Clear children
+        resultsCol.innerHTML = '';
+        const frag = document.createElement('div');
+        frag.innerHTML = meta + header + cards;
+        while (frag.firstChild) resultsCol.appendChild(frag.firstChild);
+
+        attachPostHandlers(showApproval);
     }
 
+
+    // ---- Feedback modal ----
+    const feedbackOverlay = $('#feedback-overlay');
+    const feedbackPostTitle = $('#feedback-post-title');
+    const feedbackNotes = $('#feedback-notes');
+
+    function openFeedback(postId) {
+        state.feedbackPostId = postId;
+        const post = state.currentPlan.posts.find(p => p.post_id === postId);
+        feedbackPostTitle.textContent = post ? (post.title || post.occasion || postId) : postId;
+        feedbackNotes.value = '';
+        // Reset chips
+        document.querySelectorAll('.feedback-chip').forEach(c => c.classList.remove('active'));
+        feedbackOverlay.classList.add('show');
+        setTimeout(() => feedbackNotes.focus(), 300);
+    }
+
+    function closeFeedback() {
+        feedbackOverlay.classList.remove('show');
+        state.feedbackPostId = null;
+    }
+
+    $('#feedback-close').addEventListener('click', closeFeedback);
+    feedbackOverlay.addEventListener('click', e => { if (e.target === feedbackOverlay) closeFeedback(); });
+
+    document.querySelectorAll('.feedback-chip').forEach(chip => {
+        chip.addEventListener('click', () => chip.classList.toggle('active'));
+    });
+
+    $('#feedback-submit').addEventListener('click', async () => {
+        const selected = Array.from(document.querySelectorAll('.feedback-chip.active')).map(c => c.dataset.val);
+        const notes = feedbackNotes.value.trim();
+        if (!selected.length && !notes) {
+            feedbackNotes.focus();
+            return;
+        }
+
+        try {
+            await apiPost(`/hub/post/${state.feedbackPostId}/feedback/`, {
+                tags: selected,
+                notes: notes
+            });
+            // Mark card as rejected
+            if (state.feedbackPostId) {
+            const card = document.querySelector(`.post-card[data-post-id="${state.feedbackPostId}"]`);
+            if (card) {
+                card.classList.remove('approved');
+                card.classList.add('rejected');
+                const rejectBtn = card.querySelector('[data-action="post-reject"]');
+                const approveBtn = card.querySelector('[data-action="post-approve"]');
+                if (rejectBtn) { rejectBtn.classList.add('active'); rejectBtn.textContent = '❌ Flagged'; }
+                if (approveBtn) approveBtn.classList.remove('active');
+                // Add status badge to title
+                const title = card.querySelector('.title');
+                const existingBadge = title.querySelector('.approval-status-badge');
+                if (existingBadge) existingBadge.remove();
+                const badge = document.createElement('span');
+                badge.className = 'approval-status-badge rejected';
+                badge.textContent = 'NEEDS CHANGES';
+                title.appendChild(badge);
+            }
+        }
+            showToast('Feedback submitted', 'success');
+            closeFeedback();
+        } catch (err) {
+            showToast('Submission failed', 'error');
+        }
+    });
+
     // ---- Per-card handlers ----
-    function attachPostHandlers() {
+    function attachPostHandlers(showApproval) {
         $$('.post-card').forEach(card => {
             const head = card.querySelector('.post-head');
             head.addEventListener('click', e => {
@@ -1137,6 +1783,36 @@
 
             const postId = card.dataset.postId;
             const post = state.currentPlan.posts.find(p => p.post_id === postId);
+
+            // Approval buttons
+            if (showApproval) {
+                const approveBtn = card.querySelector('[data-action="post-approve"]');
+                const rejectBtn = card.querySelector('[data-action="post-reject"]');
+                if (approveBtn) {
+                    approveBtn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        // Mark approved
+                        card.classList.add('approved');
+                        card.classList.remove('rejected');
+                        approveBtn.classList.add('active');
+                        if (rejectBtn) rejectBtn.classList.remove('active');
+                        // Update title badge
+                        const title = card.querySelector('.title');
+                        let badge = title.querySelector('.approval-status-badge');
+                        if (!badge) { badge = document.createElement('span'); title.appendChild(badge); }
+                        badge.className = 'approval-status-badge approved';
+                        badge.textContent = '✓ APPROVED';
+                        // TODO: open social media link when implemented
+                        showToast('Post approved ✅', 'success');
+                    });
+                }
+                if (rejectBtn) {
+                    rejectBtn.addEventListener('click', e => {
+                        e.stopPropagation();
+                        openFeedback(postId);
+                    });
+                }
+            }
 
             // Copy buttons
             card.querySelectorAll('.copy-btn').forEach(btn => {
@@ -1250,15 +1926,17 @@
         renderLoading();
 
         try {
-            const plan = await apiPost('/hub/plan/generate/', {
+            const res = await apiPost('/hub/plan/request/', {
                 start_date: startDate.value,
                 end_date: endDate.value,
                 frequency: state.frequency,
                 platforms: state.platforms,
                 notes: $('#notes').value.trim(),
+                photo_counts: state.photoCounts,
             });
-            renderPlan(plan);
-            showToast(`Plan ready · ${plan.posts.length} posts`, 'success');
+            renderPending(res);
+            showToast(res.message, 'success');
+            showToast(`Plan requested successfully — awaiting admin review`, 'success');
             await refreshPastPlans();
         } catch (err) {
             console.error(err);
@@ -1321,13 +1999,29 @@
             const r = await fetch(`/hub/plan/${planId}/`, { credentials: 'same-origin' });
             if (!r.ok) throw new Error('Could not load plan');
             const plan = await r.json();
-            renderPlan(plan);
+            renderPlan(plan, true); // show approval buttons for past plans
             showToast('Plan loaded', 'success');
         } catch (err) {
             renderEmpty();
             showToast(err.message || 'Load failed', 'error');
         }
     }
+
+    // ---- Initial Load ----
+    async function init() {
+        try {
+            // Check for pending requests first
+            const r = await fetch('/hub/plan/request-status/', { credentials: 'same-origin' });
+            const data = await r.json();
+            if (data.requests && data.requests.length > 0) {
+                renderPending(data.requests[0]);
+                return;
+            }
+            // If no pending, maybe load most recent plan?
+            await refreshPastPlans();
+        } catch (err) { console.error(err); }
+    }
+    init();
 })();
 </script>
 {% endblock %}

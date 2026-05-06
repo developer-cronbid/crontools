@@ -1,0 +1,2509 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Control · Agency Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ══════════════════════════════════════════════════════════
+           ROOT TOKENS
+        ══════════════════════════════════════════════════════════ */
+        :root {
+            --bg: #080e1a;
+            --sidebar-bg: #0d1525;
+            --surface: rgba(255, 255, 255, 0.03);
+            --surface-2: rgba(255, 255, 255, 0.06);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-2: rgba(255, 255, 255, 0.14);
+            --accent: #3b82f6;
+            --accent-dim: rgba(59, 130, 246, 0.15);
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --success-dim: rgba(16, 185, 129, 0.12);
+            --warning: #f59e0b;
+            --warning-dim: rgba(245, 158, 11, 0.12);
+            --danger: #ef4444;
+            --danger-dim: rgba(239, 68, 68, 0.12);
+            --violet: #8b5cf6;
+            --violet-dim: rgba(139, 92, 246, 0.12);
+            --text: #f1f5f9;
+            --text-2: #94a3b8;
+            --text-3: #475569;
+            --mono: 'JetBrains Mono', monospace;
+            --sidebar-w: 240px;
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-2);
+            border-radius: 99px;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           SIDEBAR
+        ══════════════════════════════════════════════════════════ */
+        aside {
+            width: var(--sidebar-w);
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 1rem;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin-bottom: 2rem;
+            padding: 0 0.5rem;
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .nav-section {
+            font-family: var(--mono);
+            font-size: 0.6rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-3);
+            padding: 0 0.75rem;
+            margin: 1.25rem 0 0.4rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-2);
+            padding: 0.55rem 0.75rem;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.15s;
+            margin-bottom: 2px;
+        }
+
+        nav a i {
+            width: 16px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        nav a:hover {
+            background: var(--surface-2);
+            color: var(--text);
+        }
+
+        nav a.active {
+            background: var(--accent-dim);
+            color: var(--accent);
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--warning);
+            color: #000;
+            font-size: 0.6rem;
+            font-weight: 700;
+            font-family: var(--mono);
+            padding: 1px 6px;
+            border-radius: 99px;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-3);
+            font-size: 0.8rem;
+            text-decoration: none;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+            transition: color 0.15s;
+        }
+
+        .sidebar-footer a:hover {
+            color: var(--text-2);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           MAIN
+        ══════════════════════════════════════════════════════════ */
+        main {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            padding: 2rem 2.5rem;
+            min-height: 100vh;
+            max-width: calc(100vw - var(--sidebar-w));
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .page-header .subtitle {
+            color: var(--text-2);
+            font-size: 0.85rem;
+            margin-top: 0.2rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           STATS ROW
+        ══════════════════════════════════════════════════════════ */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: var(--tint, transparent);
+            opacity: 0.04;
+        }
+
+        .stat-card .stat-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--tint, var(--surface-2));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .stat-label {
+            color: var(--text-2);
+            font-size: 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            font-family: var(--mono);
+            letter-spacing: -0.03em;
+        }
+
+        .stat-sub {
+            font-size: 0.7rem;
+            color: var(--text-3);
+            margin-top: 0.2rem;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           TABLE
+        ══════════════════════════════════════════════════════════ */
+        .table-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            gap: 0.75rem;
+        }
+
+        .table-toolbar h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.65rem 1.25rem;
+            background: rgba(0, 0, 0, 0.25);
+            color: var(--text-3);
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-family: var(--mono);
+        }
+
+        td {
+            padding: 0.85rem 1.25rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+
+        tr:hover td {
+            background: var(--surface-2);
+        }
+
+        .mono {
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            color: var(--text-2);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           STATUS PILLS
+        ══════════════════════════════════════════════════════════ */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.65rem;
+            border-radius: 99px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            font-family: var(--mono);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .pill::before {
+            content: "";
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .pill-pending {
+            background: var(--warning-dim);
+            color: var(--warning);
+        }
+
+        .pill-working {
+            background: var(--accent-dim);
+            color: var(--accent);
+        }
+
+        .pill-approved {
+            background: var(--success-dim);
+            color: var(--success);
+        }
+
+        .pill-rejected {
+            background: var(--danger-dim);
+            color: var(--danger);
+        }
+
+        .pill-draft {
+            background: var(--violet-dim);
+            color: var(--violet);
+        }
+
+        .pill-delivered {
+            background: var(--success-dim);
+            color: var(--success);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           CARDS & LAYOUT
+        ══════════════════════════════════════════════════════════ */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title .icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            margin-right: 0.5rem;
+        }
+
+        .split-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .left-col {
+            position: sticky;
+            top: 1.5rem;
+            max-height: calc(100vh - 3rem);
+            overflow-y: auto;
+            padding-right: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .right-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           FORM FIELDS
+        ══════════════════════════════════════════════════════════ */
+        .field {
+            margin-bottom: 1rem;
+        }
+
+        .field:last-child {
+            margin-bottom: 0;
+        }
+
+        label.field-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            font-family: var(--mono);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-3);
+            margin-bottom: 0.35rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="url"],
+        input[type="email"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border-2);
+            border-radius: var(--radius-sm);
+            padding: 0.55rem 0.75rem;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.15s;
+            resize: vertical;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--accent);
+        }
+
+        select option {
+            background: #1e293b;
+        }
+
+        textarea {
+            line-height: 1.55;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        /* Color swatches */
+        .color-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.35rem;
+        }
+
+        .color-swatch {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* Social handles grid */
+        .handles-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .handle-row {
+            position: relative;
+        }
+
+        .handle-icon {
+            position: absolute;
+            left: 0.6rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-3);
+            font-size: 0.75rem;
+            width: 14px;
+            text-align: center;
+        }
+
+        .handle-row input {
+            padding-left: 2rem;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           BUTTONS
+        ══════════════════════════════════════════════════════════ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn i {
+            font-size: 0.78rem;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-ghost {
+            background: var(--surface-2);
+            border: 1px solid var(--border-2);
+            color: var(--text-2);
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: #000;
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.65rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-lg {
+            padding: 0.7rem 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           POST EDITOR CARD
+        ══════════════════════════════════════════════════════════ */
+        .post-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .post-item-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.9rem 1.25rem;
+            background: rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .post-item-head:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .post-date-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .post-day {
+            font-family: var(--mono);
+            font-size: 0.7rem;
+            font-weight: 700;
+            background: var(--accent-dim);
+            color: var(--accent);
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+        }
+
+        .post-title-preview {
+            font-size: 0.85rem;
+            font-weight: 600;
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .post-item-body {
+            padding: 1.25rem;
+            display: none;
+            border-top: 1px solid var(--border);
+        }
+
+        .post-item.expanded .post-item-body {
+            display: block;
+        }
+
+        .post-item.expanded .chevron {
+            transform: rotate(180deg);
+        }
+
+        .chevron {
+            transition: transform 0.2s;
+            color: var(--text-3);
+        }
+
+        .post-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Image preview */
+        .img-preview-box {
+            border: 2px dashed var(--border-2);
+            border-radius: var(--radius-sm);
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-3);
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .img-preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-sm);
+        }
+
+        .img-preview-box:hover {
+            border-color: var(--accent);
+        }
+
+        /* Video preview */
+        .vid-preview-box {
+            border: 2px dashed var(--border-2);
+            border-radius: var(--radius-sm);
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-3);
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+        }
+
+        .vid-preview-box video {
+            width: 100%;
+            border-radius: var(--radius-sm);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           PLATFORM COUNT DISPLAY
+        ══════════════════════════════════════════════════════════ */
+        .plat-count-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.45rem 0.75rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 0.4rem;
+            font-size: 0.82rem;
+        }
+
+        .plat-count-row input[type="number"] {
+            width: 52px;
+            text-align: center;
+            padding: 0.2rem 0.4rem;
+            font-size: 0.82rem;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           TOAST
+        ══════════════════════════════════════════════════════════ */
+        #toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+        }
+
+        .toast-msg {
+            background: var(--surface-2);
+            border: 1px solid var(--border-2);
+            border-radius: var(--radius-sm);
+            padding: 0.65rem 1rem;
+            font-size: 0.82rem;
+            min-width: 220px;
+            max-width: 320px;
+            backdrop-filter: blur(12px);
+            animation: slideIn 0.25s ease;
+        }
+
+        .toast-msg.ok {
+            border-left: 3px solid var(--success);
+        }
+
+        .toast-msg.error {
+            border-left: 3px solid var(--danger);
+        }
+
+        .toast-msg.info {
+            border-left: 3px solid var(--accent);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           ALERT BOX
+        ══════════════════════════════════════════════════════════ */
+        .alert {
+            padding: 0.85rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+        }
+
+        .alert-warning {
+            background: var(--warning-dim);
+            border-left: 3px solid var(--warning);
+            color: var(--text);
+        }
+
+        .alert-success {
+            background: var(--success-dim);
+            border-left: 3px solid var(--success);
+            color: var(--text);
+        }
+
+        .alert-info {
+            background: var(--accent-dim);
+            border-left: 3px solid var(--accent);
+            color: var(--text);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           DIVIDER / SECTION LABEL
+        ══════════════════════════════════════════════════════════ */
+        .section-label {
+            font-family: var(--mono);
+            font-size: 0.62rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-3);
+            margin-bottom: 0.75rem;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           CUSTOMER CARD (customer list)
+        ══════════════════════════════════════════════════════════ */
+        .customer-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: var(--text);
+            transition: border-color 0.15s, background 0.15s;
+            margin-bottom: 0.75rem;
+        }
+
+        .customer-card:hover {
+            border-color: var(--border-2);
+            background: var(--surface-2);
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--accent-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--accent);
+            flex-shrink: 0;
+            text-transform: uppercase;
+        }
+
+        .customer-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .customer-meta {
+            font-size: 0.75rem;
+            color: var(--text-2);
+            margin-top: 0.15rem;
+        }
+
+        .customer-stats {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .cst {
+            font-size: 0.75rem;
+            color: var(--text-3);
+            font-family: var(--mono);
+        }
+
+        .cst strong {
+            color: var(--text);
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           PLAN APPROVAL HEADER BAR
+        ══════════════════════════════════════════════════════════ */
+        .approval-bar {
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-2);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .approval-bar.draft {
+            background: var(--violet-dim);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        .approval-bar.approved {
+            background: var(--success-dim);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .approval-bar.rejected {
+            background: var(--danger-dim);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .approval-bar .ab-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .draft .ab-icon {
+            background: var(--violet-dim);
+        }
+
+        .approved .ab-icon {
+            background: var(--success-dim);
+        }
+
+        .rejected .ab-icon {
+            background: var(--danger-dim);
+        }
+
+        .ab-text {
+            flex: 1;
+        }
+
+        .ab-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .ab-sub {
+            font-size: 0.78rem;
+            color: var(--text-2);
+            margin-top: 0.1rem;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           REQUEST CONTEXT PANEL
+        ══════════════════════════════════════════════════════════ */
+        .context-pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .context-pill {
+            padding: 0.3rem 0.75rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-family: var(--mono);
+            background: var(--surface-2);
+            border: 1px solid var(--border-2);
+        }
+
+        .context-pill strong {
+            color: var(--accent);
+        }
+
+        /* Highlighted note block */
+        .note-block {
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text-2);
+            margin-bottom: 0.75rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ════════════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════════════ -->
+    <aside>
+        <div class="logo">
+            <div class="logo-icon">⚡</div>
+            Production
+        </div>
+
+        <div class="nav-section">Overview</div>
+        <nav>
+            <a href="{% url 'admin_dashboard' %}" class="{% if section == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </a>
+        </nav>
+
+        <div class="nav-section">Image Requests</div>
+        <nav>
+            <a href="{% url 'admin_requests' %}"
+                class="{% if section == 'requests' or section == 'request_detail' %}active{% endif %}">
+                <i class="fas fa-inbox"></i> Plan Requests
+                {% if stats.pending %}<span class="nav-badge">{{ stats.pending }}</span>{% endif %}
+            </a>
+        </nav>
+
+        <div class="nav-section">Video Requests</div>
+        <nav>
+            <a href="{% url 'admin_video_requests' %}"
+                class="{% if section == 'video_requests' or section == 'video_request_detail' or section == 'video_plan_detail' %}active{% endif %}">
+                <i class="fas fa-film"></i> Video Requests
+            </a>
+        </nav>
+
+        <div class="nav-section">Customers</div>
+        <nav>
+            <a href="{% url 'admin_customers' %}"
+                class="{% if section == 'customers' or section == 'customer_detail' %}active{% endif %}">
+                <i class="fas fa-users"></i> All Customers
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{% url 'hub_home' %}">
+                <i class="fas fa-arrow-left"></i> Back to Hub
+            </a>
+        </div>
+    </aside>
+
+    <!-- ════════════════════════════════════════════════
+     MAIN CONTENT
+════════════════════════════════════════════════ -->
+    <main>
+
+        <!-- ██████████████  DASHBOARD  ██████████████ -->
+        {% if section == 'dashboard' %}
+        <div class="page-header">
+            <div>
+                <h1>Production Dashboard</h1>
+                <div class="subtitle">All customer requests · live status overview</div>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card" style="--tint:#f59e0b;">
+                <div class="stat-icon" style="background:var(--warning-dim); color:var(--warning);">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-label">Pending Review</div>
+                <div class="stat-value">{{ stats.pending }}</div>
+                <div class="stat-sub">Awaiting admin action</div>
+            </div>
+            <div class="stat-card" style="--tint:#3b82f6;">
+                <div class="stat-icon" style="background:var(--accent-dim); color:var(--accent);">
+                    <i class="fas fa-cog fa-spin"></i>
+                </div>
+                <div class="stat-label">In Production</div>
+                <div class="stat-value">{{ stats.working }}</div>
+                <div class="stat-sub">Being worked on</div>
+            </div>
+            <div class="stat-card" style="--tint:#10b981;">
+                <div class="stat-icon" style="background:var(--success-dim); color:var(--success);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-label">Approved Plans</div>
+                <div class="stat-value">{{ stats.approved }}</div>
+                <div class="stat-sub">Released to customers</div>
+            </div>
+            <div class="stat-card" style="--tint:#8b5cf6;">
+                <div class="stat-icon" style="background:var(--violet-dim); color:var(--violet);">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-label">Total Customers</div>
+                <div class="stat-value">{{ stats.customers }}</div>
+                <div class="stat-sub">With onboarding profiles</div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <div class="table-toolbar">
+                <h3>🔔 Recent Requests</h3>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Request ID</th>
+                        <th>Date Range</th>
+                        <th>Platforms</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in recent_requests %}
+                    <tr>
+                        <td>
+                            <div style="font-weight:600;">{{ r.user.email }}</div>
+                            <div class="mono">{{ r.user.username }}</div>
+                        </td>
+                        <td><span class="mono">{{ r.request_id }}</span></td>
+                        <td class="mono">{{ r.start_date }} → {{ r.end_date }}</td>
+                        <td>{{ r.platforms|join:", " }}</td>
+                        <td><span class="pill pill-{{ r.status }}">{{ r.status }}</span></td>
+                        <td><a href="{% url 'admin_request_detail' r.request_id %}" class="btn btn-ghost btn-sm"><i
+                                    class="fas fa-arrow-right"></i> Manage</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align:center; color:var(--text-3); padding: 2rem;">No requests yet
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- ██████████████  PLAN REQUESTS LIST  ██████████████ -->
+        {% elif section == 'requests' %}
+        <div class="page-header">
+            <div>
+                <h1>Image Plan Requests</h1>
+                <div class="subtitle">Each row = a customer clicked "Generate". No AI has run yet.</div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <div class="table-toolbar">
+                <h3>All Requests</h3>
+                <div style="display:flex; gap:0.5rem;">
+                    <a href="?status=pending" class="btn btn-ghost btn-sm">Pending only</a>
+                    <a href="?status=" class="btn btn-ghost btn-sm">All</a>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Request ID</th>
+                        <th>Date Range</th>
+                        <th>Platforms</th>
+                        <th>Freq</th>
+                        <th>Images / Platform</th>
+                        <th>Status</th>
+                        <th>Requested</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in plan_requests %}
+                    <tr>
+                        <td>
+                            <div style="font-weight:600;">{{ r.user.email }}</div>
+                        </td>
+                        <td><span class="mono">{{ r.request_id }}</span></td>
+                        <td class="mono">{{ r.start_date }} → {{ r.end_date }}</td>
+                        <td>{{ r.platforms|join:", " }}</td>
+                        <td class="mono">{{ r.frequency }}</td>
+                        <td class="mono">
+                            {% for p, c in r.platform_counts.items %}
+                            {{ p }}: <strong>{{ c }}</strong>{% if not forloop.last %}, {% endif %}
+                            {% empty %}—{% endfor %}
+                        </td>
+                        <td><span class="pill pill-{{ r.status }}">{{ r.status }}</span></td>
+                        <td class="mono" style="font-size:0.72rem; color:var(--text-3);">{{ r.created_at|date:"d M Y ·
+                            H:i" }}</td>
+                        <td><a href="{% url 'admin_request_detail' r.request_id %}" class="btn btn-primary btn-sm"><i
+                                    class="fas fa-tools"></i> Work</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" style="text-align:center; color:var(--text-3); padding: 2rem;">No requests found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- ██████████████  REQUEST DETAIL (Image)  ██████████████ -->
+        {% elif section == 'request_detail' %}
+        <div class="page-header">
+            <div>
+                <h1>⚙️ Production: {{ req.request_id }}</h1>
+                <div class="subtitle">
+                    Customer: <strong>{{ req.user.email }}</strong> ·
+                    Requested: {{ req.created_at|date:"d M Y, H:i" }}
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost btn-sm" onclick="updateStatus('working')">
+                    <i class="fas fa-play"></i> Set Working
+                </button>
+                <button class="btn btn-ghost btn-sm" onclick="updateStatus('rejected')" style="color:var(--danger);">
+                    <i class="fas fa-ban"></i> Reject
+                </button>
+                <button class="btn btn-warning btn-lg" onclick="saveBrief()">
+                    <i class="fas fa-save"></i> Save All
+                </button>
+                <button class="btn btn-primary btn-lg" onclick="generateDraft()">
+                    <i class="fas fa-magic"></i> Generate AI Draft
+                </button>
+            </div>
+        </div>
+
+        <!-- Status bar -->
+        <div class="alert alert-info" style="margin-bottom:1.5rem;">
+            <i class="fas fa-info-circle"></i>
+            <div>Current status: <strong>{{ req.status|upper }}</strong>.
+                {% if req.status == 'pending' %}Edit customer profile + strategy below, then click <strong>Generate AI
+                    Draft</strong>.{% endif %}
+                {% if req.status == 'working' %}Draft is being built or is ready. Review posts in the plan editor.{% endif %}
+                {% if req.generated_plan %}Linked plan: <a
+                    href="{% url 'admin_plan_detail' req.generated_plan.plan_id %}" style="color:var(--accent);">{{
+                    req.generated_plan.plan_id }}</a>{% endif %}
+            </div>
+        </div>
+
+        <div class="split-layout">
+            <!-- ── LEFT: Customer DNA + Strategy ── -->
+            <div class="left-col" id="brief-editor">
+
+                <!-- 1. Customer Onboarding Profile -->
+                <div class="card">
+                    <div class="card-title">
+                        <span><span class="icon"
+                                style="background:var(--accent-dim); color:var(--accent); display:inline-flex; width:22px; height:22px; border-radius:5px; align-items:center; justify-content:center; margin-right:0.4rem; font-size:0.65rem;"><i
+                                    class="fas fa-building"></i></span> Business Profile</span>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label">Business Name</label>
+                        <input type="text" data-field="business_name" value="{{ profile.business_name|default:'' }}"
+                            placeholder="e.g. FixRupee">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Industry</label>
+                        <input type="text" data-field="industry" value="{{ profile.industry|default:'' }}"
+                            placeholder="e.g. FinTech / NBFC">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Website</label>
+                        <input type="url" data-field="website" value="{{ profile.website|default:'' }}"
+                            placeholder="https://...">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Target Audience</label>
+                        <textarea data-field="target_audience" rows="2"
+                            placeholder="Who are they selling to?">{{ profile.target_audience|default:'' }}</textarea>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Business Goals</label>
+                        <textarea data-field="goals" rows="2"
+                            placeholder="What are their content goals?">{{ profile.goals|default:'' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- 2. Brand Assets -->
+                <div class="card">
+                    <div class="card-title">
+                        <span><i class="fas fa-palette" style="margin-right:0.4rem; color:var(--violet);"></i> Brand
+                            Assets</span>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label">Logo URL</label>
+                        <input type="url" data-field="logo_url" value="{{ profile.logo_url|default:'' }}"
+                            placeholder="https://...">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Brand Colors (JSON array)</label>
+                        <input type="text" data-field="brand_colors" value="{{ profile.brand_colors|default:'[]' }}"
+                            placeholder='["#10b7fe","#ffffff"]'>
+                        {% if profile.brand_colors %}
+                        <div class="color-list">
+                            {% for col in profile.brand_colors %}
+                            {% if col %}
+                            <div class="color-swatch" data-color="{{ col }}" title="{{ col }}"></div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Fonts</label>
+                        <input type="text" data-field="fonts" value="{{ profile.fonts|default:'' }}"
+                            placeholder="e.g. Inter, Fraunces">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Tone of Voice</label>
+                        <input type="text" data-field="tone_of_voice" value="{{ profile.tone_of_voice|default:'' }}"
+                            placeholder="e.g. Professional & Friendly">
+                    </div>
+                </div>
+
+                <!-- 3. Social Handles -->
+                <div class="card">
+                    <div class="card-title">
+                        <span><i class="fas fa-share-nodes" style="margin-right:0.4rem; color:var(--warning);"></i>
+                            Social Handles</span>
+                    </div>
+                    <div class="handles-grid">
+                        <div class="handle-row field">
+                            <i class="fab fa-instagram handle-icon"></i>
+                            <input type="text" data-field="instagram" value="{{ profile.instagram|default:'' }}"
+                                placeholder="Instagram URL">
+                        </div>
+                        <div class="handle-row field">
+                            <i class="fab fa-facebook handle-icon"></i>
+                            <input type="text" data-field="facebook" value="{{ profile.facebook|default:'' }}"
+                                placeholder="Facebook URL">
+                        </div>
+                        <div class="handle-row field">
+                            <i class="fab fa-linkedin handle-icon"></i>
+                            <input type="text" data-field="linkedin" value="{{ profile.linkedin|default:'' }}"
+                                placeholder="LinkedIn URL">
+                        </div>
+                        <div class="handle-row field">
+                            <i class="fab fa-x-twitter handle-icon"></i>
+                            <input type="text" data-field="x_twitter" value="{{ profile.x_twitter|default:'' }}"
+                                placeholder="X / Twitter URL">
+                        </div>
+                        <div class="handle-row field">
+                            <i class="fab fa-youtube handle-icon"></i>
+                            <input type="text" data-field="youtube" value="{{ profile.youtube|default:'' }}"
+                                placeholder="YouTube URL">
+                        </div>
+                        <div class="handle-row field">
+                            <i class="fab fa-tiktok handle-icon"></i>
+                            <input type="text" data-field="tiktok" value="{{ profile.tiktok|default:'' }}"
+                                placeholder="TikTok URL">
+                        </div>
+                        <div class="handle-row field">
+                            <i class="fab fa-discord handle-icon"></i>
+                            <input type="text" data-field="discord" value="{{ profile.discord|default:'' }}"
+                                placeholder="Discord URL">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Generation Settings (from the request) -->
+                <div class="card">
+                    <div class="card-title">
+                        <span><i class="fas fa-sliders" style="margin-right:0.4rem; color:var(--success);"></i>
+                            Generation Settings</span>
+                        <span class="pill pill-{{ req.status }}" style="font-size:0.62rem;">{{ req.status }}</span>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="field">
+                            <label class="field-label">Start Date</label>
+                            <input type="date" id="admin-start-date" value="{{ req.start_date|date:'Y-m-d' }}">
+                        </div>
+                        <div class="field">
+                            <label class="field-label">End Date</label>
+                            <input type="date" id="admin-end-date" value="{{ req.end_date|date:'Y-m-d' }}">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label">Posting Frequency</label>
+                        <select id="admin-frequency">
+                            <option value="daily" {% if req.frequency == 'daily' %}selected{% endif %}>Daily</option>
+                            <option value="alternate" {% if req.frequency == 'alternate' %}selected{% endif %}>Every Other
+                                Day</option>
+                            <option value="weekly_3" {% if req.frequency == 'weekly_3' %}selected{% endif %}>3× per Week
+                            </option>
+                            <option value="weekly_2" {% if req.frequency == 'weekly_2' %}selected{% endif %}>2× per Week
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label">Images per Platform</label>
+                        {% for p in platforms_with_counts %}
+                        <div class="plat-count-row">
+                            <span><i class="fas fa-hashtag" style="color:var(--text-3); margin-right:0.4rem;"></i>{{ p.name }}</span>
+                            <input type="number" class="plat-count-inp" data-platform="{{ p.name }}"
+                                value="{{ p.count }}" min="1" max="10">
+                        </div>
+                        {% empty %}
+                        <div style="color:var(--text-3); font-size:0.8rem; padding:0.4rem 0;">No platforms set yet</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label">Admin Workspace Notes</label>
+                        <textarea id="adminNote" rows="3"
+                            placeholder="Internal production notes…">{{ req.admin_note }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── RIGHT: Request context + Plan link ── -->
+            <div class="right-col">
+                <!-- Customer's original brief -->
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-quote-left"
+                            style="color:var(--accent); margin-right:0.5rem;"></i> Customer's Original Request</div>
+                    <div class="context-pill-row">
+                        <span class="context-pill">📅 {{ req.start_date }} → {{ req.end_date }}</span>
+                        <span class="context-pill">🔁 {{ req.frequency }}</span>
+                        {% for p in req.platforms %}
+                        <span class="context-pill">📱 {{ p }}</span>
+                        {% endfor %}
+                        {% for p, c in req.platform_counts.items %}
+                        <span class="context-pill"><strong>{{ c }}</strong> × {{ p }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="note-block">{{ req.extra_notes|default:"(No extra notes from customer)" }}</div>
+
+                    <label class="field-label" style="margin-top:0.5rem;">Refine Brief for AI Generation</label>
+                    <textarea id="extraNotes" rows="5"
+                        placeholder="Rewrite and expand the customer's notes for Claude to follow during generation…">{{ req.extra_notes }}</textarea>
+                </div>
+
+                <!-- If plan already generated -->
+                {% if req.generated_plan %}
+                <div class="card" style="border-color:rgba(16,185,129,0.4);">
+                    <div class="card-title" style="color:var(--success);">
+                        <i class="fas fa-check-circle"></i> Draft Plan Ready
+                    </div>
+                    <p style="margin-bottom:1.25rem; color:var(--text-2); font-size:0.85rem;">
+                        AI has generated <strong>{{ req.generated_plan.posts.count }}</strong> posts.
+                        Status: <span class="pill pill-{{ req.generated_plan.status }}">{{ req.generated_plan.status
+                            }}</span>
+                    </p>
+                    <a href="{% url 'admin_plan_detail' req.generated_plan.plan_id %}"
+                        class="btn btn-success btn-full btn-lg">
+                        <i class="fas fa-edit"></i> Open Full Post Editor
+                    </a>
+                </div>
+                {% else %}
+                <div class="card" style="border-style:dashed;">
+                    <div class="card-title" style="color:var(--text-3);">No Draft Yet</div>
+                    <p style="color:var(--text-3); font-size:0.85rem; margin-bottom:1.25rem;">
+                        Fill in the customer DNA on the left, refine the brief above, then generate.
+                    </p>
+                    <button class="btn btn-primary btn-full btn-lg" onclick="generateDraft()">
+                        <i class="fas fa-magic"></i> Generate AI Draft Plan
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+
+        <!-- ██████████████  PLAN EDITOR (Image)  ██████████████ -->
+        {% elif section == 'plan_detail' %}
+        {% with plan_status=plan.status %}
+        <div class="page-header">
+            <div>
+                <h1>📝 Plan Editor</h1>
+                <div class="subtitle">
+                    <span class="mono">{{ plan.plan_id }}</span> ·
+                    Customer: <strong>{{ plan.user.email }}</strong> ·
+                    {{ plan.posts.count }} posts
+                </div>
+            </div>
+            <div class="header-actions">
+                {% if plan.status != 'approved' %}
+                <button class="btn btn-ghost" onclick="saveMeta()"><i class="fas fa-save"></i> Save Summary</button>
+                <button class="btn btn-danger btn-sm" onclick="rejectPlan()"><i class="fas fa-times"></i>
+                    Reject</button>
+                <button class="btn btn-danger btn-sm" onclick="deletePlan()"><i class="fas fa-trash"></i>
+                    Delete Plan</button>
+                <button class="btn btn-success btn-lg" onclick="approvePlan()"><i class="fas fa-check"></i> Approve &
+                    Release</button>
+                {% else %}
+                <button class="btn btn-danger btn-sm" onclick="rejectPlan()"><i class="fas fa-undo"></i> Revoke
+                    Approval</button>
+                <button class="btn btn-danger btn-sm" onclick="deletePlan()"><i class="fas fa-trash"></i>
+                    Delete Plan</button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Approval status bar -->
+        <div class="approval-bar {{ plan_status }}">
+            <div class="ab-icon">
+                {% if plan_status == 'approved' %}✅{% elif plan_status == 'rejected' %}🚫{% else %}🔶{% endif %}
+            </div>
+            <div class="ab-text">
+                <div class="ab-title">
+                    {% if plan_status == 'approved' %}Plan Approved — Visible to Customer{% endif %}
+                    {% if plan_status == 'draft' %}Draft — Customer Cannot See This Yet{% endif %}
+                    {% if plan_status == 'rejected' %}Rejected — Customer Not Notified{% endif %}
+                </div>
+                <div class="ab-sub">
+                    {% if plan.approved_at %}Approved {{ plan.approved_at|date:"d M Y, H:i" }}{% endif %}
+                    {% if plan.admin_note %} · Note: {{ plan.admin_note }}{% endif %}
+                </div>
+            </div>
+            <span class="pill pill-{{ plan_status }}">{{ plan_status }}</span>
+        </div>
+
+        <div class="split-layout">
+            <!-- LEFT: Brand DNA readonly (but editable) -->
+            <div class="left-col" id="brief-editor">
+                <div class="card">
+                    <div class="card-title">
+                        Brand DNA
+                        <button class="btn btn-ghost btn-sm" onclick="saveBrief('{{ plan.user.id }}')">Save</button>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Business Name</label>
+                        <input type="text" data-field="business_name" value="{{ profile.business_name|default:'' }}">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Industry</label>
+                        <input type="text" data-field="industry" value="{{ profile.industry|default:'' }}">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Website</label>
+                        <input type="url" data-field="website" value="{{ profile.website|default:'' }}">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Target Audience</label>
+                        <textarea data-field="target_audience"
+                            rows="2">{{ profile.target_audience|default:'' }}</textarea>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Goals</label>
+                        <textarea data-field="goals" rows="2">{{ profile.goals|default:'' }}</textarea>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Tone of Voice</label>
+                        <input type="text" data-field="tone_of_voice" value="{{ profile.tone_of_voice|default:'' }}">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Brand Colors (JSON)</label>
+                        <input type="text" data-field="brand_colors" value="{{ profile.brand_colors|default:'[]' }}">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Fonts</label>
+                        <input type="text" data-field="fonts" value="{{ profile.fonts|default:'' }}">
+                    </div>
+                </div>
+
+                {% if req %}
+                <div class="card">
+                    <div class="card-title">Platform Allocation</div>
+                    {% for p in platforms_with_counts %}
+                    <div class="plat-count-row">
+                        <span>{{ p.name }}</span>
+                        <input type="number" class="plat-count-inp" data-platform="{{ p.name }}" value="{{ p.count }}"
+                            min="1" max="10">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="card">
+                    <div class="card-title">Plan Summary</div>
+                    <textarea id="planSummary" rows="4">{{ plan.summary }}</textarea>
+                    <div class="field" style="margin-top:0.75rem;">
+                        <label class="field-label">Admin Note (Internal)</label>
+                        <textarea id="adminNote" rows="2"
+                            placeholder="Internal production notes…">{{ plan.admin_note }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Post Editor -->
+            <div class="right-col">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem;">
+                    <div class="section-label">{{ plan.posts.count }} posts · click any row to expand &amp; edit</div>
+                    <button class="btn btn-ghost btn-sm" onclick="expandAll()">Expand All</button>
+                </div>
+
+                {% for p in posts %}
+                <div class="post-item" id="post-{{ p.post_id }}" data-post-id="{{ p.post_id }}">
+                    <div class="post-item-head" onclick="togglePost('{{ p.post_id }}')">
+                        <div class="post-date-badge">
+                            <span class="post-day">{{ p.date }}</span>
+                            <span style="color:var(--text-3); font-size:0.75rem;">{{ p.day_of_week }}</span>
+                        </div>
+                        <span class="post-title-preview" style="margin:0 1rem;">{{ p.title|default:"(no title)"
+                            }}</span>
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <span class="pill pill-{{ p.image_status }}" style="font-size:0.6rem;">{{ p.image_status
+                                }}</span>
+                            <i class="fas fa-chevron-down chevron"></i>
+                        </div>
+                    </div>
+
+                    <div class="post-item-body">
+                        <div class="post-grid">
+                            <!-- Left: Text content -->
+                            <div>
+                                <div class="field">
+                                    <label class="field-label">Post Title</label>
+                                    <input type="text" data-field="title" value="{{ p.title }}">
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Occasion / Theme</label>
+                                    <input type="text" data-field="occasion" value="{{ p.occasion }}">
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Post Type</label>
+                                    <select data-field="post_type">
+                                        <option value="festival" {% if p.post_type == 'festival' %}selected{% endif %}>
+                                            Festival</option>
+                                        <option value="educational" {% if p.post_type == 'educational' %}selected{% endif %}>Educational</option>
+                                        <option value="offer" {% if p.post_type == 'offer' %}selected{% endif %}>Offer /
+                                            Product</option>
+                                        <option value="trust" {% if p.post_type == 'trust' %}selected{% endif %}>Trust /
+                                            Testimonial</option>
+                                        <option value="engagement" {% if p.post_type == 'engagement' %}selected{% endif %}>Engagement</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Caption</label>
+                                    <textarea data-field="caption" rows="6">{{ p.caption }}</textarea>
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Hashtags (JSON array)</label>
+                                    <input type="text" data-field="hashtags" value="{{ p.hashtags|safe }}"
+                                        placeholder='["#tag1","#tag2"]'>
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Call to Action</label>
+                                    <input type="text" data-field="call_to_action" value="{{ p.call_to_action }}">
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Aspect Ratio</label>
+                                    <select data-field="image_aspect_ratio">
+                                        <option value="1:1" {% if p.image_aspect_ratio == "1:1" %}selected{% endif %}>1:1</option>
+                                        <option value="4:5" {% if p.image_aspect_ratio == "4:5" %}selected{% endif %}>4:5</option>
+                                        <option value="9:16" {% if p.image_aspect_ratio == "9:16" %}selected{% endif %}>9:16</option>
+                                        <option value="16:9" {% if p.image_aspect_ratio == "16:9" %}selected{% endif %}>16:9</option>
+                                        <option value="4:3" {% if p.image_aspect_ratio == "4:3" %}selected{% endif %}>4:3</option>
+                                        <option value="3:4" {% if p.image_aspect_ratio == "3:4" %}selected{% endif %}>3:4</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label class="field-label">Admin Note (Internal)</label>
+                                    <input type="text" data-field="admin_post_note" value="{{ p.admin_post_note }}">
+                                </div>
+                            </div>
+
+                            <!-- Right: Image -->
+                            <div>
+                                <label class="field-label">Image</label>
+                                <div class="img-preview-box"
+                                    onclick="document.getElementById('img-upload-{{ p.post_id }}').click()">
+                                    {% if p.image_url %}
+                                    <img src="{{ p.image_url }}" alt="{{ p.title }}">
+                                    <div
+                                        style="position:absolute; bottom:0.5rem; right:0.5rem; background:rgba(0,0,0,0.6); padding:0.2rem 0.5rem; border-radius:4px; font-size:0.65rem; z-index:2;">
+                                        Click to replace</div>
+                                    {% else %}
+                                    <i class="fas fa-image" style="font-size:1.5rem;"></i>
+                                    <div>Click to upload image</div>
+                                    {% endif %}
+                                </div>
+                                <input type="file" id="img-upload-{{ p.post_id }}" style="display:none"
+                                    onchange="uploadImage(this, '{{ p.post_id }}')" accept="image/*">
+
+                                <div class="field">
+                                    <label class="field-label">Image Prompt (AI)</label>
+                                    <textarea data-field="image_prompt" rows="5">{{ p.image_prompt }}</textarea>
+                                </div>
+
+                                <div class="field">
+                                    <label class="field-label">Direct Image URL (override)</label>
+                                    <input type="url" data-field="image_url" value="{{ p.image_url }}"
+                                        placeholder="https://...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="post-actions">
+                            <button class="btn btn-primary btn-sm" onclick="savePost('{{ p.post_id }}')">
+                                <i class="fas fa-save"></i> Save Post
+                            </button>
+                            <button class="btn btn-ghost btn-sm" onclick="generateImage('{{ p.post_id }}')">
+                                <i class="fas fa-magic"></i> AI Gen Image
+                            </button>
+                            <label class="btn btn-ghost btn-sm" style="cursor:pointer;">
+                                <i class="fas fa-upload"></i> Upload Image
+                                <input type="file" style="display:none" onchange="uploadImage(this, '{{ p.post_id }}')"
+                                    accept="image/*">
+                            </label>
+                            {% if p.image_url %}
+                            <a class="btn btn-ghost btn-sm" href="{{ p.image_url }}" target="_blank">
+                                <i class="fas fa-external-link-alt"></i> Preview
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endwith %}
+
+
+        <!-- ██████████████  CUSTOMERS LIST  ██████████████ -->
+        {% elif section == 'customers' %}
+        <div class="page-header">
+            <div>
+                <h1>All Customers</h1>
+                <div class="subtitle">{{ profiles|length }} onboarded customer{{ profiles|length|pluralize }}</div>
+            </div>
+        </div>
+
+        {% for profile in profiles %}
+        <a class="customer-card" href="{% url 'admin_customer_detail' profile.user.id %}">
+            <div class="avatar">{{ profile.business_name|first|upper|default:"?" }}</div>
+            <div class="customer-info">
+                <div class="customer-name">{{ profile.business_name|default:"(No Business Name)" }}</div>
+                <div class="customer-meta">{{ profile.user.email }} · {{ profile.industry|default:"—" }}</div>
+            </div>
+            <div class="customer-stats">
+                <div class="cst">Requests<br><strong>{{ profile.user.plan_requests.count }}</strong></div>
+                <div class="cst">Plans<br><strong>{{ profile.user.generated_plans.count }}</strong></div>
+            </div>
+            <i class="fas fa-chevron-right" style="color:var(--text-3);"></i>
+        </a>
+        {% empty %}
+        <div class="card" style="text-align:center; color:var(--text-3); padding:3rem;">No customers yet</div>
+        {% endfor %}
+
+
+        <!-- ██████████████  CUSTOMER DETAIL  ██████████████ -->
+        {% elif section == 'customer_detail' %}
+        <div class="page-header">
+            <div>
+                <h1>{{ profile.business_name|default:cust.email }}</h1>
+                <div class="subtitle">{{ cust.email }} · Joined {{ cust.date_joined|date:"d M Y" }}</div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost btn-sm" onclick="saveProfile('{{ cust.id }}')">
+                    <i class="fas fa-save"></i> Save Profile
+                </button>
+            </div>
+        </div>
+
+        <div class="split-layout">
+            <div class="left-col" id="profile-editor-{{ cust.id }}">
+                <!-- Business Profile -->
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-building"
+                            style="color:var(--accent); margin-right:0.4rem;"></i> Business Profile</div>
+                    <div class="field">
+                        <label class="field-label">Business Name</label>
+                        <input type="text" data-field="business_name" value="{{ profile.business_name|default:'' }}">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Industry</label>
+                        <input type="text" data-field="industry" value="{{ profile.industry|default:'' }}">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Website</label>
+                        <input type="url" data-field="website" value="{{ profile.website|default:'' }}">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Target Audience</label>
+                        <textarea data-field="target_audience"
+                            rows="2">{{ profile.target_audience|default:'' }}</textarea>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Goals</label>
+                        <textarea data-field="goals" rows="2">{{ profile.goals|default:'' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Brand Assets -->
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-palette"
+                            style="color:var(--violet); margin-right:0.4rem;"></i> Brand Assets</div>
+                    <div class="field">
+                        <label class="field-label">Logo URL</label>
+                        <input type="url" data-field="logo_url" value="{{ profile.logo_url|default:'' }}">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Brand Colors (JSON)</label>
+                        <input type="text" data-field="brand_colors" value="{{ profile.brand_colors|default:'[]' }}">
+                        {% if profile.brand_colors %}
+                        <div class="color-list">
+                            {% for col in profile.brand_colors %}
+                            {% if col %}
+                            <div class="color-swatch" data-color="{{ col }}" title="{{ col }}"></div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Fonts</label>
+                        <input type="text" data-field="fonts" value="{{ profile.fonts|default:'' }}">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Tone of Voice</label>
+                        <input type="text" data-field="tone_of_voice" value="{{ profile.tone_of_voice|default:'' }}">
+                    </div>
+                </div>
+
+                <!-- Social Handles -->
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-share-nodes"
+                            style="color:var(--warning); margin-right:0.4rem;"></i> Social Handles</div>
+                    <div class="handles-grid">
+                        <div class="handle-row field"><i class="fab fa-instagram handle-icon"></i><input type="text"
+                                data-field="instagram" value="{{ profile.instagram|default:'' }}"
+                                placeholder="Instagram"></div>
+                        <div class="handle-row field"><i class="fab fa-facebook handle-icon"></i><input type="text"
+                                data-field="facebook" value="{{ profile.facebook|default:'' }}" placeholder="Facebook">
+                        </div>
+                        <div class="handle-row field"><i class="fab fa-linkedin handle-icon"></i><input type="text"
+                                data-field="linkedin" value="{{ profile.linkedin|default:'' }}" placeholder="LinkedIn">
+                        </div>
+                        <div class="handle-row field"><i class="fab fa-x-twitter handle-icon"></i><input type="text"
+                                data-field="x_twitter" value="{{ profile.x_twitter|default:'' }}"
+                                placeholder="X / Twitter"></div>
+                        <div class="handle-row field"><i class="fab fa-youtube handle-icon"></i><input type="text"
+                                data-field="youtube" value="{{ profile.youtube|default:'' }}" placeholder="YouTube">
+                        </div>
+                        <div class="handle-row field"><i class="fab fa-tiktok handle-icon"></i><input type="text"
+                                data-field="tiktok" value="{{ profile.tiktok|default:'' }}" placeholder="TikTok"></div>
+                        <div class="handle-row field"><i class="fab fa-discord handle-icon"></i><input type="text"
+                                data-field="discord" value="{{ profile.discord|default:'' }}" placeholder="Discord">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: History -->
+            <div class="right-col">
+                <div class="card">
+                    <div class="card-title">Request History</div>
+                    {% for r in requests %}
+                    <div
+                        style="display:flex; align-items:center; gap:0.75rem; padding:0.65rem 0; border-bottom:1px solid var(--border);">
+                        <span class="pill pill-{{ r.status }}"
+                            style="width:80px; text-align:center; justify-content:center;">{{ r.status }}</span>
+                        <span class="mono">{{ r.request_id }}</span>
+                        <span style="flex:1; color:var(--text-2); font-size:0.8rem;">{{ r.start_date }} → {{ r.end_date
+                            }}</span>
+                        <a href="{% url 'admin_request_detail' r.request_id %}" class="btn btn-ghost btn-sm">Open</a>
+                    </div>
+                    {% empty %}
+                    <div style="color:var(--text-3); font-size:0.85rem; padding:0.5rem 0;">No requests yet</div>
+                    {% endfor %}
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Generated Plans</div>
+                    {% for plan in plans %}
+                    <div
+                        style="display:flex; align-items:center; gap:0.75rem; padding:0.65rem 0; border-bottom:1px solid var(--border);">
+                        <span class="pill pill-{{ plan.status }}"
+                            style="width:80px; text-align:center; justify-content:center;">{{ plan.status }}</span>
+                        <span class="mono">{{ plan.plan_id }}</span>
+                        <span style="flex:1; color:var(--text-2); font-size:0.8rem;">{{ plan.posts.count }} posts · {{
+                            plan.start_date }}</span>
+                        <a href="{% url 'admin_plan_detail' plan.plan_id %}" class="btn btn-ghost btn-sm">Edit</a>
+                    </div>
+                    {% empty %}
+                    <div style="color:var(--text-3); font-size:0.85rem; padding:0.5rem 0;">No plans yet</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ██████████████  VIDEO REQUESTS LIST  ██████████████ -->
+        {% elif section == 'video_requests' %}
+        <div class="page-header">
+            <div>
+                <h1>Video Requests</h1>
+                <div class="subtitle">Each row = a customer clicked "Generate Video". No video has been produced yet.
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Request ID</th>
+                        <th>Date Range</th>
+                        <th>Platforms</th>
+                        <th>Count / Platform</th>
+                        <th>Status</th>
+                        <th>Requested</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in video_requests %}
+                    <tr>
+                        <td style="font-weight:600;">{{ r.user.email }}</td>
+                        <td><span class="mono">{{ r.request_id }}</span></td>
+                        <td class="mono">{{ r.start_date }} → {{ r.end_date }}</td>
+                        <td>{{ r.platforms|join:", " }}</td>
+                        <td class="mono">
+                            {% for p, c in r.platform_counts.items %}
+                            {{ p }}: <strong>{{ c }}</strong>{% if not forloop.last %}, {% endif %}
+                            {% empty %}—{% endfor %}
+                        </td>
+                        <td><span class="pill pill-{{ r.status }}">{{ r.status }}</span></td>
+                        <td class="mono" style="font-size:0.72rem; color:var(--text-3);">{{ r.created_at|date:"d M Y ·
+                            H:i" }}</td>
+                        <td><a href="{% url 'admin_video_request_detail' r.request_id %}"
+                                class="btn btn-primary btn-sm"><i class="fas fa-film"></i> Work</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" style="text-align:center; color:var(--text-3); padding:2rem;">No video requests
+                            found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- ██████████████  VIDEO REQUEST DETAIL  ██████████████ -->
+        {% elif section == 'video_request_detail' %}
+        <div class="page-header">
+            <div>
+                <h1>🎬 Video Production: {{ req.request_id }}</h1>
+                <div class="subtitle">Customer: <strong>{{ req.user.email }}</strong> · {{ req.created_at|date:"d M Y,
+                    H:i" }}</div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost btn-sm" onclick="updateStatus('working')"><i class="fas fa-play"></i> Set
+                    Working</button>
+                <button class="btn btn-warning btn-lg" onclick="saveBrief()"><i class="fas fa-save"></i> Save
+                    All</button>
+                <button class="btn btn-primary btn-lg" onclick="generateDraft()"><i class="fas fa-magic"></i> Generate
+                    AI Draft</button>
+            </div>
+        </div>
+
+        <div class="split-layout">
+            <div class="left-col" id="brief-editor">
+                <!-- Brand profile (same fields) -->
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-building"
+                            style="color:var(--accent); margin-right:0.4rem;"></i> Business Profile</div>
+                    <div class="field"><label class="field-label">Business Name</label><input type="text"
+                            data-field="business_name" value="{{ profile.business_name|default:'' }}"></div>
+                    <div class="field"><label class="field-label">Industry</label><input type="text"
+                            data-field="industry" value="{{ profile.industry|default:'' }}"></div>
+                    <div class="field"><label class="field-label">Target Audience</label><textarea
+                            data-field="target_audience" rows="2">{{ profile.target_audience|default:'' }}</textarea>
+                    </div>
+                    <div class="field"><label class="field-label">Goals</label><textarea data-field="goals"
+                            rows="2">{{ profile.goals|default:'' }}</textarea></div>
+                </div>
+
+                <!-- Video-specific generation settings -->
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-film"
+                            style="color:var(--violet); margin-right:0.4rem;"></i> Video Settings</div>
+                    <div class="grid-2">
+                        <div class="field"><label class="field-label">Start Date</label><input type="date"
+                                id="admin-start-date" value="{{ req.start_date|date:'Y-m-d' }}"></div>
+                        <div class="field"><label class="field-label">End Date</label><input type="date"
+                                id="admin-end-date" value="{{ req.end_date|date:'Y-m-d' }}"></div>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Frequency</label>
+                        <select id="admin-frequency">
+                            <option value="daily" {% if req.frequency == 'daily' %}selected{% endif %}>Daily</option>
+                            <option value="alternate" {% if req.frequency == 'alternate' %}selected{% endif %}>Every Other
+                                Day</option>
+                            <option value="weekly_3" {% if req.frequency == 'weekly_3' %}selected{% endif %}>3× per Week
+                            </option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Video Theme / Concept</label>
+                        <input type="text" id="admin-theme" value="{{ req.theme|default:'' }}"
+                            placeholder="e.g. Brand Story, Testimonials">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Duration per Video (seconds)</label>
+                        <input type="number" id="admin-duration" value="{{ req.duration|default:30 }}" min="5"
+                            max="120">
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Videos per Platform</label>
+                        {% for p in platforms_with_counts %}
+                        <div class="plat-count-row">
+                            <span>{{ p.name }}</span>
+                            <input type="number" class="plat-count-inp" data-platform="{{ p.name }}"
+                                value="{{ p.count }}" min="1" max="10">
+                        </div>
+                        {% empty %}
+                        <div style="color:var(--text-3); font-size:0.8rem;">No platforms set</div>
+                        {% endfor %}
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Admin Notes (Internal)</label>
+                        <textarea id="adminNote" rows="3"
+                            placeholder="Production notes…">{{ req.admin_note }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Brand assets for video -->
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-palette"
+                            style="color:var(--warning); margin-right:0.4rem;"></i> Brand Assets</div>
+                    <div class="field"><label class="field-label">Logo URL</label><input type="url"
+                            data-field="logo_url" value="{{ profile.logo_url|default:'' }}"></div>
+                    <div class="field"><label class="field-label">Brand Colors</label><input type="text"
+                            data-field="brand_colors" value="{{ profile.brand_colors|default:'[]' }}"></div>
+                    <div class="field"><label class="field-label">Tone of Voice</label><input type="text"
+                            data-field="tone_of_voice" value="{{ profile.tone_of_voice|default:'' }}"></div>
+                </div>
+            </div>
+
+            <div class="right-col">
+                <div class="card">
+                    <div class="card-title"><i class="fas fa-quote-left"
+                            style="color:var(--accent); margin-right:0.5rem;"></i> Customer Brief</div>
+                    <div class="context-pill-row">
+                        <span class="context-pill">📅 {{ req.start_date }} → {{ req.end_date }}</span>
+                        <span class="context-pill">🔁 {{ req.frequency }}</span>
+                        {% for p in req.platforms %}<span class="context-pill">📱 {{ p }}</span>{% endfor %}
+                        {% for p, c in req.platform_counts.items %}<span class="context-pill"><strong>{{ c }}</strong> ×
+                            {{ p }}</span>{% endfor %}
+                    </div>
+                    <div class="note-block">{{ req.extra_notes|default:"(No extra notes from customer)" }}</div>
+                    <label class="field-label" style="margin-top:0.5rem;">Refine Brief for AI</label>
+                    <textarea id="extraNotes" rows="5"
+                        placeholder="Expand and refine for video generation…">{{ req.extra_notes }}</textarea>
+                </div>
+
+                <div class="card" style="border-style:dashed;">
+                    <div class="card-title" style="color:var(--text-3);">Video Draft</div>
+                    <p style="color:var(--text-3); font-size:0.85rem; margin-bottom:1.25rem;">Generate video scripts and
+                        prompts using AI, then upload final rendered videos per post.</p>
+                    <button class="btn btn-primary btn-full btn-lg" onclick="generateDraft()">
+                        <i class="fas fa-magic"></i> Generate AI Video Plan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ██████████████  VIDEO PLAN DETAIL  ██████████████ -->
+        {% elif section == 'video_plan_detail' %}
+        <div class="page-header">
+            <div>
+                <h1>🎬 Video Plan Editor</h1>
+                <div class="subtitle"><span class="mono">{{ plan.plan_id }}</span> · {{ plan.video_posts.count }} videos
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-success btn-lg" onclick="approvePlan()"><i class="fas fa-check"></i> Approve &
+                    Release</button>
+                <button class="btn btn-danger btn-sm" onclick="rejectPlan()"><i class="fas fa-times"></i>
+                    Reject</button>
+                <button class="btn btn-danger btn-sm" onclick="deletePlan()"><i class="fas fa-trash"></i>
+                    Delete Plan</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Plan Summary</div>
+            <textarea id="planSummary" rows="3">{{ plan.summary }}</textarea>
+            <div style="margin-top:0.75rem;">
+                <button class="btn btn-ghost btn-sm" onclick="saveMeta()"><i class="fas fa-save"></i> Save
+                    Summary</button>
+            </div>
+        </div>
+
+        {% for p in posts %}
+        <div class="post-item" id="post-{{ p.post_id }}" data-post-id="{{ p.post_id }}">
+            <div class="post-item-head" onclick="togglePost('{{ p.post_id }}')">
+                <div class="post-date-badge">
+                    <span class="post-day">{{ p.date }}</span>
+                    <span style="color:var(--text-3); font-size:0.75rem;">{{ p.day_of_week }}</span>
+                </div>
+                <span class="post-title-preview" style="margin:0 1rem;">{{ p.title|default:"(no title)" }}</span>
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <span class="pill pill-{{ p.video_status }}" style="font-size:0.6rem;">{{ p.video_status }}</span>
+                    <i class="fas fa-chevron-down chevron"></i>
+                </div>
+            </div>
+
+            <div class="post-item-body">
+                <div class="post-grid">
+                    <div>
+                        <div class="field"><label class="field-label">Title</label><input type="text" data-field="title"
+                                value="{{ p.title }}"></div>
+                        <div class="field"><label class="field-label">Occasion / Theme</label><input type="text"
+                                data-field="occasion" value="{{ p.occasion }}"></div>
+                        <div class="field"><label class="field-label">Caption</label><textarea data-field="caption"
+                                rows="4">{{ p.caption }}</textarea></div>
+                        <div class="field"><label class="field-label">Script / Voiceover</label><textarea
+                                data-field="script" rows="5">{{ p.script }}</textarea></div>
+                        <div class="field"><label class="field-label">Hashtags (JSON)</label><input type="text"
+                                data-field="hashtags" value="{{ p.hashtags|safe }}"></div>
+                        <div class="field"><label class="field-label">Call to Action</label><input type="text"
+                                data-field="call_to_action" value="{{ p.call_to_action }}"></div>
+                    </div>
+                    <div>
+                        <label class="field-label">Video</label>
+                        <div class="vid-preview-box">
+                            {% if p.video_url %}
+                            <video src="{{ p.video_url }}" controls></video>
+                            {% else %}
+                            <i class="fas fa-video" style="font-size:1.5rem;"></i>
+                            <div>No video yet</div>
+                            {% endif %}
+                        </div>
+                        <div class="field"><label class="field-label">Video Prompt (AI)</label><textarea
+                                data-field="video_prompt" rows="5">{{ p.video_prompt }}</textarea></div>
+                    </div>
+                </div>
+
+                <div class="post-actions">
+                    <button class="btn btn-primary btn-sm" onclick="savePost('{{ p.post_id }}')"><i
+                            class="fas fa-save"></i> Save Post</button>
+                    <label class="btn btn-ghost btn-sm" style="cursor:pointer;">
+                        <i class="fas fa-upload"></i> Upload Video
+                        <input type="file" style="display:none" onchange="uploadVideo(this, '{{ p.post_id }}')"
+                            accept="video/*">
+                    </label>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% endif %}
+    </main>
+
+    <!-- Toast container -->
+    <div id="toast"></div>
+
+    <!-- ════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════ -->
+    <script>
+        /* ── CSRF ── */
+        function getCookie(name) {
+            let val = null;
+            document.cookie.split(';').forEach(c => {
+                c = c.trim();
+                if (c.startsWith(name + '=')) val = decodeURIComponent(c.slice(name.length + 1));
+            });
+            return val;
+        }
+
+        async function api(url, data = {}, method = 'POST') {
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                body: JSON.stringify(data),
+                credentials: 'same-origin',
+            });
+            return res.json();
+        }
+
+        /* ── Toast ── */
+        function toast(msg, type = 'ok') {
+            const el = document.createElement('div');
+            el.className = `toast-msg ${type}`;
+            el.textContent = msg;
+            document.getElementById('toast').appendChild(el);
+            setTimeout(() => el.remove(), 3500);
+        }
+
+        /* ── Dynamic IDs from Django ── */
+        const REQ_ID = "{{ req.request_id|default:'' }}";
+        const PLAN_ID = "{{ plan.plan_id|default:'' }}";
+
+        /* ── Post toggle ── */
+        function togglePost(id) {
+            document.getElementById('post-' + id).classList.toggle('expanded');
+        }
+        function expandAll() {
+            document.querySelectorAll('.post-item').forEach(el => el.classList.add('expanded'));
+        }
+
+        /* ── Save brief (onboarding + request settings) ── */
+        async function saveBrief() {
+            if (!REQ_ID) return;
+            const editor = document.getElementById('brief-editor');
+            const data = {
+                extra_notes: document.getElementById('extraNotes')?.value || '',
+                admin_note: document.getElementById('adminNote')?.value || '',
+                start_date: document.getElementById('admin-start-date')?.value,
+                end_date: document.getElementById('admin-end-date')?.value,
+                frequency: document.getElementById('admin-frequency')?.value,
+                platform_counts: {},
+                theme: document.getElementById('admin-theme')?.value || '',
+                duration: document.getElementById('admin-duration')?.value || 30,
+            };
+
+            // Collect platform counts
+            document.querySelectorAll('.plat-count-inp').forEach(inp => {
+                data.platform_counts[inp.dataset.platform] = parseInt(inp.value) || 1;
+            });
+
+            // Collect all onboarding data-field inputs (business profile + handles + brand assets)
+            editor.querySelectorAll('[data-field]').forEach(inp => {
+                data[inp.dataset.field] = inp.value;
+            });
+
+            try {
+                const res = await api(`/agency-admin/requests/${REQ_ID}/save-brief/`, data);
+                if (res.ok) toast('All data saved ✓', 'ok');
+                else toast(res.error || 'Save failed', 'error');
+            } catch (e) { toast('Network error', 'error'); }
+        }
+
+        /* ── Save profile (customer detail page) ── */
+        async function saveProfile(userId) {
+            const editor = document.getElementById('profile-editor-' + userId);
+            const data = {};
+            editor.querySelectorAll('[data-field]').forEach(inp => {
+                data[inp.dataset.field] = inp.value;
+            });
+            try {
+                const res = await api(`/agency-admin/customers/${userId}/edit-profile/`, data);
+                if (res.ok) toast('Profile saved ✓', 'ok');
+                else toast(res.error || 'Save failed', 'error');
+            } catch (e) { toast('Network error', 'error'); }
+        }
+
+        /* ── Update request status ── */
+        async function updateStatus(newStatus) {
+            if (!REQ_ID) return;
+            const note = document.getElementById('adminNote')?.value || '';
+            try {
+                const res = await api(`/agency-admin/requests/${REQ_ID}/status/`, { status: newStatus, note });
+                if (res.ok) { toast('Status → ' + newStatus, 'ok'); setTimeout(() => location.reload(), 800); }
+                else toast(res.error || 'Failed', 'error');
+            } catch (e) { toast('Network error', 'error'); }
+        }
+
+        /* ── Generate AI draft ── */
+        async function generateDraft() {
+            if (!REQ_ID) return;
+            if (!confirm('Generate AI draft? This uses Claude tokens.')) return;
+            toast('Generating… this may take 30–90 seconds', 'info');
+            try {
+                const res = await api(`/agency-admin/requests/${REQ_ID}/generate/`);
+                if (res.ok) {
+                    toast(`Draft ready — ${res.posts || ''} posts`, 'ok');
+                    const dest = res.type === 'video'
+                        ? `/agency-admin/video-plans/${res.plan_id}/`
+                        : `/agency-admin/plans/${res.plan_id}/`;
+                    setTimeout(() => location.href = dest, 1000);
+                } else {
+                    toast('Error: ' + (res.error || 'Unknown'), 'error');
+                }
+            } catch (e) { toast('Network error', 'error'); }
+        }
+
+        /* ── Save plan meta (summary + admin note) ── */
+        async function saveMeta() {
+            if (!PLAN_ID) return;
+            const data = {
+                summary: document.getElementById('planSummary')?.value || '',
+                admin_note: document.getElementById('adminNote')?.value || '',
+            };
+            try {
+                const res = await api(`/agency-admin/plans/${PLAN_ID}/save-meta/`, data);
+                if (res.ok) toast('Summary saved ✓', 'ok');
+                else toast(res.error || 'Failed', 'error');
+            } catch (e) { toast('Network error', 'error'); }
+        }
+
+        /* ── Approve plan ── */
+        async function approvePlan() {
+            if (!PLAN_ID) return;
+            if (!confirm('RELEASE TO CUSTOMER? They will be able to see all posts immediately.')) return;
+            const note = document.getElementById('adminNote')?.value || '';
+            try {
+                const res = await api(`/agency-admin/plans/${PLAN_ID}/approve/`, { note });
+                if (res.ok) { toast('Plan approved & released ✓', 'ok'); setTimeout(() => location.reload(), 800); }
+                else toast(res.error || 'Failed', 'error');
+            } catch (e) { toast('Network error', 'error'); }
+        }
+
+        /* ── Reject plan ── */
+        async function rejectPlan() {
+            if (!PLAN_ID) return;
+            const reason = prompt('Reason for rejection (optional):');
+            try {
+                const res = await api(`/agency-admin/plans/${PLAN_ID}/reject/`, { note: reason || '' });
+                if (res.ok) { toast('Plan rejected', 'ok'); setTimeout(() => location.reload(), 800); }
+                else toast(res.error || 'Failed', 'error');
+            } catch (e) { toast('Network error', 'error'); }
+        }
+
+        /* ── Delete plan ── */
+        async function deletePlan() {
+            if (!PLAN_ID) return;
+            if (!confirm('DELETE THIS PLAN PERMANENTLY? The request will revert to "Pending" status.')) return;
+            try {
+                const res = await api(`/agency-admin/plans/${PLAN_ID}/delete/`);
+                if (res.ok) {
+                    toast('Plan deleted ✓', 'ok');
+                    // Redirect back to request if we can, or dashboard
+                    setTimeout(() => {
+                        location.href = '/agency-admin/';
+                    }, 1000);
+                } else toast(res.error || 'Failed', 'error');
+            } catch (e) { toast('Network error', 'error'); }
+        }
+
+        /* ── Save single post ── */
+        async function savePost(postId) {
+            const el = document.getElementById('post-' + postId);
+            const data = {};
+            el.querySelectorAll('[data-field]').forEach(inp => {
+                data[inp.dataset.field] = inp.value;
+            });
+            try {
+                const res = await api(`/agency-admin/posts/${postId}/save/`, data);
+                if (res.ok) toast('Post saved ✓', 'ok');
+                else toast(res.error || 'Save failed', 'error');
+            } catch (e) { toast('Network error', 'error'); }
+        }
+
+        /* ── AI Generate image ── */
+        async function generateImage(postId) {
+            const el = document.getElementById('post-' + postId);
+            const prompt = el.querySelector('[data-field="image_prompt"]')?.value || '';
+            if (!prompt) { toast('Enter an image prompt first', 'error'); return; }
+            toast('Generating image…', 'info');
+            try {
+                const res = await api(`/agency-admin/posts/${postId}/generate-image/`, { custom_prompt: prompt });
+                if (res.ok) {
+                    toast('Image generated ✓', 'ok');
+                    // Update preview
+                    const box = el.querySelector('.img-preview-box');
+                    if (box) {
+                        box.innerHTML = `<img src="${res.image_url}" alt="Generated" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:var(--radius-sm);">`;
+                    }
+                    // Update URL field
+                    const urlField = el.querySelector('[data-field="image_url"]');
+                    if (urlField) urlField.value = res.image_url;
+                } else {
+                    toast('Error: ' + (res.error || 'Unknown'), 'error');
+                }
+            } catch (e) { toast('Network error', 'error'); }
+        }
+
+        /* ── Upload image ── */
+        async function uploadImage(input, postId) {
+            if (!input.files || !input.files[0]) return;
+            const formData = new FormData();
+            formData.append('image_file', input.files[0]);
+            toast('Uploading…', 'info');
+            try {
+                const r = await fetch(`/agency-admin/posts/${postId}/upload-image/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                    body: formData,
+                    credentials: 'same-origin',
+                });
+                const res = await r.json();
+                if (res.ok) {
+                    toast('Image uploaded ✓', 'ok');
+                    // Update preview & URL field
+                    const el = document.getElementById('post-' + postId);
+                    const box = el?.querySelector('.img-preview-box');
+                    if (box) box.innerHTML = `<img src="${res.image_url}" alt="Uploaded" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:var(--radius-sm);">`;
+                    const urlField = el?.querySelector('[data-field="image_url"]');
+                    if (urlField) urlField.value = res.image_url;
+                } else {
+                    toast(res.error || 'Upload failed', 'error');
+                }
+            } catch (e) { toast('Network error', 'error'); }
+        }
+
+        /* ── Upload video ── */
+        async function uploadVideo(input, postId) {
+            if (!input.files || !input.files[0]) return;
+            const formData = new FormData();
+            formData.append('video_file', input.files[0]);
+            toast('Uploading video…', 'info');
+            try {
+                const r = await fetch(`/agency-admin/posts/${postId}/upload-video/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                    body: formData,
+                    credentials: 'same-origin',
+                });
+                const res = await r.json();
+                if (res.ok) { toast('Video uploaded ✓', 'ok'); setTimeout(() => location.reload(), 800); }
+                else toast(res.error || 'Upload failed', 'error');
+            } catch (e) { toast('Network error', 'error'); }
+        }
+
+        /* ── Keyboard shortcut: Ctrl+S ── */
+        document.addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                if (REQ_ID) saveBrief();
+                else if (PLAN_ID) saveMeta();
+            }
+        });
+    </script>
+    <script>
+        // Apply brand color swatches at runtime to avoid template CSS parsing errors
+        (function(){
+            document.querySelectorAll('.color-swatch[data-color]').forEach(function(el){
+                const c = el.getAttribute('data-color');
+                if (c) el.style.backgroundColor = c;
+            });
+        })();
+    </script>
+</body>
+
+</html>

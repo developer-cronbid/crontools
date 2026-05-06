@@ -69,7 +69,10 @@ class GeneratedVideoPlan(models.Model):
     summary = models.TextField(blank=True, default='')
     themes = models.JSONField(default=list, blank=True)
     is_bookmarked = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    status        = models.CharField(max_length=20, default='approved') # 'draft' | 'approved' | 'rejected'
+    admin_note    = models.TextField(blank=True, default='')
+    created_at    = models.DateTimeField(auto_now_add=True)
+    approved_at   = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -88,6 +91,8 @@ class GeneratedVideoPlan(models.Model):
             "platforms": self.platforms,
             "summary": self.summary,
             "themes": self.themes,
+            "status": self.status,
+            "admin_note": self.admin_note,
             "posts": posts,
         }
 

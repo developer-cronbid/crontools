@@ -26,6 +26,7 @@ urlpatterns = [
     path("hub/", include("hub.urls")),
     path("video/", include("video.urls")),
     path('accounts/', include('accounts.urls')),
+    path("agency-admin/", include("hub.admin_urls")),
     path("", landing, name="landing"), 
 ]
 

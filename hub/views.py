@@ -15,7 +15,53 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import BusinessProfile, GeneratedPlan, GeneratedPost
+from .models import BusinessProfile, GeneratedPlan, GeneratedPost, PlanRequest, Feedback
+
+@login_required
+def request_plan(request):
+    """User clicks Generate — creates a PlanRequest instead of calling AI."""
+    if request.method == 'POST':
+        body = json.loads(request.body.decode('utf-8'))
+        request_id = datetime.utcnow().strftime("%Y%m%d%H%M%S%f")
+        
+        PlanRequest.objects.create(
+            user=request.user,
+            request_id=request_id,
+            start_date=body.get('start_date'),
+            end_date=body.get('end_date'),
+            frequency=body.get('frequency', 'daily'),
+            platforms=body.get('platforms', []),
+            platform_counts=body.get('photo_counts', {}),
+            extra_notes=body.get('notes', ''),
+            status='pending'
+        )
+        return JsonResponse({"ok": True, "request_id": request_id, "message": "Plan requested. Admin will review within 24h."})
+    return JsonResponse({"error": "Method not allowed"}, status=405)
+
+@login_required
+def plan_request_status(request):
+    """Check status of pending requests (both image and video)."""
+    # Combine both types of requests
+    reqs = list(PlanRequest.objects.filter(user=request.user).exclude(status='approved'))
+    vreqs = list(VideoRequest.objects.filter(user=request.user).exclude(status='approved'))
+    
+    combined = sorted(reqs + vreqs, key=lambda x: x.created_at, reverse=True)
+    return JsonResponse({"requests": [r.to_dict() for r in combined]})
+
+@login_required
+@require_POST
+def submit_feedback(request, post_id):
+    """Submit user feedback on a post."""
+    post = get_object_or_404(GeneratedPost, post_id=post_id, plan__user=request.user)
+    body = json.loads(request.body.decode('utf-8'))
+    
+    Feedback.objects.create(
+        post=post,
+        user=request.user,
+        tags=body.get('tags', []),
+        notes=body.get('notes', '')
+    )
+    return JsonResponse({"ok": True, "message": "Feedback submitted. Admin will review."})
 
 # ============================================================
 # AIML API CONFIG
@@ -297,7 +343,7 @@ def _observances_in_range(start: date, end: date):
 def hub_plan(request):
     profile = getattr(request.user, 'business_profile', None)
     brand = profile.to_brand_dict() if profile else None
-    db_plans = GeneratedPlan.objects.filter(user=request.user)
+    db_plans = GeneratedPlan.objects.filter(user=request.user, status='approved')
     plans = [p.to_dict() for p in db_plans]
     return render(request, "hub/hub_plan.html", {
         "brand": brand,
@@ -354,7 +400,7 @@ def generate_plan(request):
     system_prompt = (
         "You are a senior social media strategist and creative director for Indian SMB brands. "
         "You produce date-anchored social media plans that are culturally aware, platform-aware, "
-        "and conversion-focused. You ALWAYS respond with valid JSON only — no prose, no markdown fences, "
+        "and conversion-focused. STRICTLY NO EMOJIS in any part of the output. You ALWAYS respond with valid JSON only — no prose, no markdown fences, "
         "no commentary outside the JSON."
     )
 
@@ -422,7 +468,7 @@ Extra notes from user: {extra_notes or '(none)'}
 3. For each post, write captions that are platform-native (Instagram = punchy + emojis + hashtags;
    LinkedIn = professional; Facebook = warm + direct). Keep captions under 600 characters unless
    it's clearly a long-form post.
-4. Hashtags: 8–15 relevant ones, mix branded + niche + broad.
+4. Hashtags: 8–15 relevant ones, mix branded + niche + broad. STRICTLY NO EMOJIS in hashtags.
 5. The image_prompt MUST be a complete, self-contained Nano Banana Pro prompt — describe scene,
    composition, subject, lighting, mood, colors (using the brand colors {', '.join(ba.get('brand_colors', []))}),
    style (photorealistic / 3D / illustration), aspect ratio intent, and any text overlay

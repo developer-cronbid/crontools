@@ -10,7 +10,8 @@ def unified_login(request):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('landing')
+            next_url = request.GET.get('next') or request.POST.get('next') or 'landing'
+            return redirect(next_url)
         else:
             messages.error(request, "Invalid email or password.")
     return render(request, 'accounts/login.html')

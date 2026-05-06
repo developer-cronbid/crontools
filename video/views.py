@@ -16,7 +16,7 @@ from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.contrib import messages
 
-from hub.views import _call_claude, _extract_json_block, AIML_API_KEY, INDIAN_FESTIVALS_2026, RECURRING_FINANCE_DAYS
+from hub.models import BusinessProfile, GeneratedPlan, GeneratedPost, PlanRequest, VideoRequest
 from .models import VideoProfile, GeneratedVideoPlan, GeneratedVideoPost
 from django.contrib.auth.decorators import login_required
 
@@ -116,6 +116,32 @@ def _video_observances_in_range(start: date, end: date):
     out.sort(key=lambda x: x["date"])
     return out
 
+
+@login_required
+def request_video_plan(request):
+    """User clicks Generate for video — creates a VideoRequest."""
+    if request.method == 'POST':
+        body = json.loads(request.body.decode('utf-8'))
+        request_id = datetime.utcnow().strftime("%Y%m%d%H%M%S%f")
+        
+        VideoRequest.objects.create(
+            user=request.user,
+            request_id=request_id,
+            start_date=body.get('start_date'),
+            end_date=body.get('end_date'),
+            frequency=body.get('frequency', 'daily'),
+            platforms=body.get('platforms', []),
+            extra_notes=body.get('notes', ''),
+            status='pending'
+        )
+        return JsonResponse({"ok": True, "request_id": request_id, "message": "Video plan requested. Admin will review."})
+    return JsonResponse({"error": "Method not allowed"}, status=405)
+
+@login_required
+def video_request_status(request):
+    """Check status of pending video requests."""
+    reqs = VideoRequest.objects.filter(user=request.user).order_by('-created_at')
+    return JsonResponse({"requests": [{"request_id": r.request_id, "status": r.status} for r in reqs]})
 
 # ============================================================
 # GENERATE VIDEO PLAN — POST endpoint (mirrors generate_plan)

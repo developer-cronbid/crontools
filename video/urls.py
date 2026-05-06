@@ -8,7 +8,10 @@ urlpatterns = [
     # Main Dashboard / Plan View
     path("", views.video_plan, name="video_plan"),
 
-    # AI Generation APIs
+    # Request APIs (customer side)
+    path("plan/request/", views.request_video_plan, name="request_video_plan"),
+    path("plan/request-status/", views.video_request_status, name="video_request_status"),
+    
     path("plan/generate/", views.generate_video_plan, name="generate_video_plan"),
     path("plan/generate-video/", views.generate_post_video, name="generate_post_video"),
 
