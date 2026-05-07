@@ -15,7 +15,8 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import BusinessProfile, GeneratedPlan, GeneratedPost, PlanRequest, Feedback
+from .models import BusinessProfile, GeneratedPlan, GeneratedPost, PlanRequest, Feedback,VideoRequest
+from django.shortcuts import get_object_or_404
 
 @login_required
 def request_plan(request):
@@ -66,7 +67,7 @@ def submit_feedback(request, post_id):
 # ============================================================
 # AIML API CONFIG
 # ============================================================
-AIML_API_KEY = "1caa12b3cd1787b67fc7c2c6b60d065b"
+AIML_API_KEY = ""
 AIML_CHAT_URL = "https://api.aimlapi.com/v1/chat/completions"
 AIML_IMAGE_URL = "https://api.aimlapi.com/v1/images/generations"
 AIML_TEXT_MODEL = "anthropic/claude-opus-4-6"
