@@ -1,154 +1,381 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-950 text-gray-100 selection:bg-yellow-600 selection:text-black font-sans">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
-    <nav class="fixed w-full z-50 top-0 border-b border-gray-800 bg-gray-950/80 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <a href="/" class="text-2xl font-serif font-bold text-white tracking-wide">
-                Cron<span class="text-yellow-600">tools</span>
-            </a>
-            <div class="hidden md:flex space-x-8 items-center">
-                <a href="#platform" class="text-xs uppercase tracking-widest text-gray-400 hover:text-white transition">Platform</a>
-                <a href="#solutions" class="text-xs uppercase tracking-widest text-gray-400 hover:text-white transition">Solutions</a>
-                
-                <div class="flex items-center space-x-4">
-                    <a href="/hub/" class="text-xs uppercase tracking-widest text-gray-400 hover:text-yellow-500 transition font-semibold">
-                        Image Hub
-                    </a>
-                    <a href="/video/" class="text-xs uppercase tracking-widest text-gray-400 hover:text-indigo-500 transition font-semibold">
-                        Video Hub
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #FAFAFA;
+        color: #0F172A;
+        overflow-x: hidden;
+    }
 
-    <header class="relative flex flex-col items-center justify-center text-center min-h-screen px-4 pt-20 overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-900 via-gray-950 to-gray-950">
-        
-        <span class="text-yellow-600 tracking-[0.25em] uppercase text-xs font-bold mb-6 flex items-center gap-4">
-            <span class="w-8 h-[1px] bg-yellow-600 opacity-60"></span>
-            AI-Powered Marketing Automation
-            <span class="w-8 h-[1px] bg-yellow-600 opacity-60"></span>
-        </span>
-        
-        <h1 class="text-5xl md:text-7xl lg:text-8xl font-serif tracking-tight mb-8 text-white leading-tight">
-            Marketing that <br>
-            <em class="text-yellow-600 italic">moves</em> at machine speed
-        </h1>
-        
-        <p class="text-gray-400 max-w-2xl text-lg md:text-xl mb-12 leading-relaxed font-light">
-            One platform to automate email, SEO, paid media, and social — precisely tuned by AI, effortlessly scaled by you.
-        </p>
-        
-        <div class="flex flex-col sm:flex-row gap-4 z-10">
-            <a href="/hub/" class="bg-yellow-600 hover:bg-yellow-500 text-black font-semibold py-4 px-10 rounded shadow-[0_0_20px_rgba(202,138,4,0.3)] hover:shadow-[0_0_30px_rgba(202,138,4,0.6)] transition-all duration-300 uppercase tracking-widest text-sm transform hover:-translate-y-1">
-                Start Automating
-            </a>
-            <a href="#platform" class="border border-gray-700 hover:border-gray-400 hover:bg-gray-800 text-gray-300 py-4 px-10 rounded transition-all duration-300 uppercase tracking-widest text-sm">
-                Explore Platform
-            </a>
-        </div>
-    </header>
+    /* Cinematic Gradients */
+    .bg-gradient-radial {
+        background-image: radial-gradient(circle at center, var(--tw-gradient-stops));
+    }
 
-    <section class="border-y border-gray-800 bg-gray-900/40">
-        <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-2 md:grid-cols-4 gap-12 text-center divide-x divide-gray-800/0 md:divide-gray-800">
-            <div>
-                <div class="text-4xl md:text-6xl font-serif text-yellow-600 mb-2">12×</div>
-                <div class="text-[0.65rem] uppercase tracking-widest text-gray-500">Faster Campaign Launch</div>
-            </div>
-            <div>
-                <div class="text-4xl md:text-6xl font-serif text-yellow-600 mb-2">340%</div>
-                <div class="text-[0.65rem] uppercase tracking-widest text-gray-500">Average ROI Increase</div>
-            </div>
-            <div>
-                <div class="text-4xl md:text-6xl font-serif text-yellow-600 mb-2">4</div>
-                <div class="text-[0.65rem] uppercase tracking-widest text-gray-500">Growth Channels Unified</div>
-            </div>
-            <div>
-                <div class="text-4xl md:text-6xl font-serif text-yellow-600 mb-2">24/7</div>
-                <div class="text-[0.65rem] uppercase tracking-widest text-gray-500">Autonomous Optimization</div>
-            </div>
-        </div>
-    </section>
+    /* Glassmorphism Utilities */
+    .glass-nav {
+        background: rgba(250, 250, 250, 0.7);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+    }
 
-    <section id="platform" class="py-32 px-6 max-w-7xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-            <div>
-                <span class="text-xs uppercase tracking-widest text-yellow-600 mb-4 block">Core Platform</span>
-                <h2 class="text-4xl md:text-5xl font-serif leading-tight">Four channels.<br>One intelligence.</h2>
-            </div>
-            <p class="text-gray-400 max-w-md font-light leading-relaxed">
-                Crontools unifies every digital growth channel under a single AI brain — so every campaign learns from every other.
-            </p>
-        </div>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+    }
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-            
-            <a href="#" class="group relative aspect-[3/4] bg-gray-900 overflow-hidden block">
-                <img src="https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=600&q=80" alt="Email" class="absolute inset-0 w-full h-full object-cover opacity-30 grayscale group-hover:grayscale-0 group-hover:opacity-50 transition-all duration-700 group-hover:scale-105">
-                <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/40 to-transparent"></div>
-                <div class="absolute top-6 left-6 border border-yellow-600/40 text-yellow-600 px-2 py-1 text-[0.6rem] uppercase tracking-widest">01</div>
-                <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                    <h3 class="text-2xl font-serif mb-2">Email Outreach</h3>
-                    <p class="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Personalized sequences that feel handwritten, sent at scale.</p>
-                </div>
-            </a>
+    /* Infinite Marquee Animation for Hero Showcase */
+    @keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+    @keyframes marquee-reverse {
+        0% { transform: translateX(-50%); }
+        100% { transform: translateX(0); }
+    }
+    .animate-marquee {
+        display: flex;
+        width: 200%;
+        animation: marquee 35s linear infinite;
+    }
+    .animate-marquee-reverse {
+        display: flex;
+        width: 200%;
+        animation: marquee-reverse 40s linear infinite;
+    }
+    .animate-marquee:hover, .animate-marquee-reverse:hover {
+        animation-play-state: paused;
+    }
 
-            <a href="#" class="group relative aspect-[3/4] bg-gray-900 overflow-hidden block">
-                <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&q=80" alt="SEO" class="absolute inset-0 w-full h-full object-cover opacity-30 grayscale group-hover:grayscale-0 group-hover:opacity-50 transition-all duration-700 group-hover:scale-105">
-                <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/40 to-transparent"></div>
-                <div class="absolute top-6 left-6 border border-yellow-600/40 text-yellow-600 px-2 py-1 text-[0.6rem] uppercase tracking-widest">02</div>
-                <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                    <h3 class="text-2xl font-serif mb-2">SEO Engine</h3>
-                    <p class="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Automated audits and content strategies that compound.</p>
-                </div>
-            </a>
+    /* Hide scrollbar for clean aesthetic */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #FAFAFA;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #CBD5E1;
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #94A3B8;
+    }
+</style>
 
-            <a href="#" class="group relative aspect-[3/4] bg-gray-900 overflow-hidden block">
-                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80" alt="PPC" class="absolute inset-0 w-full h-full object-cover opacity-30 grayscale group-hover:grayscale-0 group-hover:opacity-50 transition-all duration-700 group-hover:scale-105">
-                <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/40 to-transparent"></div>
-                <div class="absolute top-6 left-6 border border-yellow-600/40 text-yellow-600 px-2 py-1 text-[0.6rem] uppercase tracking-widest">03</div>
-                <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                    <h3 class="text-2xl font-serif mb-2">PPC Automation</h3>
-                    <p class="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Smart bidding and real-time budget allocation across platforms.</p>
-                </div>
-            </a>
-
-            <a href="/hub/" class="group relative aspect-[3/4] bg-gray-900 overflow-hidden block">
-                <img src="https://images.unsplash.com/photo-1611926653458-09294b3142bf?w=600&q=80" alt="Social" class="absolute inset-0 w-full h-full object-cover opacity-30 grayscale group-hover:grayscale-0 group-hover:opacity-50 transition-all duration-700 group-hover:scale-105">
-                <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/40 to-transparent"></div>
-                <div class="absolute top-6 left-6 border border-yellow-600/40 text-yellow-600 px-2 py-1 text-[0.6rem] uppercase tracking-widest">04</div>
-                <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                    <h3 class="text-2xl font-serif mb-2 text-yellow-500">Social Hub &rarr;</h3>
-                    <p class="text-sm text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">Schedule, analyze, and grow across every platform seamlessly.</p>
-                </div>
-            </a>
-
-        </div>
-    </section>
-
-    <section class="py-32 px-6 bg-gray-900 border-t border-gray-800 text-center">
-        <div class="max-w-3xl mx-auto">
-            <span class="text-xs uppercase tracking-widest text-yellow-600 mb-4 block">Begin Today</span>
-            <h2 class="text-4xl md:text-6xl font-serif mb-8 leading-tight">Your competitors<br>are already automating.</h2>
-            <p class="text-gray-400 mb-12 text-lg font-light">Get every channel running on AI in under 30 minutes. No agency. No complexity.</p>
-            <a href="/hub/" class="inline-block bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-4 px-12 rounded uppercase tracking-widest text-sm transition-all shadow-lg hover:-translate-y-1">
-                Go to Hub
-            </a>
-        </div>
-    </section>
-
-    <footer class="border-t border-gray-800 py-12 px-6 text-center md:text-left">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="text-xl font-serif font-bold text-white tracking-wide">
-                Cron<span class="text-yellow-600">tools</span>
-            </div>
-            <p class="text-xs tracking-wider text-gray-600 uppercase">
-                © 2026 Crontools. Built for growth teams.
-            </p>
-        </div>
-    </footer>
-
+<div class="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
+    <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-gradient-radial from-blue-100/40 to-transparent blur-3xl mix-blend-multiply"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-gradient-radial from-purple-100/40 to-transparent blur-3xl mix-blend-multiply"></div>
 </div>
+
+<nav class="fixed top-0 w-full z-50 glass-nav transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+            <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer">
+                <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <span class="font-bold text-xl tracking-tight text-slate-900">Crontool</span>
+            </div>
+            <div class="hidden md:block">
+                <div class="ml-10 flex items-baseline space-x-8">
+                    <a href="#products" class="text-slate-600 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Products</a>
+                    <a href="#intelligence" class="text-slate-600 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Intelligence</a>
+                    <a href="#pricing" class="text-slate-600 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Pricing</a>
+                </div>
+            </div>
+            <div>
+                <a href="/login/" class="text-sm font-semibold text-slate-900 hover:text-slate-600 transition-colors mr-6">Sign in</a>
+                <a href="/signup/" class="bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20 hover:shadow-xl hover:shadow-slate-900/30 transform hover:-translate-y-0.5">Get Started</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="pt-32">
+    <section class="relative max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 text-center">
+        <div x-data="{ shown: false }" x-init="setTimeout(() => shown = true, 100)" class="max-w-4xl mx-auto">
+            <div :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'" class="transition-all duration-1000 ease-out">
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tighter leading-[1.05] text-slate-900">
+                    A place to display your <br/>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900">masterpiece.</span>
+                </h1>
+                <p class="mt-8 text-lg md:text-xl text-slate-500 max-w-2xl mx-auto font-medium leading-relaxed">
+                    Crontool merges generative AI with predictive trend analysis. We do not just follow trends. We equip you to create them.
+                </p>
+                <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="#start" class="bg-slate-900 text-white px-8 py-4 rounded-full text-base font-semibold hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 hover:shadow-2xl hover:shadow-slate-900/30">
+                        Join for $19.99/m
+                    </a>
+                    <a href="#demo" class="bg-white text-slate-900 border border-slate-200 px-8 py-4 rounded-full text-base font-semibold hover:bg-slate-50 transition-all shadow-sm">
+                        Watch Demo
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-24 w-full overflow-hidden relative" x-data="{ shown: false }" x-intersect.once="shown = true">
+            <div class="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#FAFAFA] to-transparent z-10 pointer-events-none"></div>
+            <div class="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#FAFAFA] to-transparent z-10 pointer-events-none"></div>
+
+            <div :class="shown ? 'opacity-100 scale-100' : 'opacity-0 scale-95'" class="transition-all duration-1000 delay-300 ease-out flex flex-col gap-6">
+                <div class="animate-marquee gap-6 items-center">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80" alt="AI Generated Art" class="w-48 h-48 md:w-64 md:h-64 object-cover rounded-3xl shadow-lg transition-transform hover:scale-105 duration-500 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1536152470836-b943b246224c?auto=format&fit=crop&w=400&q=80" alt="AI Generated Art" class="w-40 h-40 md:w-56 md:h-56 object-cover rounded-3xl shadow-lg transition-transform hover:scale-105 duration-500 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=400&q=80" alt="AI Generated Art" class="w-56 h-56 md:w-72 md:h-72 object-cover rounded-[2.5rem] shadow-xl transition-transform hover:scale-105 duration-500 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?auto=format&fit=crop&w=400&q=80" alt="AI Generated Art" class="w-48 h-48 md:w-64 md:h-64 object-cover rounded-3xl shadow-lg transition-transform hover:scale-105 duration-500 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=400&q=80" alt="AI Generated Art" class="w-40 h-40 md:w-56 md:h-56 object-cover rounded-3xl shadow-lg transition-transform hover:scale-105 duration-500 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80" alt="AI Generated Art" class="w-48 h-48 md:w-64 md:h-64 object-cover rounded-3xl shadow-lg transition-transform hover:scale-105 duration-500 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1536152470836-b943b246224c?auto=format&fit=crop&w=400&q=80" alt="AI Generated Art" class="w-40 h-40 md:w-56 md:h-56 object-cover rounded-3xl shadow-lg transition-transform hover:scale-105 duration-500 cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=400&q=80" alt="AI Generated Art" class="w-56 h-56 md:w-72 md:h-72 object-cover rounded-[2.5rem] shadow-xl transition-transform hover:scale-105 duration-500 cursor-pointer">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="products" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div x-data="{ shown: false }" x-intersect.once="shown = true" :class="shown ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'" class="transition-all duration-1000 ease-out">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-800 text-sm font-semibold mb-6">
+                        <span class="w-2 h-2 rounded-full bg-blue-600"></span> Video Generation
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-6">
+                        Cinematic motion at the speed of thought.
+                    </h2>
+                    <p class="text-lg text-slate-500 mb-8 leading-relaxed">
+                        Transform text prompts or static images into breathtaking, high-fidelity video clips. Crontool understands physics, lighting, and camera dynamics to deliver studio-quality results in seconds.
+                    </p>
+                    <ul class="space-y-4 mb-10">
+                        <li class="flex items-center text-slate-700 font-medium">
+                            <svg class="w-5 h-5 mr-3 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Text-to-Video & Image-to-Video
+                        </li>
+                        <li class="flex items-center text-slate-700 font-medium">
+                            <svg class="w-5 h-5 mr-3 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            4K Resolution Upscaling
+                        </li>
+                        <li class="flex items-center text-slate-700 font-medium">
+                            <svg class="w-5 h-5 mr-3 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Consistent Character Generation
+                        </li>
+                    </ul>
+                    <a href="/video/" class="inline-flex items-center justify-center bg-slate-900 text-white px-6 py-3 rounded-full font-semibold hover:bg-slate-800 transition-colors group">
+                        Explore Video Hub
+                        <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                </div>
+                
+                <div x-data="{ shown: false }" x-intersect.once="shown = true" :class="shown ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'" class="transition-all duration-1000 ease-out relative">
+                    <div class="relative rounded-[2rem] overflow-hidden shadow-2xl aspect-[4/5] group bg-slate-100 border border-slate-200">
+                        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80" alt="Video Interface" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-8">
+                            <div class="glass-card rounded-2xl p-4 flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <button class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-900 hover:scale-110 transition-transform">
+                                        <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
+                                    </button>
+                                    <div class="text-white text-sm font-medium">00:12 / 00:30</div>
+                                </div>
+                                <div class="w-1/2 h-1 bg-white/30 rounded-full overflow-hidden">
+                                    <div class="w-2/5 h-full bg-white rounded-full"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="intelligence" class="py-24 bg-[#FAFAFA]">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16" x-data="{ shown: false }" x-intersect.once="shown = true" :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'" class="transition-all duration-700">
+                <h2 class="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-6">
+                    Intelligence that scales.
+                </h2>
+                <p class="text-lg text-slate-500">
+                    Stop guessing what your audience wants. Crontool analyzes millions of data points to predict emerging aesthetic trends before they peak.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" x-data="{ shown: false }" x-intersect.once="shown = true">
+                <div :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="md:col-span-2 glass-card rounded-[2rem] p-8 md:p-12 relative overflow-hidden group transition-all duration-700 delay-100">
+                    <div class="relative z-10 w-full md:w-2/3">
+                        <div class="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center mb-6 text-white">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-4">Predictive Trend Engine</h3>
+                        <p class="text-slate-500 leading-relaxed mb-8">
+                            Our proprietary algorithm scans visual platforms globally, identifying shifts in color palettes, subject matter, and composition styles weeks before they go viral.
+                        </p>
+                    </div>
+                    <div class="absolute right-0 bottom-0 w-64 h-64 opacity-50 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 transform translate-x-1/4 translate-y-1/4">
+                         <img src="https://images.unsplash.com/photo-1557672172-298e090bd0f1?auto=format&fit=crop&w=400&q=80" alt="Abstract" class="rounded-full w-full h-full object-cover blur-2xl">
+                    </div>
+                </div>
+
+                <div :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="glass-card rounded-[2rem] p-8 relative overflow-hidden group transition-all duration-700 delay-200">
+                    <div class="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center mb-6 text-slate-900 shadow-sm">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Audience Growth</h3>
+                    <p class="text-slate-500 leading-relaxed text-sm">
+                        Automated posting strategies designed specifically to exploit algorithmic preferences on modern social networks.
+                    </p>
+                </div>
+
+                <div :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="glass-card rounded-[2rem] p-8 relative overflow-hidden group transition-all duration-700 delay-300">
+                    <div class="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center mb-6 text-slate-900 shadow-sm">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Image Hub</h3>
+                    <p class="text-slate-500 leading-relaxed text-sm mb-4">
+                        Generate hyper-realistic or stylized imagery instantly.
+                    </p>
+                    <a href="/hub/" class="text-sm font-semibold text-slate-900 hover:text-slate-600 transition-colors flex items-center">
+                        Launch Hub <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    </a>
+                </div>
+
+                <div :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'" class="md:col-span-2 glass-card rounded-[2rem] p-0 relative overflow-hidden group transition-all duration-700 delay-400 min-h-[300px]">
+                     <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=1200&q=80" alt="Dashboard Mockup" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700">
+                     <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+                     <div class="absolute bottom-0 left-0 p-8 md:p-12">
+                         <h3 class="text-2xl font-bold text-white mb-2">Automated Creative Marketing</h3>
+                         <p class="text-slate-200 max-w-md">Connect your social accounts and let Crontool schedule, generate, and publish optimized content autonomously.</p>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-white border-t border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center text-slate-900 mb-16">Trusted by modern creatives.</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-xl transition-shadow duration-300">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Avatar" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <h4 class="font-bold text-slate-900">Sarah Jenkins</h4>
+                            <p class="text-sm text-slate-500">Creative Director</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-600 leading-relaxed">
+                        "Crontool completely changed our agency's workflow. The trend prediction alone saved us hundreds of hours in mood-boarding."
+                    </p>
+                </div>
+                <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-xl transition-shadow duration-300">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80" alt="Avatar" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <h4 class="font-bold text-slate-900">David Chen</h4>
+                            <p class="text-sm text-slate-500">Founder, Aura</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-600 leading-relaxed">
+                        "The video generation fidelity is unmatched. We produce high-end social campaigns with a fraction of our previous budget."
+                    </p>
+                </div>
+                <div class="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-xl transition-shadow duration-300">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=100&q=80" alt="Avatar" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <h4 class="font-bold text-slate-900">Elena Rostova</h4>
+                            <p class="text-sm text-slate-500">Growth Marketer</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-600 leading-relaxed">
+                        "Finally, an AI tool that understands aesthetics. It doesn't look generated; it looks curated and highly professional."
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-32 relative overflow-hidden">
+        <div class="absolute inset-0 bg-slate-900"></div>
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=2000&q=80')] opacity-10 bg-cover bg-center mix-blend-overlay"></div>
+        
+        <div class="relative max-w-4xl mx-auto px-6 text-center" x-data="{ shown: false }" x-intersect.once="shown = true">
+            <h2 :class="shown ? 'opacity-100 scale-100' : 'opacity-0 scale-95'" class="text-5xl md:text-6xl font-bold text-white mb-8 transition-all duration-700 ease-out">
+                Ready to build the future?
+            </h2>
+            <p :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'" class="text-xl text-slate-300 mb-12 transition-all duration-700 delay-100 ease-out">
+                Join thousands of creators, agencies, and modern brands scaling their visual output with Crontool.
+            </p>
+            <div :class="shown ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'" class="transition-all duration-700 delay-200">
+                <a href="/signup/" class="inline-block bg-white text-slate-900 px-10 py-5 rounded-full text-lg font-bold hover:bg-slate-100 hover:scale-105 transition-all shadow-[0_0_40px_rgba(255,255,255,0.3)]">
+                    Start creating for free
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="bg-white border-t border-slate-200 pt-20 pb-10">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
+            <div class="col-span-2 lg:col-span-2">
+                <div class="flex items-center gap-2 mb-6">
+                    <div class="w-6 h-6 rounded bg-slate-900 flex items-center justify-center">
+                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <span class="font-bold text-lg text-slate-900">Crontool</span>
+                </div>
+                <p class="text-slate-500 text-sm max-w-xs mb-6">
+                    The premium AI platform for forward-thinking creative marketing, image generation, and trend intelligence.
+                </p>
+            </div>
+            
+            <div>
+                <h4 class="font-bold text-slate-900 mb-4">Platform</h4>
+                <ul class="space-y-3">
+                    <li><a href="/hub/" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Image Hub</a></li>
+                    <li><a href="/video/" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Video Hub</a></li>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Social Growth</a></li>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Trend Engine</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-slate-900 mb-4">Company</h4>
+                <ul class="space-y-3">
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">About Us</a></li>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Careers</a></li>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Blog</a></li>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Contact</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-slate-900 mb-4">Legal</h4>
+                <ul class="space-y-3">
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Privacy Policy</a></li>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-slate-900 transition-colors">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="pt-8 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between">
+            <p class="text-slate-400 text-sm">© 2026 Crontool Inc. All rights reserved.</p>
+            <div class="flex space-x-6 mt-4 md:mt-0">
+                <a href="#" class="text-slate-400 hover:text-slate-900">
+                    <span class="sr-only">Twitter</span>
+                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
 {% endblock %}
