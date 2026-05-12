@@ -39,6 +39,9 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:9000',
     'https://hub.crontools.com',
 ]
+CSRF_TRUSTED_ORIGINS = [
+    'https://hub.crontools.com',
+]
 # Ngrok/Proxy settings for OAuth
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
