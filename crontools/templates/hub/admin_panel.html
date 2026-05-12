@@ -1265,7 +1265,15 @@
                             <div style="font-weight:600;">{{ fb.user.email }}</div>
                         </td>
                         <td>
-                            <span class="mono">{{ fb.post.title|default:fb.video_post.title|default:fb.post.post_id|default:fb.video_post.post_id }}</span>
+                            <span class="mono">
+                                {% if fb.post %}
+                                    {{ fb.post.title|default:fb.post.post_id }}
+                                {% elif fb.video_post %}
+                                    {{ fb.video_post.title|default:fb.video_post.post_id }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </span>
                         </td>
                         <td>
                             {% for tag in fb.tags %}
@@ -1890,7 +1898,17 @@
                 <tbody>
                     {% for fb in feedback_list %}
                     <tr>
-                        <td><span class="mono">{{ fb.post.title|default:fb.video_post.title|default:fb.post.post_id|default:fb.video_post.post_id }}</span></td>
+                        <td>
+                            <span class="mono">
+                                {% if fb.post %}
+                                    {{ fb.post.title|default:fb.post.post_id }}
+                                {% elif fb.video_post %}
+                                    {{ fb.video_post.title|default:fb.video_post.post_id }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </span>
+                        </td>
                         <td>
                             {% for tag in fb.tags %}
                             <span class="pill pill-working" style="margin: 1px;">{{ tag }}</span>
