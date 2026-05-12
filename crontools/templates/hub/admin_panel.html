@@ -398,6 +398,28 @@
             color: var(--success);
         }
 
+        /* Request Type Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            font-family: var(--mono);
+        }
+
+        .badge-image {
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .badge-video {
+            background: var(--warning-dim);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
         /* ══════════════════════════════════════════════════════════
            CARDS & LAYOUT
         ══════════════════════════════════════════════════════════ */
@@ -511,13 +533,13 @@
 
         .grid-2 {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 0.75rem;
         }
 
         .grid-3 {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 0.75rem;
         }
 
@@ -1101,6 +1123,7 @@
             <a href="{% url 'admin_video_requests' %}"
                 class="{% if section == 'video_requests' or section == 'video_request_detail' or section == 'video_plan_detail' %}active{% endif %}">
                 <i class="fas fa-film"></i> Video Requests
+                {% if stats.pending_video %}<span class="nav-badge">{{ stats.pending_video }}</span>{% endif %}
             </a>
         </nav>
 
@@ -1133,31 +1156,31 @@
         </div>
 
         <div class="stats-row">
-            <div class="stat-card" style="--tint:#f59e0b;">
+            <div class="stat-card">
                 <div class="stat-icon" style="background:var(--warning-dim); color:var(--warning);">
                     <i class="fas fa-clock"></i>
                 </div>
-                <div class="stat-label">Pending Review</div>
+                <div class="stat-label">IMG Pending</div>
                 <div class="stat-value">{{ stats.pending }}</div>
-                <div class="stat-sub">Awaiting admin action</div>
+                <div class="stat-sub">Image requests</div>
             </div>
-            <div class="stat-card" style="--tint:#3b82f6;">
-                <div class="stat-icon" style="background:var(--accent-dim); color:var(--accent);">
-                    <i class="fas fa-cog fa-spin"></i>
+            <div class="stat-card">
+                <div class="stat-icon" style="background:var(--warning-dim); color:var(--warning);">
+                    <i class="fas fa-video"></i>
                 </div>
-                <div class="stat-label">In Production</div>
-                <div class="stat-value">{{ stats.working }}</div>
-                <div class="stat-sub">Being worked on</div>
+                <div class="stat-label">VID Pending</div>
+                <div class="stat-value">{{ stats.pending_video }}</div>
+                <div class="stat-sub">Video requests</div>
             </div>
-            <div class="stat-card" style="--tint:#10b981;">
-                <div class="stat-icon" style="background:var(--success-dim); color:var(--success);">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:var(--accent-dim); color:var(--accent);">
                     <i class="fas fa-check-circle"></i>
                 </div>
-                <div class="stat-label">Approved Plans</div>
-                <div class="stat-value">{{ stats.approved }}</div>
-                <div class="stat-sub">Released to customers</div>
+                <div class="stat-label">Approved</div>
+                <div class="stat-value">{{ stats.approved|add:stats.approved_video }}</div>
+                <div class="stat-sub">Plans released</div>
             </div>
-            <div class="stat-card" style="--tint:#8b5cf6;">
+            <div class="stat-card">
                 <div class="stat-icon" style="background:var(--violet-dim); color:var(--violet);">
                     <i class="fas fa-users"></i>
                 </div>
@@ -1174,10 +1197,10 @@
             <table>
                 <thead>
                     <tr>
+                        <th>Type</th>
                         <th>Customer</th>
                         <th>Request ID</th>
                         <th>Date Range</th>
-                        <th>Platforms</th>
                         <th>Status</th>
                         <th>Action</th>
                     </tr>
@@ -1186,20 +1209,75 @@
                     {% for r in recent_requests %}
                     <tr>
                         <td>
+                            <span
+                                class="badge {% if r.req_type == 'video' %}badge-video{% else %}badge-image{% endif %}">
+                                {{ r.req_type|upper }}
+                            </span>
+                        </td>
+                        <td>
                             <div style="font-weight:600;">{{ r.user.email }}</div>
                             <div class="mono">{{ r.user.username }}</div>
                         </td>
                         <td><span class="mono">{{ r.request_id }}</span></td>
                         <td class="mono">{{ r.start_date }} → {{ r.end_date }}</td>
-                        <td>{{ r.platforms|join:", " }}</td>
                         <td><span class="pill pill-{{ r.status }}">{{ r.status }}</span></td>
-                        <td><a href="{% url 'admin_request_detail' r.request_id %}" class="btn btn-ghost btn-sm"><i
-                                    class="fas fa-arrow-right"></i> Manage</a></td>
+                        <td>
+                            {% if r.req_type == 'video' %}
+                            <a href="{% url 'admin_video_request_detail' r.request_id %}" class="btn btn-ghost btn-sm">
+                                <i class="fas fa-arrow-right"></i> Manage
+                            </a>
+                            {% else %}
+                            <a href="{% url 'admin_request_detail' r.request_id %}" class="btn btn-ghost btn-sm">
+                                <i class="fas fa-arrow-right"></i> Manage
+                            </a>
+                            {% endif %}
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
                         <td colspan="6" style="text-align:center; color:var(--text-3); padding: 2rem;">No requests yet
                         </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Customer Feedback -->
+        <div class="table-wrap" style="margin-top: 1.5rem;">
+            <div class="table-toolbar">
+                <h3>💬 Customer Feedback {% if stats.unresolved_feedback %}<span class="pill pill-pending" style="margin-left: 0.5rem;">{{ stats.unresolved_feedback }} unresolved</span>{% endif %}</h3>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Post</th>
+                        <th>Tags</th>
+                        <th>Notes</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fb in recent_feedback %}
+                    <tr>
+                        <td>
+                            <div style="font-weight:600;">{{ fb.user.email }}</div>
+                        </td>
+                        <td>
+                            <span class="mono">{{ fb.post.title|default:fb.video_post.title|default:fb.post.post_id|default:fb.video_post.post_id }}</span>
+                        </td>
+                        <td>
+                            {% for tag in fb.tags %}
+                            <span class="pill pill-working" style="margin: 1px;">{{ tag }}</span>
+                            {% endfor %}
+                        </td>
+                        <td style="max-width: 300px; font-size: 0.82rem;">{{ fb.notes|truncatewords:20 }}</td>
+                        <td class="mono">{{ fb.created_at|date:"d M Y, H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align:center; color:var(--text-3); padding: 2rem;">No customer feedback yet</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -1240,8 +1318,10 @@
                 </thead>
                 <tbody>
                     {% for r in plan_requests %}
-                   <tr>
-                        <td><div style="font-weight:600;">{{ r.user.email }}</div></td>
+                    <tr>
+                        <td>
+                            <div style="font-weight:600;">{{ r.user.email }}</div>
+                        </td>
                         <td><span class="mono">{{ r.request_id }}</span></td>
                         <td class="mono">{{ r.start_date }} → {{ r.end_date }}</td>
                         <td>{{ r.platforms|join:", " }}</td>
@@ -1252,9 +1332,11 @@
                             {% empty %}—{% endfor %}
                         </td>
                         <td><span class="pill pill-{{ r.status }}">{{ r.status }}</span></td>
-                        
-                        <td class="mono" style="font-size:0.72rem; color:var(--text-3);">{{ r.created_at|date:"d M Y · H:i" }}</td>
-                        <td><a href="{% url 'admin_request_detail' r.request_id %}" class="btn btn-primary btn-sm"><i class="fas fa-tools"></i> Work</a></td>
+
+                        <td class="mono" style="font-size:0.72rem; color:var(--text-3);">{{ r.created_at|date:"d M Y ·
+                            H:i" }}</td>
+                        <td><a href="{% url 'admin_request_detail' r.request_id %}" class="btn btn-primary btn-sm"><i
+                                    class="fas fa-tools"></i> Work</a></td>
                     </tr>
                     {% empty %}
                     <tr>
@@ -1272,7 +1354,8 @@
         <div class="page-header">
             <div>
                 <h1>⚙️ Production: {{ req.request_id }}</h1>
-                <div class="subtitle">Customer: <strong>{{ req.user.email }}</strong> · Requested: {{ req.created_at|date:"d M Y, H:i" }}</div>
+                <div class="subtitle">Customer: <strong>{{ req.user.email }}</strong> · Requested: {{
+                    req.created_at|date:"d M Y, H:i" }}</div>
             </div>
             <div class="header-actions">
                 <button class="btn btn-ghost btn-sm" onclick="updateStatus('working')">
@@ -1294,9 +1377,12 @@
         <div class="alert alert-info" style="margin-bottom:1.5rem;">
             <i class="fas fa-info-circle"></i>
             <div>Current status: <strong>{{ req.status|upper }}</strong>.
-                {% if req.status == 'pending' %}Edit customer profile + strategy below, then click <strong>Generate AI Draft</strong>.{% endif %}
+                {% if req.status == 'pending' %}Edit customer profile + strategy below, then click <strong>Generate AI
+                    Draft</strong>.{% endif %}
                 {% if req.status == 'working' %}Draft is being built or is ready. Review posts in the plan editor.{% endif %}
-                {% if req.generated_plan %}Linked plan: <a href="{% url 'admin_plan_detail' req.generated_plan.plan_id %}" style="color:var(--accent);">{{ req.generated_plan.plan_id }}</a>{% endif %}
+                {% if req.generated_plan %}Linked plan: <a
+                    href="{% url 'admin_plan_detail' req.generated_plan.plan_id %}" style="color:var(--accent);">{{
+                    req.generated_plan.plan_id }}</a>{% endif %}
             </div>
         </div>
 
@@ -1445,9 +1531,12 @@
                         <label class="field-label">Posting Frequency</label>
                         <select id="admin-frequency">
                             <option value="daily" {% if req.frequency == 'daily' %}selected{% endif %}>Daily</option>
-                            <option value="alternate" {% if req.frequency == 'alternate' %}selected{% endif %}>Every Other Day</option>
-                            <option value="weekly_3" {% if req.frequency == 'weekly_3' %}selected{% endif %}>3× per Week</option>
-                            <option value="weekly_2" {% if req.frequency == 'weekly_2' %}selected{% endif %}>2× per Week</option>
+                            <option value="alternate" {% if req.frequency == 'alternate' %}selected{% endif %}>Every Other
+                                Day</option>
+                            <option value="weekly_3" {% if req.frequency == 'weekly_3' %}selected{% endif %}>3× per Week
+                            </option>
+                            <option value="weekly_2" {% if req.frequency == 'weekly_2' %}selected{% endif %}>2× per Week
+                            </option>
                         </select>
                     </div>
 
@@ -1455,8 +1544,10 @@
                         <label class="field-label">Images per Platform</label>
                         {% for p in platforms_with_counts %}
                         <div class="plat-count-row">
-                            <span><i class="fas fa-hashtag" style="color:var(--text-3); margin-right:0.4rem;"></i>{{ p.name }}</span>
-                            <input type="number" class="plat-count-inp" data-platform="{{ p.name }}" value="{{ p.count }}" min="1" max="10">
+                            <span><i class="fas fa-hashtag" style="color:var(--text-3); margin-right:0.4rem;"></i>{{
+                                p.name }}</span>
+                            <input type="number" class="plat-count-inp" data-platform="{{ p.name }}"
+                                value="{{ p.count }}" min="1" max="10">
                         </div>
                         {% empty %}
                         <div style="color:var(--text-3); font-size:0.8rem; padding:0.4rem 0;">No platforms set yet</div>
@@ -1499,7 +1590,8 @@
                     </div>
                     <p style="margin-bottom:1.25rem; color:var(--text-2); font-size:0.85rem;">
                         AI has generated <strong>{{ req.generated_plan.posts.count }}</strong> posts.
-                        Status: <span class="pill pill-{{ req.generated_plan.status }}">{{ req.generated_plan.status }}</span>
+                        Status: <span class="pill pill-{{ req.generated_plan.status }}">{{ req.generated_plan.status
+                            }}</span>
                     </p>
                     <a href="{% url 'admin_plan_detail' req.generated_plan.plan_id %}"
                         class="btn btn-success btn-full btn-lg">
@@ -1646,14 +1738,16 @@
 
                 {% for p in posts %}
                 <div class="post-item" id="post-{{ p.post_id }}" data-post-id="{{ p.post_id }}">
-                 <div class="post-item-head" onclick="togglePost('{{ p.post_id }}')">
+                    <div class="post-item-head" onclick="togglePost('{{ p.post_id }}')">
                         <div class="post-date-badge">
                             <span class="post-day">{{ p.date }}</span>
                             <span style="color:var(--text-3); font-size:0.75rem;">{{ p.day_of_week }}</span>
                         </div>
-                        <span class="post-title-preview" style="margin:0 1rem;">{{ p.title|default:"(no title)" }}</span>
+                        <span class="post-title-preview" style="margin:0 1rem;">{{ p.title|default:"(no title)"
+                            }}</span>
                         <div style="display:flex; align-items:center; gap:0.5rem;">
-                            <span class="pill pill-{{ p.image_status }}" style="font-size:0.6rem;">{{ p.image_status }}</span>
+                            <span class="pill pill-{{ p.image_status }}" style="font-size:0.6rem;">{{ p.image_status
+                                }}</span>
                             <i class="fas fa-chevron-down chevron"></i>
                         </div>
                     </div>
@@ -1672,12 +1766,17 @@
                                 </div>
                                 <div class="field">
                                     <label class="field-label">Post Type</label>
-                                   <select data-field="post_type">
-                                        <option value="festival" {% if p.post_type == 'festival' %}selected{% endif %}>Festival</option>
-                                        <option value="educational" {% if p.post_type == 'educational' %}selected{% endif %}>Educational</option>
-                                        <option value="offer" {% if p.post_type == 'offer' %}selected{% endif %}>Offer / Product</option>
-                                        <option value="trust" {% if p.post_type == 'trust' %}selected{% endif %}>Trust / Testimonial</option>
-                                        <option value="engagement" {% if p.post_type == 'engagement' %}selected{% endif %}>Engagement</option>
+                                    <select data-field="post_type">
+                                        <option value="festival" {% if p.post_type == 'festival' %}selected{% endif %}>
+                                            Festival</option>
+                                        <option value="educational" {% if p.post_type == 'educational' %}selected{% endif %}>
+                                            Educational</option>
+                                        <option value="offer" {% if p.post_type == 'offer' %}selected{% endif %}>Offer /
+                                            Product</option>
+                                        <option value="trust" {% if p.post_type == 'trust' %}selected{% endif %}>Trust /
+                                            Testimonial</option>
+                                        <option value="engagement" {% if p.post_type == 'engagement' %}selected{% endif %}>
+                                            Engagement</option>
                                     </select>
                                 </div>
                                 <div class="field">
@@ -1696,12 +1795,18 @@
                                 <div class="field">
                                     <label class="field-label">Aspect Ratio</label>
                                     <select data-field="image_aspect_ratio">
-                                        <option value="1:1" {% if p.image_aspect_ratio == '1:1' %}selected{% endif %}>1:1</option>
-                                        <option value="4:5" {% if p.image_aspect_ratio == '4:5' %}selected{% endif %}>4:5</option>
-                                        <option value="9:16" {% if p.image_aspect_ratio == '9:16' %}selected{% endif %}>9:16</option>
-                                        <option value="16:9" {% if p.image_aspect_ratio == '16:9' %}selected{% endif %}>16:9</option>
-                                        <option value="4:3" {% if p.image_aspect_ratio == '4:3' %}selected{% endif %}>4:3</option>
-                                        <option value="3:4" {% if p.image_aspect_ratio == '3:4' %}selected{% endif %}>3:4</option>
+                                        <option value="1:1" {% if p.image_aspect_ratio == '1:1' %}selected{% endif %}>1:1
+                                        </option>
+                                        <option value="4:5" {% if p.image_aspect_ratio == '4:5' %}selected{% endif %}>4:5
+                                        </option>
+                                        <option value="9:16" {% if p.image_aspect_ratio == '9:16' %}selected{% endif %}>
+                                            9:16</option>
+                                        <option value="16:9" {% if p.image_aspect_ratio == '16:9' %}selected{% endif %}>
+                                            16:9</option>
+                                        <option value="4:3" {% if p.image_aspect_ratio == '4:3' %}selected{% endif %}>4:3
+                                        </option>
+                                        <option value="3:4" {% if p.image_aspect_ratio == '3:4' %}selected{% endif %}>3:4
+                                        </option>
                                     </select>
                                 </div>
                                 <div class="field">
@@ -1765,6 +1870,47 @@
             </div>
         </div>
         {% endwith %}
+
+        <!-- Customer Feedback for this Plan -->
+        {% if feedback_list %}
+        <div class="table-wrap" style="margin-top: 1.5rem;">
+            <div class="table-toolbar">
+                <h3>💬 Customer Feedback ({{ feedback_list|length }})</h3>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Post</th>
+                        <th>Tags</th>
+                        <th>Notes</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fb in feedback_list %}
+                    <tr>
+                        <td><span class="mono">{{ fb.post.title|default:fb.video_post.title|default:fb.post.post_id|default:fb.video_post.post_id }}</span></td>
+                        <td>
+                            {% for tag in fb.tags %}
+                            <span class="pill pill-working" style="margin: 1px;">{{ tag }}</span>
+                            {% endfor %}
+                        </td>
+                        <td style="max-width: 350px; font-size: 0.82rem;">{{ fb.notes }}</td>
+                        <td class="mono">{{ fb.created_at|date:"d M Y, H:i" }}</td>
+                        <td>
+                            {% if fb.is_resolved %}
+                            <span class="pill pill-approved">Resolved</span>
+                            {% else %}
+                            <span class="pill pill-pending">Open</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
 
 
         <!-- ██████████████  CUSTOMERS LIST  ██████████████ -->
@@ -1942,7 +2088,7 @@
             <!-- RIGHT: History -->
             <!-- <div class="right-col">
                 <div class="card"> -->
-                    <!-- <div class="card-title">Request History</div>
+            <!-- <div class="card-title">Request History</div>
                     {% for r in requests %}
                     <div
                         style="display:flex; align-items:center; gap:0.75rem; padding:0.65rem 0; border-bottom:1px solid var(--border);">
@@ -1958,7 +2104,7 @@
                     {% endfor %}
                 </div> -->
 
-                <!-- <div class="card">
+            <!-- <div class="card">
                     <div class="card-title">Generated Plans</div>
                     {% for plan in plans %}
                     <div
@@ -2004,7 +2150,7 @@
                 </thead>
                 <tbody>
                     {% for r in video_requests %}
-              <tr>
+                    <tr>
                         <td style="font-weight:600;">{{ r.user.email }}</td>
                         <td><span class="mono">{{ r.request_id }}</span></td>
                         <td class="mono">{{ r.start_date }} → {{ r.end_date }}</td>
@@ -2013,8 +2159,10 @@
                             {% for p, c in r.platform_counts.items %}{{ p }}: <strong>{{ c }}</strong>{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}
                         </td>
                         <td><span class="pill pill-{{ r.status }}">{{ r.status }}</span></td>
-                        <td class="mono" style="font-size:0.72rem; color:var(--text-3);">{{ r.created_at|date:"d M Y · H:i" }}</td>
-                        <td><a href="{% url 'admin_video_request_detail' r.request_id %}" class="btn btn-primary btn-sm"><i class="fas fa-film"></i> Work</a></td>
+                        <td class="mono" style="font-size:0.72rem; color:var(--text-3);">{{ r.created_at|date:"d M Y ·
+                            H:i" }}</td>
+                        <td><a href="{% url 'admin_video_request_detail' r.request_id %}"
+                                class="btn btn-primary btn-sm"><i class="fas fa-film"></i> Work</a></td>
                     </tr>
                     {% empty %}
                     <tr>
@@ -2032,16 +2180,39 @@
         <div class="page-header">
             <div>
                 <h1>🎬 Video Production: {{ req.request_id }}</h1>
-                <div class="subtitle">Customer: <strong>{{ req.user.email }}</strong> · {{ req.created_at|date:"d M Y,
-                    H:i" }}</div>
+                <!-- <div class="subtitle">
+                    Customer: <strong>{{ req.user.email }}</strong> · 
+                    📅 {{ req.start_date }} → {{ req.end_date }} · 
+                    📱 {% for p in req.platforms %}{{ p|upper }}{% if not forloop.last %}, {% endif %}{% endfor %} ·
+                    {{ req.created_at|date:"d M Y, H:i" }}
+                </div> -->
             </div>
             <div class="header-actions">
-                <button class="btn btn-ghost btn-sm" onclick="updateStatus('working')"><i class="fas fa-play"></i> Set
-                    Working</button>
-                <button class="btn btn-warning btn-lg" onclick="saveBrief()"><i class="fas fa-save"></i> Save
-                    All</button>
-                <button class="btn btn-primary btn-lg" onclick="generateDraft()"><i class="fas fa-magic"></i> Generate
-                    AI Draft</button>
+                <button class="btn btn-ghost btn-sm" onclick="updateStatus('working')">
+                    <i class="fas fa-play"></i> Set Working
+                </button>
+                <button class="btn btn-ghost btn-sm" onclick="updateStatus('rejected')" style="color:var(--danger);">
+                    <i class="fas fa-ban"></i> Reject
+                </button>
+                <button class="btn btn-warning btn-lg" onclick="saveBrief()">
+                    <i class="fas fa-save"></i> Save All
+                </button>
+                <button class="btn btn-primary btn-lg" onclick="generateDraft()">
+                    <i class="fas fa-magic"></i> Generate AI Draft
+                </button>
+            </div>
+        </div>
+
+        <!-- Status bar -->
+        <div class="alert alert-info" style="margin-bottom:1.5rem;">
+            <i class="fas fa-info-circle"></i>
+            <div>Current status: <strong>{{ req.status|upper }}</strong>.
+                {% if req.status == 'pending' %}Edit customer profile + settings below, then click <strong>Generate AI
+                    Draft</strong>.{% endif %}
+                {% if req.status == 'working' %}Draft is being built or is ready. Review videos in the plan editor.{% endif %}
+                {% if req.generated_plan %}Linked plan: <a
+                    href="{% url 'admin_video_plan_detail' req.generated_plan.plan_id %}"
+                    style="color:var(--accent);">{{ req.generated_plan.plan_id }}</a>{% endif %}
             </div>
         </div>
 
@@ -2076,9 +2247,12 @@
                         <label class="field-label">Frequency</label>
                         <select id="admin-frequency">
                             <option value="daily" {% if req.frequency == 'daily' %}selected{% endif %}>Daily</option>
-                            <option value="alternate" {% if req.frequency == 'alternate' %}selected{% endif %}>Every Other Day</option>
-                            <option value="weekly_3" {% if req.frequency == 'weekly_3' %}selected{% endif %}>3× per Week</option>
-                            <option value="weekly_2" {% if req.frequency == 'weekly_2' %}selected{% endif %}>2× per Week</option>
+                            <option value="alternate" {% if req.frequency == 'alternate' %}selected{% endif %}>Every Other
+                                Day</option>
+                            <option value="weekly_3" {% if req.frequency == 'weekly_3' %}selected{% endif %}>3× per Week
+                            </option>
+                            <option value="weekly_2" {% if req.frequency == 'weekly_2' %}selected{% endif %}>2× per Week
+                            </option>
                         </select>
                     </div>
                     <div class="field">
@@ -2140,29 +2314,56 @@
                         placeholder="Expand and refine for video generation…">{{ req.extra_notes }}</textarea>
                 </div>
 
+                <!-- If plan already generated -->
+                {% if req.generated_plan %}
+                <div class="card" style="border-color:rgba(16,185,129,0.4);">
+                    <div class="card-title" style="color:var(--success);">
+                        <i class="fas fa-check-circle"></i> Draft Plan Ready
+                    </div>
+                    <p style="margin-bottom:1.25rem; color:var(--text-2); font-size:0.85rem;">
+                        AI has generated <strong>{{ req.generated_plan.video_posts.count }}</strong> videos.
+                        Status: <span class="pill pill-{{ req.generated_plan.status }}">{{ req.generated_plan.status
+                            }}</span>
+                    </p>
+                    <a href="{% url 'admin_video_plan_detail' req.generated_plan.plan_id %}"
+                        class="btn btn-success btn-full btn-lg">
+                        <i class="fas fa-edit"></i> Open Full Video Editor
+                    </a>
+                </div>
+                {% else %}
                 <div class="card" style="border-style:dashed;">
-                    <div class="card-title" style="color:var(--text-3);">Video Draft</div>
-                    <p style="color:var(--text-3); font-size:0.85rem; margin-bottom:1.25rem;">Generate video scripts and
-                        prompts using AI, then upload final rendered videos per post.</p>
+                    <div class="card-title" style="color:var(--text-3);">No Draft Yet</div>
+                    <p style="color:var(--text-3); font-size:0.85rem; margin-bottom:1.25rem;">
+                        Fill in the customer DNA on the left, refine the brief above, then generate.
+                    </p>
                     <button class="btn btn-primary btn-full btn-lg" onclick="generateDraft()">
                         <i class="fas fa-magic"></i> Generate AI Video Plan
                     </button>
                 </div>
+                {% endif %}
             </div>
         </div>
 
 
         <!-- ██████████████  VIDEO PLAN DETAIL  ██████████████ -->
-       {% elif section == 'video_plan_detail' %}
+        {% elif section == 'video_plan_detail' %}
         <div class="page-header">
             <div>
                 <h1>🎬 Video Plan Editor</h1>
-                <div class="subtitle"><span class="mono">{{ plan.plan_id }}</span> · {{ plan.video_posts.count }} videos</div>
+                <div class="subtitle">
+                    <span class="mono">{{ plan.plan_id }}</span> ·
+                    📅 {{ plan.start_date|date:"d M" }} – {{ plan.end_date|date:"d M Y" }} ·
+                    📱 {% for p in plan.platforms %}{{ p|upper }}{% if not forloop.last %}, {% endif %}{% endfor %} ·
+                    {{ plan.video_posts.count }} videos
+                </div>
             </div>
             <div class="header-actions">
-                <button class="btn btn-success btn-lg" onclick="approvePlan()"><i class="fas fa-check"></i> Approve & Release</button>
-                <button class="btn btn-danger btn-sm" onclick="rejectPlan()"><i class="fas fa-times"></i> Reject</button>
-                <button class="btn btn-danger btn-sm" onclick="deletePlan()"><i class="fas fa-trash"></i> Delete Plan</button>
+                <button class="btn btn-success btn-lg" onclick="approvePlan()"><i class="fas fa-check"></i> Approve &
+                    Release</button>
+                <button class="btn btn-danger btn-sm" onclick="rejectPlan()"><i class="fas fa-times"></i>
+                    Reject</button>
+                <button class="btn btn-danger btn-sm" onclick="deletePlan()"><i class="fas fa-trash"></i> Delete
+                    Plan</button>
             </div>
         </div>
 
@@ -2170,7 +2371,8 @@
             <div class="card-title">Plan Summary</div>
             <textarea id="planSummary" rows="3">{{ plan.summary }}</textarea>
             <div style="margin-top:0.75rem;">
-                <button class="btn btn-ghost btn-sm" onclick="saveMeta()"><i class="fas fa-save"></i> Save Summary</button>
+                <button class="btn btn-ghost btn-sm" onclick="saveMeta()"><i class="fas fa-save"></i> Save
+                    Summary</button>
             </div>
         </div>
 
@@ -2189,19 +2391,24 @@
             </div>
 
             <div class="post-item-body">
-                
+
                 {% if p.feedback_entries.all %}
                 <div class="alert alert-warning" style="margin-bottom:1.25rem; border-left:4px solid var(--warning);">
                     <i class="fas fa-exclamation-triangle" style="margin-top:0.2rem; color:var(--warning);"></i>
                     <div style="flex:1;">
-                        <strong style="display:block; margin-bottom:0.5rem; color:var(--warning);">User Requested Changes:</strong>
+                        <strong style="display:block; margin-bottom:0.5rem; color:var(--warning);">User Requested
+                            Changes:</strong>
                         {% for fb in p.feedback_entries.all %}
-                        <div style="font-size:0.8rem; margin-bottom:0.5rem; background:rgba(0,0,0,0.25); padding:0.6rem; border-radius:6px; color:var(--text);">
-                            {% if fb.tags %}<div style="margin-bottom:0.25rem;"><strong style="color:var(--text-2);">Tags:</strong> {{ fb.tags|join:", " }}</div>
+                        <div
+                            style="font-size:0.8rem; margin-bottom:0.5rem; background:rgba(0,0,0,0.25); padding:0.6rem; border-radius:6px; color:var(--text);">
+                            {% if fb.tags %}<div style="margin-bottom:0.25rem;"><strong
+                                    style="color:var(--text-2);">Tags:</strong> {{ fb.tags|join:", " }}</div>
                             {% endif %}
-                            {% if fb.notes %}<div><strong style="color:var(--text-2);">Note:</strong> {{ fb.notes }}</div>
+                            {% if fb.notes %}<div><strong style="color:var(--text-2);">Note:</strong> {{ fb.notes }}
+                            </div>
                             {% endif %}
-                            <div style="font-size:0.7rem; color:var(--text-3); margin-top:0.3rem;">{{ fb.created_at|date:"d M Y, H:i" }}</div>
+                            <div style="font-size:0.7rem; color:var(--text-3); margin-top:0.3rem;">{{
+                                fb.created_at|date:"d M Y, H:i" }}</div>
                         </div>
                         {% endfor %}
                     </div>
@@ -2210,33 +2417,43 @@
 
                 <div class="post-grid">
                     <div>
-                        <div class="field"><label class="field-label">Title</label><input type="text" data-field="title" value="{{ p.title }}"></div>
-                        <div class="field"><label class="field-label">Occasion / Theme</label><input type="text" data-field="occasion" value="{{ p.occasion }}"></div>
-                        <div class="field"><label class="field-label">Caption</label><textarea data-field="caption" rows="4">{{ p.caption }}</textarea></div>
-                        <div class="field"><label class="field-label">Script / Voiceover</label><textarea data-field="script" rows="5">{{ p.script }}</textarea></div>
-                        <div class="field"><label class="field-label">Hashtags (JSON)</label><input type="text" data-field="hashtags" value="{{ p.hashtags|safe }}"></div>
-                        <div class="field"><label class="field-label">Call to Action</label><input type="text" data-field="call_to_action" value="{{ p.call_to_action }}"></div>
+                        <div class="field"><label class="field-label">Title</label><input type="text" data-field="title"
+                                value="{{ p.title }}"></div>
+                        <div class="field"><label class="field-label">Occasion / Theme</label><input type="text"
+                                data-field="occasion" value="{{ p.occasion }}"></div>
+                        <div class="field"><label class="field-label">Caption</label><textarea data-field="caption"
+                                rows="4">{{ p.caption }}</textarea></div>
+                        <div class="field"><label class="field-label">Script / Voiceover</label><textarea
+                                data-field="script" rows="5">{{ p.script }}</textarea></div>
+                        <div class="field"><label class="field-label">Hashtags (JSON)</label><input type="text"
+                                data-field="hashtags" value="{{ p.hashtags|safe }}"></div>
+                        <div class="field"><label class="field-label">Call to Action</label><input type="text"
+                                data-field="call_to_action" value="{{ p.call_to_action }}"></div>
                     </div>
-                    
+
                     <div>
                         <label class="field-label">Video</label>
                         <div class="vid-preview-box">
                             {% if p.video_url %}
-                            <video src="{{ p.video_url }}" controls style="width:100%; border-radius:var(--radius-sm);"></video>
+                            <video src="{{ p.video_url }}" controls
+                                style="width:100%; border-radius:var(--radius-sm);"></video>
                             {% else %}
                             <i class="fas fa-video" style="font-size:1.5rem;"></i>
                             <div>No video yet</div>
                             {% endif %}
                         </div>
-                        <div class="field"><label class="field-label">Video Prompt (AI)</label><textarea data-field="video_prompt" rows="5">{{ p.video_prompt }}</textarea></div>
+                        <div class="field"><label class="field-label">Video Prompt (AI)</label><textarea
+                                data-field="video_prompt" rows="5">{{ p.video_prompt }}</textarea></div>
                     </div>
                 </div>
 
                 <div class="post-actions">
-                    <button class="btn btn-primary btn-sm" onclick="savePost('{{ p.post_id }}')"><i class="fas fa-save"></i> Save Post</button>
+                    <button class="btn btn-primary btn-sm" onclick="savePost('{{ p.post_id }}')"><i
+                            class="fas fa-save"></i> Save Post</button>
                     <label class="btn btn-ghost btn-sm" style="cursor:pointer;">
                         <i class="fas fa-upload"></i> Upload Video
-                        <input type="file" style="display:none" onchange="uploadVideo(this, '{{ p.post_id }}')" accept="video/*">
+                        <input type="file" style="display:none" onchange="uploadVideo(this, '{{ p.post_id }}')"
+                            accept="video/*">
                     </label>
                 </div>
             </div>

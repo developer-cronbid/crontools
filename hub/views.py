@@ -4,9 +4,14 @@ import re
 import base64
 import mimetypes
 from datetime import datetime, timedelta, date
+import urllib.parse
+import hashlib
+import secrets
+from django.utils import timezone
 
 import requests
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
@@ -15,8 +20,7 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import BusinessProfile, GeneratedPlan, GeneratedPost, PlanRequest, Feedback,VideoRequest
-from django.shortcuts import get_object_or_404
+from .models import BusinessProfile, GeneratedPlan, GeneratedPost, PlanRequest, Feedback, VideoRequest
 
 @login_required
 def request_plan(request):
@@ -64,10 +68,331 @@ def submit_feedback(request, post_id):
     )
     return JsonResponse({"ok": True, "message": "Feedback submitted. Admin will review."})
 
+@login_required
+@require_POST
+def approve_post(request, post_id):
+    """Approve a post and publish it to Buffer API."""
+    post = get_object_or_404(GeneratedPost, post_id=post_id, plan__user=request.user)
+    
+    profile = getattr(request.user, 'business_profile', None)
+    if not profile or not profile.buffer_access_token:
+        return JsonResponse({"error": "Please connect your Buffer account first."}, status=400)
+        
+    # Check and refresh token if needed
+    refresh_buffer_token(profile)
+    
+    buffer_token = profile.buffer_access_token
+    buffer_channels = profile.buffer_channels
+    
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {buffer_token}'
+    }
+    
+    errors = []
+    success_count = 0
+    
+    # Loop through all platforms requested for this post
+    for platform in post.platforms:
+        # Match our platform string (e.g. 'instagram') to Buffer's service string
+        channel_id = buffer_channels.get(platform)
+        if not channel_id:
+            errors.append(f"No Buffer channel connected for {platform}.")
+            continue
+            
+        # Construct the GraphQL query
+        # Instagram requires metadata { instagram: { type: post, shouldShareToFeed: true } }
+        metadata_block = ""
+        if platform == 'instagram':
+            metadata_block = "metadata: { instagram: { type: post, shouldShareToFeed: true } },"
+
+        if post.image_url:
+            # Ensure image_url is absolute so Buffer can download it
+            abs_image_url = request.build_absolute_uri(post.image_url)
+            
+            query = f"""
+            mutation CreatePost($text: String!, $channelId: ChannelId!, $imageUrl: String!) {{
+              createPost(input: {{
+                text: $text,
+                channelId: $channelId,
+                schedulingType: automatic,
+                mode: shareNow,
+                {metadata_block}
+                assets: {{
+                  images: [
+                    {{ url: $imageUrl }}
+                  ]
+                }}
+              }}) {{
+                ... on PostActionSuccess {{ post {{ id }} }}
+                ... on MutationError {{ message }}
+              }}
+            }}
+            """
+            variables = {
+                "text": post.caption,
+                "channelId": channel_id,
+                "imageUrl": abs_image_url
+            }
+        else:
+            query = f"""
+            mutation CreatePost($text: String!, $channelId: ChannelId!) {{
+              createPost(input: {{
+                text: $text,
+                channelId: $channelId,
+                schedulingType: automatic,
+                mode: shareNow,
+                {metadata_block}
+              }}) {{
+                ... on PostActionSuccess {{ post {{ id }} }}
+                ... on MutationError {{ message }}
+              }}
+            }}
+            """
+            variables = {
+                "text": post.caption,
+                "channelId": channel_id
+            }
+
+        payload = {
+            'query': query,
+            'variables': variables
+        }
+        
+        try:
+            response = requests.post('https://api.buffer.com', json=payload, headers=headers)
+            if response.status_code != 200:
+                errors.append(f"API Error for {platform}: {response.text}")
+                continue
+                
+            data = response.json()
+            if 'errors' in data:
+                errors.append(f"GraphQL Error for {platform}: {str(data['errors'])}")
+                continue
+                
+            if 'data' in data and data['data'].get('createPost', {}).get('message'):
+                errors.append(f"Buffer Error for {platform}: {data['data']['createPost']['message']}")
+                continue
+                
+            success_count += 1
+        except requests.exceptions.RequestException as e:
+            errors.append(f"Network Error for {platform}: {str(e)}")
+            
+    if errors:
+        return JsonResponse({"error": " | ".join(errors)}, status=400)
+    
+    platforms_str = ", ".join(post.platforms[:success_count]) if success_count else ""
+    return JsonResponse({
+        "ok": True,
+        "status": "published", 
+        "count": success_count,
+        "message": f"🎉 Post published to {platforms_str}! Check your social media."
+    })
+
+def generate_pkce_pair():
+    """Generates a PKCE code verifier and code challenge."""
+    # Verifier: random string
+    verifier = secrets.token_urlsafe(64)
+    # Challenge: SHA256 hash of verifier, base64url encoded
+    challenge_hash = hashlib.sha256(verifier.encode('ascii')).digest()
+    challenge = base64.urlsafe_b64encode(challenge_hash).decode('ascii').replace('=', '')
+    return verifier, challenge
+#6__4srUENGIIkhJDoY4k1pX9P8yCAaAmldhll9aJNmx
+@login_required
+def buffer_auth(request):
+    """Redirect user to Buffer OAuth authorization page using PKCE."""
+    client_id = "s04N2vp6llELftQFusMgLkhI14eRdnQcak0Pr3ccwTz"
+    redirect_uri = "https://delana-fruited-tripp.ngrok-free.dev/hub/buffer/callback/"
+    
+    if not client_id:
+        return HttpResponse("BUFFER_CLIENT_ID not configured in environment.", status=500)
+    
+    # PKCE step 1
+    verifier, challenge = generate_pkce_pair()
+    # Store verifier in session for Step 4
+    request.session['buffer_code_verifier'] = verifier
+        
+    params = {
+        'client_id': client_id,
+        'redirect_uri': redirect_uri,
+        'response_type': 'code',
+        'scope': 'posts:write posts:read account:read offline_access',
+        'state': secrets.token_urlsafe(16),
+        'code_challenge': challenge,
+        'code_challenge_method': 'S256',
+        'prompt': 'consent'
+    }
+    
+    auth_url = f"https://auth.buffer.com/auth?{urllib.parse.urlencode(params)}"
+    return redirect(auth_url)
+
+@login_required
+def buffer_callback(request):
+    """Handle Buffer OAuth callback using PKCE and fetch channels."""
+    code = request.GET.get('code')
+    state = request.GET.get('state') # In a production app, verify this state
+    error = request.GET.get('error')
+
+    if error:
+        return HttpResponse(f"Buffer Authorization Error: {error}", status=403)
+
+    client_id = "s04N2vp6llELftQFusMgLkhI14eRdnQcak0Pr3ccwTz"
+    client_secret = "_1UNiSNIySx-TuuxFgmJIgqFKNMrpqX6BoKMm9iR2xS"
+    redirect_uri = "https://delana-fruited-tripp.ngrok-free.dev/hub/buffer/callback/"
+    
+    # Retrieve verifier from session
+    code_verifier = request.session.get('buffer_code_verifier')
+    if not code_verifier:
+        return HttpResponse("DEBUG ERROR: PKCE verifier missing from session. Your browser might be blocking cookies or the session expired. Please try clicking Connect again.", status=400)
+
+    # Exchange code for access token (PKCE flow — no client_secret needed)
+    token_url = "https://auth.buffer.com/token"
+    data = {
+        'client_id': client_id,
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': redirect_uri,
+        'code_verifier': code_verifier
+    }
+    
+    try:
+        # Use ONLY the body for credentials as requested by Buffer's 'one mechanism' rule
+        response = requests.post(token_url, data=data)
+        if response.status_code != 200:
+            return HttpResponse(f"DEBUG ERROR: Token Exchange Failed ({response.status_code}). Buffer says: {response.text}. (Note: If you refreshed the page, this is normal. Try clicking Connect again.)", status=400)
+            
+        token_data = response.json()
+        print("BUFFER TOKEN EXCHANGE RESPONSE:", token_data) # DEBUG LOG
+        
+        access_token = token_data.get('access_token')
+        refresh_token = token_data.get('refresh_token')
+        expires_in = token_data.get('expires_in', 3600) # Default 1 hour
+        
+        if not access_token:
+            return HttpResponse("Failed to retrieve access token from Buffer.", status=400)
+            
+        # Fetch connected channels using the new GraphQL API
+        graphql_url = "https://api.buffer.com"
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json"
+        }
+        
+        # Query to get organizations and their channels
+        # We try to get channels from both account level and organization level
+        query = """
+        query {
+          account {
+            id
+            email
+            organizations {
+              id
+              name
+              channels {
+                id
+                service
+                name
+              }
+            }
+          }
+        }
+        """
+        
+        try:
+            graphql_response = requests.post(graphql_url, json={'query': query}, headers=headers)
+            graphql_response.raise_for_status()
+            graphql_data = graphql_response.json()
+            
+            # DEBUG: Print this to your terminal so we can see the structure
+            print("BUFFER GRAPHQL RESPONSE:", graphql_data)
+            
+            if 'errors' in graphql_data:
+                return HttpResponse(f"GraphQL Error fetching channels: {graphql_data['errors']}", status=400)
+                
+            # Build mapping of service -> channel_id
+            channels = {}
+            account_data = graphql_data.get('data', {}).get('account', {})
+            organizations = account_data.get('organizations', [])
+            
+            for org in organizations:
+                for channel in org.get('channels', []):
+                    service = channel.get('service') # e.g., 'instagram', 'facebook'
+                    if service:
+                        channels[service] = channel.get('id')
+            
+            if not channels:
+                 # If no channels found, show a more helpful message with the email
+                 user_email = account_data.get('email', 'your account')
+                 return HttpResponse(f"Connected successfully to Buffer account ({user_email}), but no social media channels were found. Please go to Buffer.com and connect your Instagram/Facebook account first, then come back here and click Connect again.", status=200)
+
+            # Save to user's profile
+            profile = getattr(request.user, 'business_profile', None)
+            if not profile:
+                profile = BusinessProfile(user=request.user)
+                
+            profile.buffer_access_token = access_token
+            profile.buffer_refresh_token = refresh_token
+            profile.buffer_token_expires_at = timezone.now() + timedelta(seconds=expires_in)
+            profile.buffer_channels = channels
+            profile.save()
+            
+            # Clear the verifier from session
+            del request.session['buffer_code_verifier']
+            
+            return redirect('hub_plan')
+            
+        except requests.exceptions.RequestException as e:
+            return HttpResponse(f"Error fetching channels from Buffer GraphQL: {e}", status=500)
+            
+    except requests.exceptions.RequestException as e:
+        return HttpResponse(f"Error communicating with Buffer during token exchange: {e}", status=500)
+
+
+def refresh_buffer_token(profile):
+    """Refreshes the Buffer access token using the refresh token if expired."""
+    if not profile.buffer_refresh_token:
+        return
+        
+    # Check if token is expired or about to expire (within 5 mins)
+    if profile.buffer_token_expires_at and profile.buffer_token_expires_at > timezone.now() + timedelta(minutes=5):
+        return # Still valid
+        
+    client_id = "s04N2vp6llELftQFusMgLkhI14eRdnQcak0Pr3ccwTz"
+    client_secret = "_1UNiSNIySx-TuuxFgmJIgqFKNMrpqX6BoKMm9iR2xS"
+    
+    token_url = "https://auth.buffer.com/token"
+    data = {
+        'client_id': client_id,
+        'client_secret': client_secret,
+        'grant_type': 'refresh_token',
+        'refresh_token': profile.buffer_refresh_token
+    }
+    
+    try:
+        # Use ONLY the body for credentials
+        response = requests.post(token_url, data=data)
+        if response.status_code == 200:
+            token_data = response.json()
+            profile.buffer_access_token = token_data.get('access_token')
+            # Buffer v2 might rotate refresh tokens, so update it if provided
+            new_refresh = token_data.get('refresh_token')
+            if new_refresh:
+                profile.buffer_refresh_token = new_refresh
+            
+            expires_in = token_data.get('expires_in', 3600)
+            profile.buffer_token_expires_at = timezone.now() + timedelta(seconds=expires_in)
+            profile.save()
+            print(f"Successfully refreshed Buffer token for {profile.user.email}")
+        else:
+            print(f"Failed to refresh Buffer token: {response.text}")
+    except Exception as e:
+        print(f"Error refreshing Buffer token: {e}")
+
+
 # ============================================================
 # AIML API CONFIG
 # ============================================================
-AIML_API_KEY = ""
+AIML_API_KEY = "1caa12b3cd1787b67fc7c2c6b60d065b"
 AIML_CHAT_URL = "https://api.aimlapi.com/v1/chat/completions"
 AIML_IMAGE_URL = "https://api.aimlapi.com/v1/images/generations"
 AIML_TEXT_MODEL = "anthropic/claude-opus-4-6"
@@ -346,10 +671,17 @@ def hub_plan(request):
     brand = profile.to_brand_dict() if profile else None
     db_plans = GeneratedPlan.objects.filter(user=request.user, status='approved')
     plans = [p.to_dict() for p in db_plans]
+    
+    # Check connection status
+    buffer_connected = bool(profile and profile.buffer_access_token)
+    has_refresh_token = bool(profile and profile.buffer_refresh_token)
+
     return render(request, "hub/hub_plan.html", {
         "brand": brand,
         "plans": plans,
         "has_brand": brand is not None,
+        "buffer_connected": buffer_connected,
+        "has_refresh_token": has_refresh_token,
     })
 
 

@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, date
 from functools import wraps
 
 import requests
+from django.db import models
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
@@ -18,7 +19,7 @@ from django.utils import timezone
 from django.conf import settings
 
 from django.core.files.storage import FileSystemStorage
-from .models import BusinessProfile, GeneratedPlan, GeneratedPost, PlanRequest, VideoRequest
+from .models import BusinessProfile, GeneratedPlan, GeneratedPost, PlanRequest, VideoRequest, Feedback
 from video.models import GeneratedVideoPlan, GeneratedVideoPost
 
 User = get_user_model()
@@ -103,19 +104,40 @@ def _call_claude(system_prompt, user_prompt, max_tokens=16000, temperature=0.65)
 def admin_dashboard(request):
     pending_requests = PlanRequest.objects.filter(status='pending').count()
     working_requests = PlanRequest.objects.filter(status='working').count()
+    
+    pending_video = VideoRequest.objects.filter(status='pending').count()
+    working_video = VideoRequest.objects.filter(status='working').count()
+    
     total_customers  = BusinessProfile.objects.count()
     approved_plans   = GeneratedPlan.objects.filter(status='approved').count()
-    recent_requests  = PlanRequest.objects.select_related('user').order_by('-created_at')[:8]
+    approved_video   = GeneratedVideoPlan.objects.filter(status='approved').count()
+    # Combined recent requests (just for dashboard feed)
+    recent_img = PlanRequest.objects.select_related('user').order_by('-created_at')[:8]
+    for r in recent_img: r.req_type = 'image'
+    
+    recent_vid = VideoRequest.objects.select_related('user').order_by('-created_at')[:8]
+    for r in recent_vid: r.req_type = 'video'
+    
+    recent_requests = sorted(list(recent_img) + list(recent_vid), key=lambda x: x.created_at, reverse=True)[:8]
+
+    # Recent feedback from customers
+    recent_feedback = Feedback.objects.select_related('post', 'video_post', 'user').order_by('-created_at')[:10]
+    unresolved_feedback = Feedback.objects.filter(is_resolved=False).count()
 
     return render(request, "hub/admin_panel.html", {
         "section": "dashboard",
         "stats": {
             "pending":   pending_requests,
             "working":   working_requests,
+            "pending_video": pending_video,
+            "working_video": working_video,
             "customers": total_customers,
             "approved":  approved_plans,
+            "approved_video": approved_video,
+            "unresolved_feedback": unresolved_feedback,
         },
         "recent_requests": recent_requests,
+        "recent_feedback": recent_feedback,
     })
 
 # ════════════════════════════════════════════════════════════════════════════════
@@ -509,6 +531,12 @@ def admin_plan_detail(request, plan_id):
     posts   = plan.posts.all().order_by('sort_order')
     profile = getattr(plan.user, 'business_profile', None)
     
+    # Get all feedback for posts in this plan
+    post_ids = [p.id for p in posts]
+    feedback_qs = Feedback.objects.filter(
+        models.Q(post__in=post_ids) | models.Q(video_post__in=post_ids)
+    ).select_related('post', 'video_post', 'user').order_by('-created_at')
+    
     # Try to find the originating request
     plan_req = getattr(plan, 'plan_request', None)
     plat_data = []
@@ -524,6 +552,7 @@ def admin_plan_detail(request, plan_id):
         "profile":   profile,
         "req":       plan_req,
         "platforms_with_counts": plat_data,
+        "feedback_list": feedback_qs,
     })
 
 @staff_required

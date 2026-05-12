@@ -3,164 +3,505 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | CronTools Studio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Sign In | CronTools Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         :root {
-            --primary: #6366f1;
-            --secondary: #a855f7;
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --text: #f8fafc;
-            --text-dim: #94a3b8;
+            --bg: #f4f6fb;
+            --border: #e3e8f0;
+            --border-hover: #c4cdd8;
+            --border-focus: #0f1117;
+            --text-primary: #0f1117;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --accent: #2563eb;
+            --accent-bg: #eff6ff;
+            --accent-border: #dbeafe;
+            --btn-bg: #0f1117;
+            --btn-hover: #1e2130;
+            --link: #2563eb;
+            --success: #10b981;
+            --font: 'Sora', -apple-system, sans-serif;
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
+            --t: 0.18s;
+            --shadow-focus: 0 0 0 3.5px rgba(15,17,23,0.09);
+            --shadow-btn: 0 6px 20px rgba(15,17,23,0.22);
+            --r-input: 12px;
+            --r-btn: 12px;
         }
 
+        html, body { height: 100%; }
+
         body {
-            margin: 0;
-            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
             background: var(--bg);
-            color: var(--text);
+            background-image:
+                radial-gradient(ellipse 65% 50% at 90% -5%, rgba(37,99,235,0.08) 0%, transparent 55%),
+                radial-gradient(ellipse 60% 50% at 5% 110%, rgba(37,99,235,0.09) 0%, transparent 55%),
+                radial-gradient(ellipse 45% 35% at 50% 45%, rgba(37,99,235,0.03) 0%, transparent 60%);
+            display: flex;
+            flex-direction: column;
+            font-family: var(--font);
+            color: var(--text-primary);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -100px; left: -100px;
+            width: 460px; height: 460px;
+            border-radius: 50%;
+            border: 1px solid rgba(37,99,235,0.07);
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -100px; right: -100px;
+            width: 400px; height: 400px;
+            border-radius: 50%;
+            border: 1px solid rgba(37,99,235,0.08);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Navbar */
+        .nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 56px;
+            background: rgba(244,246,251,0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(227,232,240,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 200;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            text-decoration: none;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+        }
+        .nav-icon {
+            width: 28px; height: 28px;
+            background: var(--text-primary);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .nav-icon svg { width: 13px; height: 13px; fill: #fff; }
+        .nav-accent { color: var(--accent); }
+        .nav-link {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color var(--t) var(--ease);
+        }
+        .nav-link:hover { color: var(--text-primary); }
+
+        /* Main layout */
+        .page {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            overflow: hidden;
+            padding: 5.5rem 1.5rem 3rem;
+            position: relative;
+            z-index: 1;
         }
 
-        .bg-glow {
-            position: fixed;
-            width: 100vw;
-            height: 100vh;
-            background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
-            z-index: -1;
-        }
-
-        .login-card {
-            background: var(--card-bg);
-            padding: 3rem;
-            border-radius: 2rem;
+        /* Center-focused single col with wide accent line */
+        .layout {
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            animation: fadeIn 0.8s ease-out;
+            max-width: 980px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Left: welcome back copy */
+        .brand-side {
+            animation: fadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
-
-        .logo {
-            font-size: 2.5rem;
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.38rem;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            color: var(--accent);
+            background: var(--accent-bg);
+            border: 1px solid var(--accent-border);
+            border-radius: 999px;
+            padding: 0.22rem 0.7rem;
+            margin-bottom: 1.25rem;
+        }
+        .eyebrow-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+        .brand-title {
+            font-size: clamp(2rem, 4vw, 3rem);
             font-weight: 800;
-            text-align: center;
-            margin-bottom: 2rem;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-primary);
+            letter-spacing: -0.05em;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+        .brand-title span { color: var(--accent); }
+        .brand-desc {
+            font-size: 0.925rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 340px;
+            margin-bottom: 1.75rem;
         }
 
-        .form-group {
-            margin-bottom: 1.5rem;
+        /* Stat pills */
+        .stat-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+        .stat-val {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.04em;
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        .stat-divider {
+            width: 1px;
+            background: var(--border);
+            align-self: stretch;
+            margin: 0.15rem 0;
         }
 
-        label {
+        /* Divider for single-col */
+        .col-divider {
+            display: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border) 30%, var(--border) 70%, transparent);
+            margin: 1.5rem 0;
+        }
+
+        /* Right: form */
+        .form-side {
+            animation: fadeUp 0.55s 0.08s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        .form-heading { margin-bottom: 1.75rem; }
+        .form-title {
+            font-size: 1.55rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.04em;
+            line-height: 1.2;
+            margin-bottom: 0.3rem;
+        }
+        .form-sub { font-size: 0.845rem; color: var(--text-muted); }
+
+        /* Alerts */
+        .alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.55rem;
+            padding: 0.72rem 0.95rem;
+            border-radius: 10px;
+            font-size: 0.79rem;
+            font-weight: 500;
+            line-height: 1.5;
+            margin-bottom: 1.25rem;
+            animation: dropIn 0.22s ease both;
+        }
+        @keyframes dropIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .alert.error   { background: rgba(255,245,245,0.85); border: 1px solid #fecaca; color: #b91c1c; backdrop-filter: blur(8px); }
+        .alert.success { background: rgba(240,253,244,0.85); border: 1px solid #bbf7d0; color: #15803d; backdrop-filter: blur(8px); }
+
+        /* Fields */
+        .field { margin-bottom: 1rem; }
+        .field-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.4rem;
+        }
+        .field-label {
             display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-dim);
-            font-size: 0.9rem;
+            font-size: 0.76rem;
+            font-weight: 650;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
         }
-
-        input {
-            width: 100%;
-            padding: 1rem;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.75rem;
-            color: white;
-            font-family: inherit;
-            transition: all 0.3s;
-            box-sizing: border-box;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            border: none;
-            border-radius: 0.75rem;
-            color: white;
+        .field-forgot {
+            font-size: 0.72rem;
             font-weight: 600;
+            color: var(--link);
+            text-decoration: none;
+            transition: opacity var(--t);
+        }
+        .field-forgot:hover { opacity: 0.72; text-decoration: underline; }
+
+        .input-wrap { position: relative; }
+        .input-ico {
+            position: absolute;
+            left: 0.88rem;
+            top: 50%; transform: translateY(-50%);
+            color: var(--text-muted);
+            display: flex; align-items: center;
+            pointer-events: none;
+            transition: color var(--t) var(--ease);
+        }
+        .input-ico svg { width: 15px; height: 15px; }
+        .input-wrap:focus-within .input-ico { color: var(--text-primary); }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            display: block;
+            width: 100%;
+            padding: 0.72rem 0.9rem 0.72rem 2.55rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--r-input);
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            font-family: var(--font);
+            font-weight: 400;
+            outline: none;
+            transition: border-color var(--t) var(--ease), background var(--t) var(--ease), box-shadow var(--t) var(--ease);
+            -webkit-appearance: none;
+        }
+        input::placeholder { color: var(--text-muted); }
+        input:hover { border-color: var(--border-hover); background: rgba(255,255,255,0.75); }
+        input:focus { border-color: var(--border-focus); background: rgba(255,255,255,0.9); box-shadow: var(--shadow-focus); }
+
+        /* Button */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            width: 100%;
+            padding: 0.82rem 1.25rem;
+            background: var(--btn-bg);
+            color: #fff;
+            border: none;
+            border-radius: var(--r-btn);
+            font-size: 0.875rem;
+            font-weight: 700;
+            font-family: var(--font);
+            letter-spacing: -0.01em;
             cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
-            margin-top: 1rem;
+            margin-top: 1.1rem;
+            position: relative;
+            overflow: hidden;
+            transition: background var(--t) var(--ease), transform var(--t) var(--ease), box-shadow var(--t) var(--ease);
         }
-
-        .btn:hover {
-            transform: scale(1.02);
-            opacity: 0.9;
+        .btn::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 55%);
+            pointer-events: none;
         }
+        .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+        .btn:hover { background: var(--btn-hover); transform: translateY(-1.5px); box-shadow: var(--shadow-btn); }
+        .btn:active { transform: translateY(0); box-shadow: none; }
 
-        .links {
+        /* Footer link */
+        .form-footer {
             text-align: center;
-            margin-top: 2rem;
-            font-size: 0.9rem;
-            color: var(--text-dim);
+            margin-top: 1.6rem;
+            font-size: 0.815rem;
+            color: var(--text-muted);
         }
-
-        .links a {
-            color: var(--primary);
+        .form-footer a {
+            color: var(--link);
             text-decoration: none;
             font-weight: 600;
+            transition: opacity var(--t);
+        }
+        .form-footer a:hover { opacity: 0.72; text-decoration: underline; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(22px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
-        .error-msg {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-            text-align: center;
+        /* ── Responsive ── */
+        @media (max-width: 780px) {
+            .layout {
+                grid-template-columns: 1fr;
+                gap: 0;
+                max-width: 480px;
+            }
+            .brand-side { text-align: center; }
+            .brand-desc { margin-left: auto; margin-right: auto; }
+            .stat-row { justify-content: center; }
+            .col-divider { display: block; }
+            .brand-title { font-size: 2rem; }
+        }
+
+        @media (max-width: 520px) {
+            .nav { padding: 0 1.25rem; }
+            .page { padding: 4.5rem 1.1rem 2.5rem; }
+            .brand-title { font-size: 1.65rem; }
+            .brand-desc { font-size: 0.85rem; max-width: 100%; }
+            .form-title { font-size: 1.35rem; }
+            .stat-val { font-size: 1.25rem; }
+        }
+
+        @media (max-width: 360px) {
+            .page { padding: 4rem 0.85rem 2rem; }
+            .brand-title { font-size: 1.45rem; }
+        }
+
+        @media (min-width: 1200px) {
+            .layout { max-width: 1100px; gap: 7rem; }
+            .brand-title { font-size: 3.25rem; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-glow"></div>
-    <div class="login-card">
-        <div class="logo">CronTools</div>
-        
-        {% if messages %}
-            {% for message in messages %}
-                <div class="error-msg">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
 
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.GET.next }}">
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" name="email" required placeholder="name@company.com">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" required placeholder="••••••••">
-            </div>
-            <button type="submit" class="btn">Sign In</button>
-        </form>
+    <nav class="nav">
+        <a href="/" class="nav-brand">
+            <span class="nav-icon">
+                <svg viewBox="0 0 16 16"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.6 10.2H7.4V7.4h1.2v3.8zm0-5H7.4V5h1.2v1.2z"/></svg>
+            </span>
+            Cron<span class="nav-accent">tools</span>
+        </a>
+        <a href="{% url 'register' %}" class="nav-link">No account? Sign up →</a>
+    </nav>
 
-        <div class="links">
-            Don't have an account? <a href="{% url 'register' %}">Create one</a>
+    <main class="page">
+        <div class="layout">
+
+            <!-- Left: welcome back copy -->
+            <div class="brand-side">
+                <div class="eyebrow">
+                    <span class="eyebrow-dot"></span>
+                    Welcome back
+                </div>
+                <h1 class="brand-title">
+                    Your workflows<br>are <span>waiting</span>
+                </h1>
+                <p class="brand-desc">
+                    Sign back in to CronTools and pick up right where you left off. Your schedules, jobs, and history are all here.
+                </p>
+                <!-- <div class="stat-row">
+                    <div class="stat">
+                        <span class="stat-val">99.9%</span>
+                        <span class="stat-label">Uptime SLA</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat">
+                        <span class="stat-val">12k+</span>
+                        <span class="stat-label">Active users</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat">
+                        <span class="stat-val">&lt;50ms</span>
+                        <span class="stat-label">Trigger latency</span>
+                    </div>
+                </div> -->
+            </div>
+
+            <!-- Divider (mobile only) -->
+            <div class="col-divider"></div>
+
+            <!-- Right: form -->
+            <div class="form-side">
+                <div class="form-heading">
+                    <h2 class="form-title">Sign in to your account</h2>
+                    <p class="form-sub">Good to have you back.</p>
+                </div>
+
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
+                        <span>{% if 'error' in message.tags %}⚠&#xFE0E;{% else %}✓{% endif %}</span>
+                        <span>{{ message }}</span>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="field">
+                        <label class="field-label" for="email">Email Address</label>
+                        <div style="margin-top:0.4rem" class="input-wrap">
+                            <input type="email" id="email" name="email" required placeholder="name@company.com" autofocus>
+                            <span class="input-ico">
+                                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.65">
+                                    <rect x="2" y="5" width="16" height="12" rx="2.5"/>
+                                    <path d="M2 7.5l8 5 8-5" stroke-linecap="round"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-row">
+                            <label class="field-label" for="password">Password</label>
+                            <a href="#" class="field-forgot">Forgot password?</a>
+                        </div>
+                        <div class="input-wrap">
+                            <input type="password" id="password" name="password" required placeholder="••••••••">
+                            <span class="input-ico">
+                                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.65">
+                                    <rect x="4" y="9" width="12" height="9" rx="2.5"/>
+                                    <path d="M7 9V6.5a3 3 0 0 1 6 0V9" stroke-linecap="round"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn">
+                        Sign In
+                        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 8h10M9 4l4 4-4 4"/>
+                        </svg>
+                    </button>
+                </form>
+
+                <div class="form-footer">
+                    Don't have an account? <a href="{% url 'register' %}">Sign up free</a>
+                </div>
+            </div>
+
         </div>
-    </div>
+    </main>
+
 </body>
 </html>

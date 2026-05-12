@@ -23,7 +23,11 @@ def unified_register(request):
         password = request.POST.get('password')
         
         if User.objects.filter(email=email).exists():
-            messages.error(request, "Email already exists.")
+            messages.warning(request, "This email is already registered. Please use a different email or log in.")
+            return render(request, 'accounts/register.html')
+        
+        if User.objects.filter(username=username).exists():
+            messages.warning(request, "This username is already taken. Please choose a different username.")
             return render(request, 'accounts/register.html')
             
         user = User.objects.create_user(username=username, email=email, password=password)

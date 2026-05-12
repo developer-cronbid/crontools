@@ -28,6 +28,12 @@ class BusinessProfile(models.Model):
     youtube = models.CharField(max_length=500, blank=True, default='')
     tiktok = models.CharField(max_length=500, blank=True, default='')
 
+    # Buffer API Integration
+    buffer_access_token = models.CharField(max_length=500, blank=True, null=True)
+    buffer_refresh_token = models.CharField(max_length=500, blank=True, null=True)
+    buffer_token_expires_at = models.DateTimeField(null=True, blank=True)
+    buffer_channels = models.JSONField(default=dict, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -183,6 +189,8 @@ class VideoRequest(models.Model):
     status         = models.CharField(max_length=20, default='pending')
     extra_notes    = models.TextField(blank=True, default='')
     admin_note     = models.TextField(blank=True, default='')
+    theme          = models.CharField(max_length=255, blank=True, default='')
+    duration       = models.IntegerField(default=30)
     generated_plan = models.OneToOneField('video.GeneratedVideoPlan', null=True, blank=True, on_delete=models.SET_NULL, related_name='video_request')
     created_at     = models.DateTimeField(auto_now_add=True)
 
@@ -196,7 +204,8 @@ class VideoRequest(models.Model):
 
 class Feedback(models.Model):
     """User feedback on specific posts."""
-    post       = models.ForeignKey(GeneratedPost, on_delete=models.CASCADE, related_name='feedback_entries')
+    post       = models.ForeignKey(GeneratedPost, on_delete=models.CASCADE, related_name='feedback_entries', null=True, blank=True)
+    video_post = models.ForeignKey('video.GeneratedVideoPost', on_delete=models.CASCADE, related_name='feedback_entries', null=True, blank=True)
     user       = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     tags       = models.JSONField(default=list) # e.g. ['caption', 'image']
     notes      = models.TextField(blank=True)

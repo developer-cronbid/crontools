@@ -10,6 +10,11 @@ urlpatterns = [
     path("plan/request/", views.request_plan, name="request_plan"),
     path("plan/request-status/", views.plan_request_status, name="plan_request_status"),
     path("post/<str:post_id>/feedback/", views.submit_feedback, name="submit_feedback"),
+    path("post/<str:post_id>/approve/", views.approve_post, name="approve_post"),
+    
+    # Buffer OAuth endpoints
+    path("buffer/auth/", views.buffer_auth, name="buffer_auth"),
+    path("buffer/callback/", views.buffer_callback, name="buffer_callback"),
 
     # Keep legacy image endpoint for admin-triggered image gen
     path("plan/image/", views.generate_post_image, name="generate_post_image"),

@@ -3,781 +3,1850 @@
 
 {% block content %}
 <style>
-    /* ===== PLAN PAGE — editorial dark + electric blue ===== */
-    @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=DM+Mono:wght@300;400;500&display=swap');
 
     :root {
-        --plan-bg: #0a0e14;
-        --plan-bg-2: #0f1520;
-        --plan-surface: #141b29;
-        --plan-surface-2: #1a2336;
-        --plan-border: rgba(255,255,255,0.08);
-        --plan-border-strong: rgba(255,255,255,0.16);
-        --plan-text: #f4f6fb;
-        --plan-text-dim: #8b94a8;
-        --plan-text-faint: #5b6377;
-        --brand: #10b7fe;
-        --brand-glow: rgba(16,183,254,0.25);
-        --accent-warm: #ffb84d;
-        --accent-pink: #ff6b9d;
-        --success: #4ade80;
-        --danger: #ef4444;
+        --bg: #f5f6fa;
+        --bg-pure: #ffffff;
+        --surface: #ffffff;
+        --surface-2: #f8f9fc;
+        --surface-3: #eef0f6;
+        --border: #e4e8f0;
+        --border-2: #cdd3e0;
+
+        --text-primary: #0d1526;
+        --text-secondary: #455069;
+        --text-muted: #8893aa;
+        --text-faint: #b8bfce;
+
+        --brand: #2563eb;
+        --brand-light: #eef3ff;
+        --brand-mid: #dbeafe;
+        --brand-dark: #1d4ed8;
+        --brand-glow: rgba(37, 99, 235, 0.12);
+
+        --success: #16a34a;
+        --success-bg: #f0fdf4;
+        --success-border: #bbf7d0;
+        --danger: #dc2626;
+        --danger-bg: #fff1f2;
+        --danger-border: #fecdd3;
+
+        --accent-violet: #7c3aed;
+        --accent-rose: #e11d48;
+        --accent-teal: #0d9488;
+
+        --radius-sm: 7px;
+        --radius: 11px;
+        --radius-lg: 16px;
+        --radius-xl: 22px;
+
+        --shadow-xs: 0 1px 3px rgba(13, 21, 38, 0.05), 0 1px 2px rgba(13, 21, 38, 0.04);
+        --shadow-sm: 0 2px 10px rgba(13, 21, 38, 0.07), 0 1px 4px rgba(13, 21, 38, 0.04);
+        --shadow: 0 4px 20px rgba(13, 21, 38, 0.09), 0 2px 8px rgba(13, 21, 38, 0.05);
+        --shadow-md: 0 8px 32px rgba(13, 21, 38, 0.10), 0 4px 14px rgba(13, 21, 38, 0.06);
+        --shadow-lg: 0 20px 52px rgba(13, 21, 38, 0.12), 0 8px 22px rgba(13, 21, 38, 0.07);
+
+        --glass-bg: rgba(255, 255, 255, 0.75);
+        --glass-bg-2: rgba(255, 255, 255, 0.4);
+        --glass-border: rgba(255, 255, 255, 0.5);
+        --glass-blur: blur(12px);
+
+        --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+        --transition: 150ms var(--ease);
+        --transition-md: 240ms var(--ease);
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
     }
 
     .plan-root {
-        background: var(--plan-bg);
-        color: var(--plan-text);
-        font-family: 'Inter', sans-serif;
+        background: radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.03) 0%, transparent 40%),
+            radial-gradient(circle at 100% 100%, rgba(124, 58, 237, 0.03) 0%, transparent 40%),
+            var(--bg);
+        color: var(--text-primary);
+        font-family: 'Plus Jakarta Sans', sans-serif;
         min-height: 100vh;
-        margin: -1.5rem -15px 0;  /* counter Bootstrap container padding if base.html adds it */
-        padding: 0 0 6rem;
+        margin: -1.5rem -15px 0;
+        padding-bottom: 6rem;
+        -webkit-font-smoothing: antialiased;
     }
 
-    .plan-root * { box-sizing: border-box; }
-
-    /* Hero */
-    .plan-hero {
-        position: relative;
-        padding: 5rem 2rem 3rem;
-        max-width: 1400px;
-        margin: 0 auto;
-        overflow: hidden;
-    }
-    .plan-hero::before {
-        content: "";
-        position: absolute;
-        top: -120px; right: -80px;
-        width: 500px; height: 500px;
-        background: radial-gradient(circle, var(--brand-glow) 0%, transparent 60%);
-        filter: blur(40px);
-        pointer-events: none;
-    }
-    .plan-hero::after {
-        content: "";
-        position: absolute;
-        bottom: -180px; left: -120px;
-        width: 460px; height: 460px;
-        background: radial-gradient(circle, rgba(255,107,157,0.18) 0%, transparent 60%);
-        filter: blur(50px);
-        pointer-events: none;
-    }
-    .plan-eyebrow {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.72rem;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: var(--brand);
-        margin-bottom: 1.25rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.6rem;
-        position: relative; z-index: 1;
-    }
-    .plan-eyebrow::before {
-        content: "";
-        width: 28px; height: 1px;
-        background: var(--brand);
-    }
-    .plan-title {
-        font-family: 'Fraunces', serif;
-        font-weight: 500;
-        font-size: clamp(2.5rem, 6vw, 4.5rem);
-        line-height: 1.02;
-        letter-spacing: -0.03em;
-        margin: 0 0 1.5rem;
-        position: relative; z-index: 1;
-    }
-    .plan-title em {
-        font-style: italic;
-        font-weight: 400;
-        background: linear-gradient(120deg, var(--brand) 0%, #7dd9ff 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    .plan-subtitle {
-        font-size: 1.05rem;
-        color: var(--plan-text-dim);
-        max-width: 620px;
-        line-height: 1.6;
-        position: relative; z-index: 1;
-    }
-
-    .brand-strip {
-        position: relative; z-index: 1;
-        margin-top: 2.5rem;
-        display: flex;
-        gap: 2rem;
-        flex-wrap: wrap;
-        padding: 1.25rem 1.5rem;
-        background: rgba(255,255,255,0.02);
-        border: 1px solid var(--plan-border);
-        border-radius: 14px;
-        backdrop-filter: blur(10px);
-    }
-    .brand-strip-item { display: flex; flex-direction: column; gap: 0.25rem; }
-    .brand-strip-label {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.65rem;
-        letter-spacing: 0.15em;
-        text-transform: uppercase;
-        color: var(--plan-text-faint);
-    }
-    .brand-strip-value {
-        font-family: 'Fraunces', serif;
-        font-size: 1rem;
-        color: var(--plan-text);
-        font-weight: 500;
-    }
-    .brand-color-dot {
-        display: inline-block;
-        width: 14px; height: 14px;
-        border-radius: 50%;
-        border: 1px solid var(--plan-border-strong);
-        margin-right: 6px;
-        vertical-align: middle;
-    }
-
-    /* Layout */
-    .plan-layout {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 0 2rem;
-        display: grid;
-        grid-template-columns: 380px 1fr;
-        gap: 2rem;
-        align-items: start;
-    }
-    @media (max-width: 1024px) {
-        .plan-layout { grid-template-columns: 1fr; }
-    }
-
-    /* Generator panel */
-    .gen-panel {
-        background: linear-gradient(160deg, var(--plan-surface) 0%, var(--plan-surface-2) 100%);
-        border: 1px solid var(--plan-border);
-        border-radius: 20px;
-        padding: 2rem;
+    /* ─── TOPBAR ─── */
+    .plan-topbar {
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border-bottom: 1px solid var(--border);
         position: sticky;
-        top: 1.5rem;
-        box-shadow: 0 30px 60px -20px rgba(0,0,0,0.5);
+        top: 0;
+        z-index: 200;
+        padding: 0 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 58px;
+        box-shadow: var(--shadow-xs);
     }
-    .gen-panel-title {
-        font-family: 'Fraunces', serif;
-        font-size: 1.6rem;
-        font-weight: 500;
-        margin: 0 0 0.4rem;
+
+    .topbar-left {
+        display: flex;
+        align-items: center;
+    }
+
+    .topbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        font-weight: 800;
+        font-size: 1.25rem;
+        color: var(--text-primary);
+        text-decoration: none;
         letter-spacing: -0.01em;
     }
-    .gen-panel-sub {
-        font-size: 0.85rem;
-        color: var(--plan-text-dim);
-        margin-bottom: 1.5rem;
-        line-height: 1.5;
-    }
-    .field-group { margin-bottom: 1.25rem; }
-    .field-label {
-        display: block;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.68rem;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--plan-text-dim);
-        margin-bottom: 0.5rem;
-    }
-    .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-    input[type="date"], select, textarea {
-        width: 100%;
-        background: rgba(0,0,0,0.3);
-        border: 1px solid var(--plan-border-strong);
-        color: var(--plan-text);
-        padding: 0.7rem 0.85rem;
-        border-radius: 10px;
-        font-family: 'Inter', sans-serif;
-        font-size: 0.92rem;
-        transition: border-color 0.15s, background 0.15s;
-        color-scheme: dark;
-    }
-    input[type="date"]:focus, select:focus, textarea:focus {
-        outline: none;
-        border-color: var(--brand);
-        background: rgba(16,183,254,0.05);
-    }
-    textarea { resize: vertical; min-height: 70px; font-size: 0.88rem; }
 
-    .freq-chips, .platform-chips {
-        display: flex; flex-wrap: wrap; gap: 0.4rem;
+    .topbar-brand-icon {
+        width: 28px;
+        height: 28px;
+        background: linear-gradient(135deg, var(--brand) 0%, var(--accent-violet) 100%);
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
     }
-    .chip {
-        padding: 0.5rem 0.85rem;
-        border-radius: 999px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid var(--plan-border);
-        color: var(--plan-text-dim);
+
+    .topbar-sep {
+        width: 1px;
+        height: 20px;
+        background: var(--border);
+        margin: 0 1.25rem;
+    }
+
+    .topbar-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
         font-size: 0.82rem;
-        cursor: pointer;
-        transition: all 0.15s;
-        user-select: none;
+        color: var(--text-muted);
     }
-    .chip:hover { border-color: var(--plan-border-strong); color: var(--plan-text); }
-    .chip.active {
-        background: rgba(16,183,254,0.12);
-        border-color: var(--brand);
+
+    .topbar-breadcrumb span {
+        color: var(--text-secondary);
+        font-weight: 600;
+    }
+
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+    }
+
+    .topbar-user {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.3rem 0.7rem;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .topbar-avatar {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--brand-mid), var(--brand-light));
+        border: 1.5px solid var(--border-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.65rem;
         color: var(--brand);
     }
-    .chip .chip-tick { display: none; }
-    .chip.active .chip-tick { display: inline; margin-right: 4px; }
 
+    .topbar-logout {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 0.35rem 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        transition: all var(--transition);
+        background: var(--surface);
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .topbar-logout:hover {
+        color: var(--text-primary);
+        border-color: var(--border-2);
+        background: var(--surface-2);
+    }
+
+    /* ─── HERO ─── */
+    .plan-hero {
+        max-width: 1440px;
+        margin: 1rem auto;
+        padding: 2.75rem 2.5rem 2rem;
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 3rem;
+    }
+
+    .hero-main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.28rem 0.8rem;
+        background: var(--brand-light);
+        border: 1px solid var(--brand-mid);
+        border-radius: 999px;
+        font-family: 'DM Mono', monospace;
+        font-size: 0.66rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--brand);
+        font-weight: 500;
+        margin-bottom: 1.1rem;
+    }
+
+    .hero-eyebrow::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--brand);
+        animation: heroPulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes heroPulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1)
+        }
+
+        50% {
+            opacity: 0.45;
+            transform: scale(0.75)
+        }
+    }
+
+    .plan-title {
+        font-weight: 800;
+        font-size: clamp(1.9rem, 3.5vw, 2.75rem);
+        line-height: 1.08;
+        letter-spacing: -0.04em;
+        color: var(--text-primary);
+        margin-bottom: 0.6rem;
+    }
+
+    .plan-title em {
+        font-style: normal;
+        color: var(--brand);
+    }
+
+    .plan-subtitle {
+        font-size: 0.97rem;
+        color: var(--text-secondary);
+        max-width: 560px;
+        line-height: 1.65;
+        font-weight: 400;
+    }
+
+    /* Brand strip */
+    .brand-strip {
+        margin-top: 1.75rem;
+        display: flex;
+        gap: 0;
+        flex-wrap: wrap;
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        max-width: 640px;
+    }
+
+    .brand-strip-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.18rem;
+        padding: 0.9rem 1.4rem;
+        border-right: 1px solid var(--border);
+        flex: 1;
+        min-width: 120px;
+        transition: background var(--transition);
+    }
+
+    .brand-strip-item:last-child {
+        border-right: none;
+    }
+
+    .brand-strip-item:hover {
+        background: var(--surface-2);
+    }
+
+    .brand-strip-label {
+        font-family: 'DM Mono', monospace;
+        font-size: 0.58rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        font-weight: 400;
+    }
+
+    .brand-strip-value {
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        font-weight: 700;
+    }
+
+    .brand-color-dot {
+        display: inline-block;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(0, 0, 0, 0.08);
+        margin-right: 3px;
+        vertical-align: middle;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    }
+
+    /* ─── LAYOUT ─── */
+    .plan-layout {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 0 2.5rem;
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        gap: 2.25rem;
+        align-items: start;
+    }
+
+    @media (max-width: 1100px) {
+        .plan-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .plan-hero {
+            padding: 2rem 1.5rem 1.5rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.5rem;
+        }
+
+        .plan-layout {
+            padding: 0 1.5rem;
+        }
+    }
+
+    .gen-panel {
+        position: static;
+        /* Don't stick on mobile as it stacks above content */
+        padding: 1.25rem;
+    }
+
+    .pending-state {
+        padding: 2.5rem 1.25rem 2rem;
+        margin: 0;
+    }
+
+    .pending-state h3 {
+        font-size: 1.3rem;
+    }
+
+    .pending-state p {
+        font-size: 0.85rem;
+        padding: 0 0.5rem;
+    }
+
+    .plan-hero {
+        padding: 2rem 1.5rem 1.5rem;
+    }
+
+    .plan-layout {
+        padding: 0 1.5rem;
+    }
+    }
+
+    @media (max-width: 640px) {
+        .plan-topbar {
+            padding: 0 1rem;
+            height: 54px;
+        }
+
+        .topbar-sep,
+        .topbar-breadcrumb {
+            display: none;
+        }
+
+        .topbar-user span {
+            display: none;
+        }
+
+        .topbar-user {
+            padding: 0.35rem;
+            gap: 0;
+        }
+
+        .topbar-right {
+            gap: 0.5rem;
+        }
+
+        .plan-hero {
+            padding: 1.5rem 1rem 1.25rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.25rem;
+        }
+
+        .brand-strip {
+            max-width: 100%;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .brand-strip-item {
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+        }
+
+        .brand-strip-item:nth-child(2n) {
+            border-right: none;
+        }
+
+        .brand-strip-item:nth-last-child(-n+2) {
+            border-bottom: none;
+        }
+
+        .plan-layout {
+            padding: 0 1rem;
+            gap: 1.25rem;
+        }
+
+        .gen-panel {
+            position: static;
+            padding: 1.25rem;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+        }
+    }
+
+    /* ─── GEN PANEL ─── */
+    .gen-panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: 1.6rem;
+        position: sticky;
+        top: 72px;
+        box-shadow: var(--shadow-sm);
+        transition: box-shadow var(--transition-md);
+    }
+
+    .gen-panel:hover {
+        box-shadow: var(--shadow);
+    }
+
+    .gen-panel-title {
+        font-weight: 800;
+        font-size: 1.05rem;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+        margin-bottom: 0.22rem;
+    }
+
+    .gen-panel-sub {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        font-weight: 400;
+        margin-bottom: 1.4rem;
+        padding-bottom: 1.2rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .field-group {
+        margin-bottom: 1.05rem;
+    }
+
+    .field-label {
+        display: block;
+        font-size: 0.76rem;
+        font-weight: 700;
+        color: var(--text-secondary);
+        margin-bottom: 0.42rem;
+        letter-spacing: 0.01em;
+    }
+
+    .date-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 0.55rem;
+    }
+
+    input[type="date"],
+    select,
+    textarea {
+        width: 100%;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        padding: 0.6rem 0.82rem;
+        border-radius: var(--radius);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.87rem;
+        font-weight: 500;
+        transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+        color-scheme: light;
+        outline: none;
+        appearance: none;
+    }
+
+    input[type="date"]:focus,
+    select:focus,
+    textarea:focus {
+        border-color: var(--brand);
+        background: var(--surface);
+        box-shadow: 0 0 0 3px var(--brand-glow);
+    }
+
+    input[type="date"]:hover:not(:focus),
+    select:hover:not(:focus),
+    textarea:hover:not(:focus) {
+        border-color: var(--border-2);
+        background: var(--surface);
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 70px;
+        font-size: 0.84rem;
+        font-weight: 400;
+    }
+
+    /* Chips */
+    .freq-chips,
+    .platform-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+
+    .chip {
+        padding: 0.4rem 0.78rem;
+        border-radius: 999px;
+        background: var(--surface-2);
+        border: 1.5px solid var(--border);
+        color: var(--text-secondary);
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition);
+        user-select: none;
+        display: flex;
+        align-items: center;
+        gap: 0.22rem;
+    }
+
+    .chip:hover {
+        border-color: var(--brand);
+        color: var(--brand);
+        background: var(--brand-light);
+    }
+
+    .chip.active {
+        background: var(--brand-light);
+        border-color: var(--brand);
+        color: var(--brand);
+        font-weight: 700;
+    }
+
+    .chip .chip-tick {
+        display: none;
+        font-size: 0.68rem;
+    }
+
+    .chip.active .chip-tick {
+        display: inline;
+    }
+
+    /* Generate button */
     .gen-btn {
         width: 100%;
-        margin-top: 0.5rem;
-        padding: 1rem 1.25rem;
-        background: linear-gradient(135deg, var(--brand) 0%, #0d8fd1 100%);
+        margin-top: 0.3rem;
+        padding: 0.82rem 1.2rem;
+        background: var(--brand);
         border: none;
-        color: #001628;
-        font-family: 'Inter', sans-serif;
+        color: #fff;
+        font-family: 'Plus Jakarta Sans', sans-serif;
         font-weight: 700;
-        font-size: 0.95rem;
-        letter-spacing: 0.02em;
-        border-radius: 12px;
+        font-size: 0.9rem;
+        border-radius: var(--radius);
         cursor: pointer;
-        transition: transform 0.15s, box-shadow 0.15s;
-        box-shadow: 0 12px 30px -10px var(--brand-glow);
+        transition: all var(--transition-md);
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1) inset, 0 3px 14px rgba(37, 99, 235, 0.32);
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
+        position: relative;
+        overflow: hidden;
+        letter-spacing: -0.01em;
     }
+
+    .gen-btn::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+        pointer-events: none;
+    }
+
     .gen-btn:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 18px 40px -10px var(--brand-glow);
+        background: var(--brand-dark);
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1) inset, 0 6px 22px rgba(37, 99, 235, 0.4);
+        transform: translateY(-1px);
     }
-    .gen-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .gen-btn:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    .gen-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
     .gen-btn .spinner {
-        width: 16px; height: 16px;
-        border: 2px solid rgba(0,22,40,0.3);
-        border-top-color: #001628;
+        width: 15px;
+        height: 15px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
         border-radius: 50%;
-        animation: spin 0.7s linear infinite;
+        animation: spin 0.65s linear infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
 
     .err-box {
-        margin-top: 1rem;
-        padding: 0.85rem 1rem;
-        background: rgba(239,68,68,0.08);
-        border: 1px solid rgba(239,68,68,0.3);
-        border-radius: 10px;
-        color: #fca5a5;
-        font-size: 0.85rem;
+        margin-top: 0.7rem;
+        padding: 0.7rem 0.88rem;
+        background: var(--danger-bg);
+        border: 1px solid var(--danger-border);
+        border-radius: var(--radius);
+        color: var(--danger);
+        font-size: 0.82rem;
+        font-weight: 600;
         display: none;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
-    .err-box.show { display: block; }
 
-    /* Right column */
-    .results-col { min-width: 0; }
-
-    .empty-state {
-        background: linear-gradient(160deg, var(--plan-surface) 0%, var(--plan-surface-2) 100%);
-        border: 1px solid var(--plan-border);
-        border-radius: 20px;
-        padding: 4rem 2rem;
-        text-align: center;
+    .err-box.show {
+        display: flex;
     }
-    .empty-illustration {
-        width: 80px; height: 80px;
-        margin: 0 auto 1.5rem;
-        border: 1px dashed var(--plan-border-strong);
-        border-radius: 20px;
+
+    .err-box::before {
+        content: "!";
+        width: 16px;
+        height: 16px;
+        background: var(--danger);
+        color: #fff;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--brand);
-        font-family: 'Fraunces', serif;
-        font-size: 2.2rem;
-    }
-    .empty-state h3 {
-        font-family: 'Fraunces', serif;
-        font-weight: 500;
-        font-size: 1.5rem;
-        margin: 0 0 0.5rem;
-    }
-    .empty-state p {
-        color: var(--plan-text-dim);
-        font-size: 0.95rem;
-        max-width: 420px;
-        margin: 0 auto;
-        line-height: 1.6;
+        font-size: 0.63rem;
+        font-weight: 800;
+        flex-shrink: 0;
+        margin-top: 1px;
     }
 
-    /* Loading state */
-    .loader-card {
-        background: linear-gradient(160deg, var(--plan-surface) 0%, var(--plan-surface-2) 100%);
-        border: 1px solid var(--plan-border);
-        border-radius: 20px;
-        padding: 3rem 2rem;
+    /* Past plans */
+    .past-plans {
+        margin-top: 1.2rem;
+        padding-top: 1.2rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .past-plans-title {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        margin-bottom: 0.6rem;
+    }
+
+    .past-plan-item {
+        padding: 0.6rem 0.82rem;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 0.35rem;
+        cursor: pointer;
+        transition: all var(--transition);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .past-plan-item:hover {
+        border-color: var(--brand);
+        background: var(--brand-light);
+    }
+
+    .past-plan-item .pp-dates {
+        font-size: 0.83rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .past-plan-item .pp-meta {
+        font-family: 'DM Mono', monospace;
+        font-size: 0.63rem;
+        color: var(--text-muted);
+        margin-top: 0.08rem;
+    }
+
+    .past-plan-delete {
+        background: none;
+        border: none;
+        color: var(--text-faint);
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        transition: all var(--transition);
+        display: flex;
+        align-items: center;
+    }
+
+    .past-plan-delete:hover {
+        color: var(--danger);
+        background: var(--danger-bg);
+    }
+
+    /* ─── RESULTS COL ─── */
+    .results-col {
+        min-width: 0;
+    }
+
+    /* Empty state */
+    .empty-state {
+        background: var(--surface);
+        border: 2px dashed var(--border);
+        border-radius: var(--radius-xl);
+        padding: 4.5rem 2rem;
         text-align: center;
     }
+
+    .empty-illustration {
+        width: 68px;
+        height: 68px;
+        margin: 0 auto 1.25rem;
+        background: var(--brand-light);
+        border: 1px solid var(--brand-mid);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.1);
+    }
+
+    .empty-state h3 {
+        font-weight: 800;
+        font-size: 1.3rem;
+        letter-spacing: -0.03em;
+        color: var(--text-primary);
+        margin-bottom: 0.4rem;
+    }
+
+    .empty-state p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        max-width: 400px;
+        margin: 0 auto;
+        line-height: 1.65;
+        font-weight: 400;
+    }
+
+    /* Loading */
+    .loader-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: 4rem 2rem;
+        text-align: center;
+        box-shadow: var(--shadow-sm);
+    }
+
     .loader-pulse {
-        width: 60px; height: 60px;
+        width: 52px;
+        height: 52px;
         margin: 0 auto 1.5rem;
         position: relative;
     }
-    .loader-pulse::before, .loader-pulse::after {
+
+    .loader-pulse::before,
+    .loader-pulse::after {
         content: "";
         position: absolute;
         inset: 0;
         border-radius: 50%;
         background: var(--brand);
-        opacity: 0.25;
-        animation: pulse 1.6s ease-out infinite;
+        opacity: 0.18;
+        animation: lpulse 1.6s ease-out infinite;
     }
-    .loader-pulse::after { animation-delay: 0.8s; }
-    @keyframes pulse {
-        0% { transform: scale(0.5); opacity: 0.6; }
-        100% { transform: scale(1.8); opacity: 0; }
+
+    .loader-pulse::after {
+        animation-delay: 0.8s;
     }
+
+    @keyframes lpulse {
+        0% {
+            transform: scale(0.5);
+            opacity: 0.5
+        }
+
+        100% {
+            transform: scale(2);
+            opacity: 0
+        }
+    }
+
     .loader-pulse-core {
-        position: absolute; inset: 18px;
+        position: absolute;
+        inset: 14px;
         background: var(--brand);
         border-radius: 50%;
-        box-shadow: 0 0 30px var(--brand-glow);
+        box-shadow: 0 3px 12px var(--brand-glow);
     }
-    .loader-card h3 {
-        font-family: 'Fraunces', serif;
-        font-weight: 500;
-        font-size: 1.4rem;
-        margin: 0 0 0.4rem;
-    }
-    .loader-card p {
-        color: var(--plan-text-dim);
-        font-size: 0.9rem;
-        margin: 0;
-    }
-    .loader-steps {
-        margin-top: 2rem;
-        display: flex; justify-content: center; gap: 0.5rem;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.7rem;
-        color: var(--plan-text-faint);
-        letter-spacing: 0.1em;
-    }
-    .loader-steps span { padding: 0.3rem 0.6rem; border: 1px solid var(--plan-border); border-radius: 4px; }
-    .loader-steps span.active { color: var(--brand); border-color: var(--brand); }
 
-    /* Plan summary banner */
-    .plan-summary {
-        background: linear-gradient(135deg, rgba(16,183,254,0.07) 0%, rgba(16,183,254,0.02) 100%);
-        border: 1px solid var(--plan-border);
-        border-left: 3px solid var(--brand);
-        border-radius: 16px;
-        padding: 1.5rem 1.75rem;
-        margin-bottom: 1.5rem;
+    .loader-card h3 {
+        font-weight: 800;
+        font-size: 1.2rem;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+        margin-bottom: 0.35rem;
     }
-    .plan-summary-meta {
-        display: flex; gap: 1.5rem; flex-wrap: wrap;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.7rem;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        color: var(--plan-text-faint);
-        margin-bottom: 1rem;
-    }
-    .plan-summary-meta strong { color: var(--brand); font-weight: 500; }
-    .plan-summary-text {
-        font-family: 'Fraunces', serif;
-        font-size: 1.15rem;
-        line-height: 1.5;
-        color: var(--plan-text);
+
+    .loader-card p {
+        color: var(--text-muted);
+        font-size: 0.88rem;
+        max-width: 360px;
+        margin: 0 auto;
+        line-height: 1.6;
         font-weight: 400;
     }
-    .plan-themes {
-        margin-top: 1rem;
-        display: flex; flex-wrap: wrap; gap: 0.4rem;
-    }
-    .plan-themes .chip { cursor: default; pointer-events: none; }
 
-    /* Timeline / posts */
-    .timeline-header {
-        display: flex; justify-content: space-between; align-items: baseline;
-        margin: 2rem 0 1rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 1px solid var(--plan-border);
+    .loader-steps {
+        margin-top: 1.75rem;
+        display: flex;
+        justify-content: center;
+        gap: 0.35rem;
+        flex-wrap: wrap;
     }
-    .timeline-header h2 {
-        font-family: 'Fraunces', serif;
-        font-weight: 500;
-        font-size: 1.5rem;
-        letter-spacing: -0.01em;
-        margin: 0;
-    }
-    .timeline-header .count {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.75rem;
-        color: var(--plan-text-dim);
+
+    .loader-steps span {
+        padding: 0.28rem 0.6rem;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        font-family: 'DM Mono', monospace;
+        font-size: 0.63rem;
         letter-spacing: 0.1em;
+        color: var(--text-faint);
+        text-transform: uppercase;
     }
 
-    .post-card {
-        background: var(--plan-surface);
-        border: 1px solid var(--plan-border);
-        border-radius: 18px;
-        margin-bottom: 1rem;
-        overflow: hidden;
-        transition: border-color 0.2s, transform 0.2s;
+    .loader-steps span.active {
+        color: var(--brand);
+        border-color: var(--brand-mid);
+        background: var(--brand-light);
     }
-    .post-card:hover { border-color: var(--plan-border-strong); }
+
+    /* ─── PENDING STATE ─── */
+    .pending-state {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: 4rem 2rem 3rem;
+        text-align: center;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .pending-state::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--brand) 0%, var(--accent-violet) 50%, var(--accent-teal) 100%);
+    }
+
+    .pending-orbit {
+        width: 76px;
+        height: 76px;
+        margin: 0 auto 1.75rem;
+        position: relative;
+    }
+
+    .pending-orbit-ring {
+        position: absolute;
+        inset: 0;
+        border: 1.5px solid var(--border-2);
+        border-radius: 50%;
+        animation: orbitSpin 6s linear infinite;
+    }
+
+    .pending-orbit-ring::after {
+        content: "";
+        position: absolute;
+        top: -4px;
+        left: 50%;
+        width: 8px;
+        height: 8px;
+        background: var(--brand);
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--brand-glow);
+        margin-left: -4px;
+    }
+
+    .pending-orbit-inner {
+        position: absolute;
+        inset: 16px;
+        border: 1px dashed var(--brand-mid);
+        border-radius: 50%;
+        animation: orbitSpin 3.5s linear infinite reverse;
+    }
+
+    .pending-orbit-core {
+        position: absolute;
+        inset: 28px;
+        background: var(--brand-light);
+        border-radius: 50%;
+        border: 1.5px solid var(--brand-mid);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+    }
+
+    @keyframes orbitSpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .pending-state h3 {
+        font-weight: 800;
+        font-size: 1.55rem;
+        letter-spacing: -0.03em;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .pending-state p {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        max-width: 420px;
+        margin: 0 auto 1.75rem;
+        line-height: 1.65;
+        font-weight: 400;
+    }
+
+    .pending-timer {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.45rem 1rem;
+        background: var(--brand-light);
+        border: 1px solid var(--brand-mid);
+        border-radius: 999px;
+        font-family: 'DM Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        color: var(--brand);
+        font-weight: 500;
+        text-transform: uppercase;
+        margin-bottom: 1.75rem;
+    }
+
+    .pending-timer .dot {
+        width: 5px;
+        height: 5px;
+        background: var(--brand);
+        border-radius: 50%;
+        animation: timerBlink 1.2s ease-in-out infinite;
+    }
+
+    @keyframes timerBlink {
+
+        0%,
+        100% {
+            opacity: 1
+        }
+
+        50% {
+            opacity: 0.3
+        }
+    }
+
+    .pending-plan-summary {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.7rem;
+        margin-top: 1.2rem;
+    }
+
+    .pending-stat {
+        padding: 0.55rem 1rem;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        text-align: center;
+    }
+
+    .pending-stat .ps-val {
+        font-weight: 800;
+        font-size: 1.15rem;
+        color: var(--text-primary);
+        display: block;
+        letter-spacing: -0.02em;
+    }
+
+    /* Plan summary */
+    .plan-summary {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--brand);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .plan-summary-meta {
+        display: flex;
+        gap: 1.25rem;
+        flex-wrap: wrap;
+        font-family: 'DM Mono', monospace;
+        font-size: 0.66rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+        margin-bottom: 0.7rem;
+    }
+
+    .plan-summary-meta strong {
+        color: var(--brand);
+        font-weight: 500;
+    }
+
+    .plan-summary-text {
+        font-size: 0.93rem;
+        line-height: 1.58;
+        color: var(--text-secondary);
+        font-weight: 400;
+    }
+
+    .plan-themes {
+        margin-top: 0.75rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+
+    .plan-themes .chip {
+        cursor: default;
+        pointer-events: none;
+        padding: 0.25rem 0.65rem;
+        font-size: 0.68rem;
+    }
+
+    /* ─── POST ACTIONS & FOOTER ─── */
+    .post-footer {
+        margin-top: 1.25rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .post-status-info {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--success);
+        box-shadow: 0 0 0 3px var(--success-bg);
+    }
+
+    .post-actions-row {
+        display: flex;
+        gap: 0.65rem;
+    }
+
+    .action-btn {
+        padding: 0.55rem 0.9rem;
+        border-radius: var(--radius-sm);
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-family: inherit;
+    }
+
+    .feedback-btn {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+    }
+
+    .feedback-btn:hover {
+        background: var(--surface-2);
+        border-color: var(--border-2);
+        color: var(--text-primary);
+    }
+
+    .approve-btn {
+        background: var(--brand);
+        border: 1px solid var(--brand-dark);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+    }
+
+    .approve-btn:hover {
+        background: var(--brand-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .approve-btn.loading {
+        opacity: 0.7;
+        cursor: wait;
+        transform: none;
+    }
+
+    /* ─── MODAL ─── */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        inset: 0;
+        background: rgba(13, 21, 38, 0.4);
+        backdrop-filter: blur(4px);
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+    }
+
+    .modal.show {
+        display: flex;
+        animation: modalFade 0.2s ease;
+    }
+
+    @keyframes modalFade {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .modal-content {
+        background: var(--surface);
+        width: 100%;
+        max-width: 480px;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        animation: modalSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlide {
+        from { transform: translateY(20px); }
+        to { transform: translateY(0); }
+    }
+
+    .modal-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .modal-header h3 {
+        font-size: 1.1rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1.5rem;
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .tag-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .tag-btn {
+        padding: 0.6rem;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+        transition: all var(--transition);
+        color: var(--text-secondary);
+    }
+
+    .tag-btn:hover {
+        background: var(--surface-3);
+    }
+
+    .tag-btn.active {
+        background: var(--brand-light);
+        border-color: var(--brand);
+        color: var(--brand);
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        background: var(--surface-2);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    /* Timeline header */
+    .timeline-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 0 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .timeline-header h2 {
+        font-weight: 800;
+        font-size: 1.15rem;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+    }
+
+    .timeline-header .count {
+        font-family: 'DM Mono', monospace;
+        font-size: 0.66rem;
+        color: var(--text-muted);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        background: var(--surface-2);
+        padding: 0.28rem 0.65rem;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+    }
+
+    /* Post cards */
+    .post-card {
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        transition: all var(--transition-md);
+    }
+
+    .post-card:hover {
+        box-shadow: var(--shadow);
+        background: rgba(255, 255, 255, 0.85);
+        transform: translateY(-2px);
+    }
+
+    .post-card.expanded {
+        background: #fff;
+        border-color: var(--brand-mid);
+        box-shadow: var(--shadow-md);
+    }
 
     .post-head {
         display: grid;
-        grid-template-columns: 90px 1fr auto;
-        gap: 1.25rem;
-        padding: 1.25rem 1.5rem;
+        grid-template-columns: 80px 1fr auto;
+        gap: 1rem;
+        padding: 1rem 1.15rem;
         align-items: center;
         cursor: pointer;
+        transition: background var(--transition);
     }
+
+    .post-head:hover {
+        background: var(--surface-2);
+    }
+
+    .post-card.expanded .post-head {
+        background: var(--surface-2);
+    }
+
     .post-date {
         text-align: center;
-        padding: 0.6rem 0.5rem;
-        background: rgba(0,0,0,0.25);
-        border: 1px solid var(--plan-border);
-        border-radius: 12px;
+        padding: 0.5rem 0.4rem;
+        background: var(--brand-light);
+        border: 1px solid var(--brand-mid);
+        border-radius: var(--radius);
     }
+
     .post-date .day {
-        font-family: 'Fraunces', serif;
-        font-size: 1.6rem;
-        font-weight: 500;
+        font-weight: 800;
+        font-size: 1.45rem;
         line-height: 1;
-        color: var(--plan-text);
+        color: var(--brand);
+        letter-spacing: -0.04em;
     }
+
     .post-date .month {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.65rem;
+        font-family: 'DM Mono', monospace;
+        font-size: 0.58rem;
         letter-spacing: 0.12em;
         text-transform: uppercase;
-        color: var(--brand);
-        margin-top: 0.3rem;
+        color: var(--text-muted);
+        margin-top: 0.18rem;
     }
+
     .post-date .dow {
-        font-size: 0.7rem;
-        color: var(--plan-text-faint);
-        margin-top: 0.2rem;
-    }
-    .post-info { min-width: 0; }
-    .post-info .title {
-        font-family: 'Fraunces', serif;
-        font-weight: 500;
-        font-size: 1.15rem;
-        margin: 0 0 0.4rem;
-        letter-spacing: -0.01em;
-    }
-    .post-info .badges { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-    .badge {
-        font-family: 'JetBrains Mono', monospace;
         font-size: 0.65rem;
-        padding: 0.25rem 0.55rem;
-        border-radius: 4px;
+        color: var(--text-faint);
+        margin-top: 0.12rem;
+        font-weight: 500;
+    }
+
+    .post-info {
+        min-width: 0;
+    }
+
+    .post-info .title {
+        font-weight: 700;
+        font-size: 0.97rem;
+        margin-bottom: 0.3rem;
+        letter-spacing: -0.01em;
+        color: var(--text-primary);
+        line-height: 1.3;
+    }
+
+    .post-info .badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.28rem;
+    }
+
+    .badge {
+        font-family: 'DM Mono', monospace;
+        font-size: 0.58rem;
+        padding: 0.18rem 0.48rem;
+        border-radius: var(--radius-sm);
         letter-spacing: 0.08em;
         text-transform: uppercase;
         font-weight: 500;
+        border: 1px solid;
     }
-    .badge.type-festival { background: rgba(255,184,77,0.12); color: var(--accent-warm); }
-    .badge.type-educational { background: rgba(125,217,255,0.12); color: #7dd9ff; }
-    .badge.type-offer { background: rgba(74,222,128,0.12); color: var(--success); }
-    .badge.type-trust { background: rgba(255,107,157,0.12); color: var(--accent-pink); }
-    .badge.type-engagement { background: rgba(167,139,250,0.15); color: #c4b5fd; }
-    .badge.platform { background: rgba(255,255,255,0.05); color: var(--plan-text-dim); }
-    .badge.occasion { background: rgba(16,183,254,0.1); color: var(--brand); }
+
+    .badge.type-festival {
+        background: #fffbeb;
+        color: #92400e;
+        border-color: #fde68a;
+    }
+
+    .badge.type-educational {
+        background: #eff6ff;
+        color: #1e40af;
+        border-color: #bfdbfe;
+    }
+
+    .badge.type-offer {
+        background: var(--success-bg);
+        color: var(--success);
+        border-color: var(--success-border);
+    }
+
+    .badge.type-trust {
+        background: #fdf2f8;
+        color: #9d174d;
+        border-color: #fbcfe8;
+    }
+
+    .badge.type-engagement {
+        background: #faf5ff;
+        color: #6b21a8;
+        border-color: #e9d5ff;
+    }
+
+    .badge.platform {
+        background: var(--surface-2);
+        color: var(--text-secondary);
+        border-color: var(--border);
+    }
+
+    .badge.occasion {
+        background: var(--brand-light);
+        color: var(--brand);
+        border-color: var(--brand-mid);
+    }
 
     .post-toggle {
-        width: 36px; height: 36px;
-        border: 1px solid var(--plan-border-strong);
-        border-radius: 10px;
-        display: flex; align-items: center; justify-content: center;
-        color: var(--plan-text-dim);
-        background: rgba(0,0,0,0.2);
-        transition: transform 0.2s, color 0.2s;
+        width: 30px;
+        height: 30px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-faint);
+        background: var(--surface);
+        transition: all var(--transition);
+        flex-shrink: 0;
     }
+
     .post-card.expanded .post-toggle {
         transform: rotate(180deg);
         color: var(--brand);
-        border-color: var(--brand);
+        border-color: var(--brand-mid);
+        background: var(--brand-light);
     }
 
     .post-body {
         display: none;
-        padding: 0 1.5rem 1.5rem;
-        border-top: 1px solid var(--plan-border);
+        padding: 0 1.15rem 1.15rem;
+        border-top: 1px solid var(--border);
     }
-    .post-card.expanded .post-body { display: block; }
+
+    .post-card.expanded .post-body {
+        display: block;
+    }
 
     .post-grid {
         display: grid;
-        grid-template-columns: 1fr 320px;
-        gap: 1.5rem;
-        padding-top: 1.5rem;
-    }
-    @media (max-width: 768px) {
-        .post-grid { grid-template-columns: 1fr; }
-        .post-head { grid-template-columns: 70px 1fr auto; gap: 0.75rem; padding: 1rem; }
+        grid-template-columns: 1fr 290px;
+        gap: 1.15rem;
+        padding-top: 1.1rem;
     }
 
-    .post-section { margin-bottom: 1.25rem; }
+    @media (max-width: 768px) {
+        .post-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .post-head {
+            grid-template-columns: 66px 1fr auto;
+            gap: 0.7rem;
+            padding: 0.85rem 0.9rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .post-head {
+            grid-template-columns: 58px 1fr auto;
+        }
+    }
+
+    .post-section {
+        margin-bottom: 1rem;
+    }
+
     .post-section-label {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.65rem;
-        letter-spacing: 0.14em;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
-        color: var(--plan-text-faint);
-        margin-bottom: 0.5rem;
+        color: var(--text-faint);
+        margin-bottom: 0.42rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
+
     .copy-btn {
-        background: none;
-        border: 1px solid var(--plan-border);
-        color: var(--plan-text-dim);
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.65rem;
-        letter-spacing: 0.1em;
-        padding: 0.25rem 0.6rem;
-        border-radius: 4px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        font-family: 'DM Mono', monospace;
+        font-size: 0.6rem;
+        letter-spacing: 0.08em;
+        padding: 0.18rem 0.52rem;
+        border-radius: var(--radius-sm);
         cursor: pointer;
-        transition: all 0.15s;
+        transition: all var(--transition);
         text-transform: uppercase;
+        font-weight: 500;
     }
-    .copy-btn:hover { color: var(--brand); border-color: var(--brand); }
-    .copy-btn.copied { color: var(--success); border-color: var(--success); }
+
+    .copy-btn:hover {
+        color: var(--brand);
+        border-color: var(--brand-mid);
+        background: var(--brand-light);
+    }
+
+    .copy-btn.copied {
+        color: var(--success);
+        border-color: var(--success-border);
+        background: var(--success-bg);
+    }
 
     .caption-text {
-        background: rgba(0,0,0,0.2);
-        border: 1px solid var(--plan-border);
-        border-radius: 10px;
-        padding: 1rem 1.1rem;
-        font-size: 0.92rem;
-        line-height: 1.6;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 0.85rem 1rem;
+        font-size: 0.87rem;
+        line-height: 1.65;
         white-space: pre-wrap;
-        color: var(--plan-text);
-    }
-    .hashtag-list {
-        display: flex; flex-wrap: wrap; gap: 0.3rem;
-    }
-    .hashtag {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.78rem;
-        color: var(--brand);
-        background: rgba(16,183,254,0.07);
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
-    }
-    .cta-text {
-        font-style: italic;
-        color: var(--plan-text-dim);
-        font-size: 0.9rem;
+        color: var(--text-primary);
+        font-weight: 400;
     }
 
-    /* Image panel */
+    .hashtag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.28rem;
+    }
+
+    .hashtag {
+        font-family: 'DM Mono', monospace;
+        font-size: 0.73rem;
+        color: var(--brand);
+        background: var(--brand-light);
+        padding: 0.18rem 0.48rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--brand-mid);
+    }
+
+    .cta-text {
+        font-style: italic;
+        color: var(--text-secondary);
+        font-size: 0.87rem;
+        padding: 0.55rem 0.82rem;
+        background: var(--surface-2);
+        border-radius: var(--radius);
+        border-left: 2px solid var(--brand);
+    }
+
+    /* Video panel */
     .image-panel {
-        background: rgba(0,0,0,0.25);
-        border: 1px solid var(--plan-border);
-        border-radius: 14px;
-        padding: 1rem;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 0.85rem;
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: 0.6rem;
     }
+
     .image-preview {
         width: 100%;
         aspect-ratio: 1/1;
-        background: linear-gradient(135deg, rgba(16,183,254,0.05), rgba(16,183,254,0.02));
-        border: 1px dashed var(--plan-border-strong);
-        border-radius: 10px;
+        background: var(--surface);
+        border: 1.5px dashed var(--border-2);
+        border-radius: var(--radius);
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
         overflow: hidden;
     }
-    .image-preview img {
-        width: 100%; height: 100%;
-        object-fit: cover;
-        border-radius: 10px;
+
+    .image-preview video {
+        width: 100%;
+        border-radius: calc(var(--radius) - 1px);
     }
+
     .image-placeholder {
         text-align: center;
-        color: var(--plan-text-faint);
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.7rem;
+        color: var(--text-faint);
+        font-family: 'DM Mono', monospace;
+        font-size: 0.65rem;
         letter-spacing: 0.1em;
         padding: 1rem;
+        text-transform: uppercase;
     }
-    .image-placeholder svg { margin-bottom: 0.6rem; opacity: 0.5; }
+
+    .image-placeholder svg {
+        margin-bottom: 0.5rem;
+        opacity: 0.35;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
 
     .image-loading {
-        position: absolute; inset: 0;
-        background: rgba(10,14,20,0.85);
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 0.75rem;
+        position: absolute;
+        inset: 0;
+        background: rgba(245, 246, 250, 0.92);
+        backdrop-filter: blur(4px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
     }
+
     .image-loading .bar {
-        width: 60%;
-        height: 3px;
-        background: rgba(255,255,255,0.08);
+        width: 55%;
+        height: 2px;
+        background: var(--border);
         border-radius: 2px;
         overflow: hidden;
         position: relative;
     }
+
     .image-loading .bar::before {
         content: "";
-        position: absolute; left: -40%; top: 0; bottom: 0;
+        position: absolute;
+        left: -40%;
+        top: 0;
+        bottom: 0;
         width: 40%;
         background: var(--brand);
-        animation: slide 1.4s ease-in-out infinite;
+        animation: imgslide 1.4s ease-in-out infinite;
+        border-radius: 2px;
     }
-    @keyframes slide {
-        0% { left: -40%; }
-        100% { left: 100%; }
+
+    @keyframes imgslide {
+        0% {
+            left: -40%
+        }
+
+        100% {
+            left: 100%
+        }
     }
+
     .image-loading .text {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.7rem;
-        letter-spacing: 0.12em;
+        font-family: 'DM Mono', monospace;
+        font-size: 0.63rem;
+        letter-spacing: 0.14em;
         color: var(--brand);
         text-transform: uppercase;
+        font-weight: 500;
     }
 
-    .img-actions { display: flex; gap: 0.5rem; }
+    .img-actions {
+        display: flex;
+        gap: 0.38rem;
+    }
+
     .img-btn {
         flex: 1;
-        padding: 0.6rem 0.75rem;
-        background: rgba(16,183,254,0.1);
-        border: 1px solid rgba(16,183,254,0.3);
+        padding: 0.52rem 0.68rem;
+        background: var(--brand-light);
+        border: 1px solid var(--brand-mid);
         color: var(--brand);
-        border-radius: 8px;
-        font-family: 'Inter', sans-serif;
-        font-size: 0.82rem;
-        font-weight: 500;
+        border-radius: var(--radius);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.78rem;
+        font-weight: 700;
         cursor: pointer;
-        transition: all 0.15s;
-        display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+        transition: all var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.32rem;
+        text-decoration: none;
     }
-    .img-btn:hover { background: rgba(16,183,254,0.18); }
+
+    .img-btn:hover {
+        background: var(--brand);
+        color: #fff;
+        border-color: var(--brand);
+    }
+
     .img-btn.secondary {
-        background: rgba(255,255,255,0.04);
-        border-color: var(--plan-border-strong);
-        color: var(--plan-text-dim);
+        background: var(--surface);
+        border-color: var(--border);
+        color: var(--text-secondary);
     }
-    .img-btn.secondary:hover { color: var(--plan-text); }
-    .img-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .img-btn.secondary:hover {
+        border-color: var(--border-2);
+        background: var(--surface-2);
+        color: var(--text-primary);
+    }
+
+    .img-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 
     .prompt-toggle {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.7rem;
-        color: var(--plan-text-dim);
+        font-family: 'DM Mono', monospace;
+        font-size: 0.65rem;
+        color: var(--text-faint);
         background: none;
         border: none;
         padding: 0;
         cursor: pointer;
-        text-decoration: underline;
-        text-decoration-style: dotted;
-        text-underline-offset: 3px;
+        letter-spacing: 0.08em;
+        transition: color var(--transition);
+        text-transform: uppercase;
     }
-    .prompt-toggle:hover { color: var(--brand); }
+
+    .prompt-toggle:hover {
+        color: var(--brand);
+    }
+
     .prompt-box {
         display: none;
-        background: rgba(0,0,0,0.3);
-        border: 1px solid var(--plan-border);
-        border-radius: 8px;
-        padding: 0.75rem;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.78rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 0.68rem 0.78rem;
+        font-family: 'DM Mono', monospace;
+        font-size: 0.73rem;
         line-height: 1.5;
-        color: var(--plan-text-dim);
+        color: var(--text-secondary);
         white-space: pre-wrap;
-        max-height: 220px;
+        max-height: 180px;
         overflow-y: auto;
     }
-    .prompt-box.show { display: block; }
 
-    /* Past plans drawer */
-    .past-plans {
-        margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 1px dashed var(--plan-border);
+    .prompt-box.show {
+        display: block;
     }
-    .past-plans-title {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.7rem;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--plan-text-faint);
-        margin-bottom: 0.75rem;
-    }
-    .past-plan-item {
-        padding: 0.75rem;
-        background: rgba(0,0,0,0.2);
-        border: 1px solid var(--plan-border);
-        border-radius: 10px;
-        margin-bottom: 0.5rem;
-        cursor: pointer;
-        transition: border-color 0.15s;
-        display: flex; justify-content: space-between; align-items: center;
-        gap: 0.5rem;
-    }
-    .past-plan-item:hover { border-color: var(--brand); }
-    .past-plan-item .pp-dates {
-        font-family: 'Fraunces', serif;
-        font-size: 0.95rem;
-    }
-    .past-plan-item .pp-meta {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.65rem;
-        color: var(--plan-text-faint);
-        letter-spacing: 0.08em;
-    }
-    .past-plan-delete {
-        background: none;
-        border: none;
-        color: var(--plan-text-faint);
-        cursor: pointer;
-        padding: 4px;
-        opacity: 0.6;
-    }
-    .past-plan-delete:hover { color: var(--danger); opacity: 1; }
 
-    /* Toast */
+    /* ─── TOAST ─── */
     .toast {
         position: fixed;
-        bottom: 2rem; right: 2rem;
-        padding: 0.85rem 1.25rem;
-        background: var(--plan-surface-2);
-        border: 1px solid var(--plan-border-strong);
-        border-radius: 10px;
-        color: var(--plan-text);
-        font-size: 0.9rem;
-        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+        bottom: 1.75rem;
+        right: 1.75rem;
+        padding: 0.72rem 1.05rem;
+        background: var(--text-primary);
+        border-radius: var(--radius);
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 600;
+        box-shadow: var(--shadow-md);
         z-index: 1000;
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px);
         transition: opacity 0.2s, transform 0.2s;
         pointer-events: none;
+        display: flex;
+        align-items: center;
+        gap: 0.52rem;
+        max-width: 300px;
     }
-    .toast.show { opacity: 1; transform: translateY(0); }
-    .toast.success { border-left: 3px solid var(--success); }
-    .toast.error { border-left: 3px solid var(--danger); }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .toast.success {
+        border-left: 3px solid var(--success);
+    }
+
+    .toast.error {
+        border-left: 3px solid var(--danger);
+    }
 </style>
 
 <div class="plan-root">
+    <!-- TOPBAR -->
+    <nav class="plan-topbar">
+        <div class="topbar-left">
+            <a class="topbar-brand" href="/">
+                <span class="topbar-brand-icon">▶</span>
+                Video Studio
+            </a>
+            <div class="topbar-sep"></div>
+
+        </div>
+        <div class="topbar-right">
+            <div class="topbar-user">
+                <div class="topbar-avatar">{{ user.email|first|upper }}</div>
+                <span>{{ user.email }}</span>
+            </div>
+            <a href="{% url 'logout' %}" class="topbar-logout">Sign out</a>
+        </div>
+    </nav>
+
     <!-- HERO -->
     <header class="plan-hero">
-        <div style="position: absolute; top: 1.5rem; right: 2rem; display: flex; gap: 1rem; align-items: center; z-index: 10;">
-            <span style="color: var(--plan-text-dim); font-size: 0.8rem;">{{ user.email }}</span>
-            <a href="{% url 'logout' %}" style="color: var(--brand); font-size: 0.8rem; text-decoration: none; border: 1px solid var(--plan-border); padding: 0.4rem 0.8rem; border-radius: 6px;">Logout</a>
+        <div class="hero-main">
+            <div class="hero-eyebrow">Video Studio · Content Calendar</div>
+            <h1 class="plan-title">Plan videos that <em>convert</em>.</h1>
+            <p class="plan-subtitle">Pick a date range. Get a culturally-aware, festival-anchored video plan with
+                scripts,
+                captions, hashtags, and AI video prompts — generated for {{ brand_obj.brand_name|default:"your brand"
+                }}.
+            </p>
         </div>
-        <div class="plan-eyebrow">Video Studio · Content Calendar</div>
-        <h1 class="plan-title">Plan videos that <em>convert</em>.</h1>
-        <p class="plan-subtitle">Pick a date range. Get a culturally-aware, festival-anchored video plan with scripts, captions, hashtags, and AI video prompts — generated for {{ brand_obj.brand_name|default:"your brand" }}.</p>
 
         {% if has_brand %}
         <div class="brand-strip">
@@ -796,7 +1865,8 @@
             <div class="brand-strip-item">
                 <span class="brand-strip-label">Palette</span>
                 <span class="brand-strip-value">
-                    {% for c in brand_obj.brand_colors %}<span class="brand-color-dot" style="--bg: {{ c|default:'#000' }}; background-color: var(--bg);"></span>{% endfor %}
+                    {% for c in brand_obj.brand_colors %}<span class="brand-color-dot"
+                        style="--bg: {{ c|default:'#000' }}; background-color: var(--bg);"></span>{% endfor %}
                 </span>
             </div>
         </div>
@@ -829,27 +1899,75 @@
             </div>
 
             <div class="field-group">
-                <label class="field-label">Platforms</label>
+                <label class="field-label">Platforms &amp; videos per post</label>
                 <div class="platform-chips" id="platform-chips">
                     <div class="chip active" data-value="instagram"><span class="chip-tick">✓</span>Instagram</div>
                     <div class="chip" data-value="youtube"><span class="chip-tick">✓</span>YouTube</div>
                     <div class="chip" data-value="tiktok"><span class="chip-tick">✓</span>TikTok</div>
                     <div class="chip" data-value="facebook"><span class="chip-tick">✓</span>Facebook</div>
                 </div>
+                <div class="platform-count-row" id="platform-count-row"
+                    style="margin-top:0.5rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
+                    <div class="platform-count-item" data-platform="instagram"
+                        style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0.6rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.78rem;">
+                        <span style="font-weight:600;">Instagram</span>
+                        <button type="button" class="count-dec" data-platform="instagram"
+                            style="width:20px;height:20px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;font-size:0.7rem;">−</button>
+                        <span class="count-val" data-platform="instagram"
+                            style="font-weight:700;min-width:14px;text-align:center;">1</span>
+                        <button type="button" class="count-inc" data-platform="instagram"
+                            style="width:20px;height:20px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;font-size:0.7rem;">+</button>
+                    </div>
+                    <div class="platform-count-item hidden" data-platform="youtube"
+                        style="display:none;align-items:center;gap:0.4rem;padding:0.3rem 0.6rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.78rem;">
+                        <span style="font-weight:600;">YouTube</span>
+                        <button type="button" class="count-dec" data-platform="youtube"
+                            style="width:20px;height:20px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;font-size:0.7rem;">−</button>
+                        <span class="count-val" data-platform="youtube"
+                            style="font-weight:700;min-width:14px;text-align:center;">1</span>
+                        <button type="button" class="count-inc" data-platform="youtube"
+                            style="width:20px;height:20px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;font-size:0.7rem;">+</button>
+                    </div>
+                    <div class="platform-count-item hidden" data-platform="tiktok"
+                        style="display:none;align-items:center;gap:0.4rem;padding:0.3rem 0.6rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.78rem;">
+                        <span style="font-weight:600;">TikTok</span>
+                        <button type="button" class="count-dec" data-platform="tiktok"
+                            style="width:20px;height:20px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;font-size:0.7rem;">−</button>
+                        <span class="count-val" data-platform="tiktok"
+                            style="font-weight:700;min-width:14px;text-align:center;">1</span>
+                        <button type="button" class="count-inc" data-platform="tiktok"
+                            style="width:20px;height:20px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;font-size:0.7rem;">+</button>
+                    </div>
+                    <div class="platform-count-item hidden" data-platform="facebook"
+                        style="display:none;align-items:center;gap:0.4rem;padding:0.3rem 0.6rem;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.78rem;">
+                        <span style="font-weight:600;">Facebook</span>
+                        <button type="button" class="count-dec" data-platform="facebook"
+                            style="width:20px;height:20px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;font-size:0.7rem;">−</button>
+                        <span class="count-val" data-platform="facebook"
+                            style="font-weight:700;min-width:14px;text-align:center;">1</span>
+                        <button type="button" class="count-inc" data-platform="facebook"
+                            style="width:20px;height:20px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;font-size:0.7rem;">+</button>
+                    </div>
+                </div>
             </div>
 
             <div class="field-group">
-                <label class="field-label">Extra notes (optional)</label>
-                <textarea id="notes" placeholder="e.g. focus on product demos, behind-the-scenes, cinematic transitions for Diwali"></textarea>
+                <label class="field-label">Extra notes <span
+                        style="font-weight:500;color:var(--text-faint);">(optional)</span></label>
+                <textarea id="notes"
+                    placeholder="e.g. focus on product demos, behind-the-scenes, cinematic transitions for Diwali"></textarea>
             </div>
 
             <button class="gen-btn" id="generate-btn">
-                <span class="btn-label">Generate video plan</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <span class="btn-label">Request video plan</span>
             </button>
 
             <div class="err-box" id="err-box"></div>
 
-            <div class="past-plans" id="past-plans-wrap" {% if not plans %}style="display:none;"{% endif %}>
+            <div class="past-plans" id="past-plans-wrap" {% if not plans %}style="display:none;" {% endif %}>
                 <div class="past-plans-title">Past plans</div>
                 <div id="past-plans-list">
                     {% for p in plans reversed %}
@@ -859,7 +1977,12 @@
                             <div class="pp-meta">{{ p.posts|length }} posts · {{ p.frequency }}</div>
                         </div>
                         <button class="past-plan-delete" data-plan-id="{{ p.id }}" title="Delete">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-2 14H7L5 6"></path><path d="M10 11v6M14 11v6"></path></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6l-2 14H7L5 6"></path>
+                                <path d="M10 11v6M14 11v6"></path>
+                            </svg>
                         </button>
                     </div>
                     {% endfor %}
@@ -869,157 +1992,222 @@
 
         <!-- RIGHT — results -->
         <section class="results-col" id="results-col">
+            <div id="pending-container"></div>
             <div class="empty-state" id="empty-state">
-                <div class="empty-illustration">✦</div>
+                <div class="empty-illustration">▶</div>
                 <h3>No plan yet</h3>
-                <p>Pick a date range on the left to generate your first AI-built video calendar. Indian festivals, trending moments, and your brand style will shape every video prompt.</p>
+                <p>Pick a date range on the left to request your first AI-built video calendar. Indian festivals,
+                    trending moments, and your brand style will shape every video prompt.</p>
             </div>
         </section>
     </main>
 </div>
 
+<!-- Feedback Modal -->
+<div class="modal" id="feedback-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Needs changes</h3>
+            <button class="modal-close" onclick="closeFeedbackModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:1rem;">What would you like to change? Our team will refine this post for you.</p>
+            <div class="tag-grid" id="feedback-tags">
+                <div class="tag-btn" data-tag="Caption">Caption</div>
+                <div class="tag-btn" data-tag="Video Script">Video Script</div>
+                <div class="tag-btn" data-tag="Visual Style">Visual Style</div>
+                <div class="tag-btn" data-tag="Hashtags">Hashtags</div>
+                <div class="tag-btn" data-tag="Platforms">Platforms</div>
+                <div class="tag-btn" data-tag="Other">Other</div>
+            </div>
+            <textarea id="feedback-notes" placeholder="Any specific instructions? e.g. 'Make it more professional', 'Add my website link'..." style="min-height:100px;"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="topbar-logout" style="border:none" onclick="closeFeedbackModal()">Cancel</button>
+            <button class="gen-btn" style="max-width:140px; margin:0;" id="submit-feedback-btn" onclick="submitFeedback()">Send Feedback</button>
+        </div>
+    </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-(function() {
-    'use strict';
+    (function () {
+        'use strict';
 
-    // ---- State ----
-    const state = {
-        frequency: 'alternate',
-        platforms: ['instagram'],
-        currentPlan: null,
-    };
+        // ---- State ----
+        const state = {
+            frequency: 'alternate',
+            platforms: ['instagram'],
+            videoCounts: { instagram: 1, youtube: 1, tiktok: 1, facebook: 1 },
+            currentPlan: null,
+            planApproved: false,
+        };
 
-    // ---- Elements ----
-    const $ = (s, root) => (root || document).querySelector(s);
-    const $$ = (s, root) => Array.from((root || document).querySelectorAll(s));
+        // ---- Elements ----
+        const $ = (s, root) => (root || document).querySelector(s);
+        const $$ = (s, root) => Array.from((root || document).querySelectorAll(s));
 
-    const startDate = $('#start-date');
-    const endDate = $('#end-date');
-    const generateBtn = $('#generate-btn');
-    const errBox = $('#err-box');
-    const resultsCol = $('#results-col');
-    const toast = $('#toast');
+        const startDate = $('#start-date');
+        const endDate = $('#end-date');
+        const generateBtn = $('#generate-btn');
+        const errBox = $('#err-box');
+        const resultsCol = $('#results-col');
+        const toast = $('#toast');
 
-    // ---- Date defaults: tomorrow + 14 days ----
-    const today = new Date();
-    const tomorrow = new Date(today.getTime() + 86400000);
-    const twoWeeksOut = new Date(tomorrow.getTime() + 13 * 86400000);
-    const fmt = d => d.toISOString().slice(0, 10);
-    startDate.value = fmt(tomorrow);
-    endDate.value = fmt(twoWeeksOut);
-    startDate.min = fmt(today);
 
-    // ---- Chip handlers ----
-    $('#freq-chips').addEventListener('click', e => {
-        const chip = e.target.closest('.chip');
-        if (!chip) return;
-        $$('#freq-chips .chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        state.frequency = chip.dataset.value;
-    });
+        // ---- Date defaults: tomorrow + 14 days ----
+        const today = new Date();
+        const tomorrow = new Date(today.getTime() + 86400000);
+        const twoWeeksOut = new Date(tomorrow.getTime() + 13 * 86400000);
+        const fmt = d => d.toISOString().slice(0, 10);
+        startDate.value = fmt(tomorrow);
+        endDate.value = fmt(twoWeeksOut);
+        startDate.min = fmt(today);
 
-    $('#platform-chips').addEventListener('click', e => {
-        const chip = e.target.closest('.chip');
-        if (!chip) return;
-        chip.classList.toggle('active');
-        state.platforms = $$('#platform-chips .chip.active').map(c => c.dataset.value);
-    });
-
-    // ---- Toast ----
-    let toastTimer;
-    function showToast(msg, type = 'success') {
-        toast.textContent = msg;
-        toast.className = `toast ${type} show`;
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
-    }
-
-    // ---- Error box ----
-    function showError(msg) {
-        errBox.textContent = msg;
-        errBox.classList.add('show');
-    }
-    function clearError() {
-        errBox.classList.remove('show');
-        errBox.textContent = '';
-    }
-
-    // ---- CSRF ----
-    function getCookie(name) {
-        const m = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-        return m ? decodeURIComponent(m[2]) : '';
-    }
-    const csrfToken = getCookie('csrftoken');
-
-    async function apiPost(url, body) {
-        const r = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
-            },
-            body: JSON.stringify(body),
-            credentials: 'same-origin',
+        // ---- Chip handlers ----
+        document.addEventListener('click', e => {
+            const freqChip = e.target.closest('#freq-chips .chip');
+            if (freqChip) {
+                $$('#freq-chips .chip').forEach(c => c.classList.remove('active'));
+                freqChip.classList.add('active');
+                state.frequency = freqChip.dataset.value;
+                return;
+            }
+            const platChip = e.target.closest('#platform-chips .chip');
+            if (platChip) {
+                platChip.classList.toggle('active');
+                state.platforms = $$('#platform-chips .chip.active').map(c => c.dataset.value);
+                document.querySelectorAll('.platform-count-item').forEach(row => {
+                    const show = state.platforms.includes(row.dataset.platform);
+                    row.style.display = show ? 'flex' : 'none';
+                });
+                return;
+            }
+            const stepBtn = e.target.closest('.count-inc, .count-dec');
+            if (stepBtn) {
+                const platform = stepBtn.dataset.platform;
+                const valEl = document.querySelector(`.count-val[data-platform="${platform}"]`);
+                if (!valEl) return;
+                let cur = state.videoCounts[platform] || 1;
+                if (stepBtn.classList.contains('count-inc')) cur = Math.min(10, cur + 1);
+                else cur = Math.max(1, cur - 1);
+                state.videoCounts[platform] = cur;
+                valEl.textContent = cur;
+                return;
+            }
         });
-        const data = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
-        return data;
-    }
 
-    // ---- Loader UI ----
-    function renderLoading() {
-        resultsCol.innerHTML = `
+        // ---- Toast ----
+        let toastTimer;
+        function showToast(msg, type = 'success') {
+            toast.textContent = msg;
+            toast.className = `toast ${type} show`;
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+        }
+
+        // ---- Error box ----
+        function showError(msg) { errBox.textContent = msg; errBox.classList.add('show'); }
+        function clearError() { errBox.classList.remove('show'); errBox.textContent = ''; }
+
+        // ---- CSRF ----
+        function getCookie(name) {
+            const m = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return m ? decodeURIComponent(m[2]) : '';
+        }
+        const csrfToken = getCookie('csrftoken');
+
+        async function apiPost(url, body) {
+            const r = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify(body),
+                credentials: 'same-origin',
+            });
+            const data = await r.json().catch(() => ({}));
+            if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+            return data;
+        }
+
+        // ---- Loader UI ----
+        function renderLoading() {
+            resultsCol.innerHTML = `
             <div class="loader-card">
                 <div class="loader-pulse"><div class="loader-pulse-core"></div></div>
-                <h3>Scripting your video plan…</h3>
-                <p>Analyzing your brand, mapping festivals, writing scripts, and designing video prompts.</p>
+                <h3>Submitting your request…</h3>
+                <p>Your video plan brief is being sent for admin review.</p>
                 <div class="loader-steps">
-                    <span class="active">SCAN BRAND</span>
-                    <span class="active">MAP FESTIVALS</span>
-                    <span class="active">WRITE SCRIPTS</span>
-                    <span class="active">VIDEO PROMPTS</span>
+                    <span class="active">SUBMITTING</span>
+                    <span>QUEUEING</span>
+                    <span>AWAITING REVIEW</span>
                 </div>
             </div>`;
-    }
+        }
 
-    function renderEmpty() {
-        resultsCol.innerHTML = `
+        function renderPending(req) {
+            if (!req) return;
+            state.currentPlan = null;
+            const status = (req.status || 'pending').toUpperCase();
+            const requestId = req.request_id || 'N/A';
+            const isRejected = status === 'REJECTED';
+            resultsCol.innerHTML = `
+                <div class="pending-state" id="pending-view">
+                    <div class="pending-orbit">
+                        <div class="pending-orbit-ring"></div>
+                        <div class="pending-orbit-inner"></div>
+                        <div class="pending-orbit-core">${isRejected ? '⚠' : '⏳'}</div>
+                    </div>
+                    <h3>${isRejected ? 'Plan Needs Revision' : 'Request received'}</h3>
+                    <p>${isRejected
+                    ? `Our team has reviewed your brief and requested some changes.<br><br><strong style="color:var(--text-primary);">Message:</strong> <span style="color:var(--danger);">${escapeHtml(req.admin_note || 'Please contact support.')}</span>`
+                    : "We've received your video brief and our team is crafting a tailored video strategy. Your full calendar will appear here once it's approved — typically within 24 hours."
+                }</p>
+                    <div class="pending-timer">
+                        <span class="dot"></span>
+                        STATUS: ${status} · ${isRejected ? 'ACTION REQUIRED' : 'AWAITING REVIEW'}
+                    </div>
+                    <div class="pending-plan-summary">
+                        <div class="pending-stat">
+                            <span class="ps-val">ID</span>
+                            <span class="ps-lbl">${requestId}</span>
+                        </div>
+                    </div>
+                    ${isRejected ? `<div style="margin-top:1.5rem;"><button class="gen-btn" style="max-width:200px;margin:0 auto;" onclick="location.reload()">Edit my brief</button></div>` : ''}
+                </div>`;
+        }
+
+        function renderEmpty() {
+            resultsCol.innerHTML = `
             <div class="empty-state">
-                <div class="empty-illustration">✦</div>
+                <div class="empty-illustration">▶</div>
                 <h3>No plan yet</h3>
-                <p>Pick a date range on the left to generate your first AI-built social calendar.</p>
+                <p>Pick a date range on the left to request your first AI-built video calendar.</p>
             </div>`;
-    }
+        }
 
-    // ---- Render plan ----
-    const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-    const DOW_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        // ---- Render plan ----
+        const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        const DOW_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    function escapeHtml(s) {
-        if (s == null) return '';
-        return String(s)
-            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    }
+        function escapeHtml(s) {
+            if (s == null) return '';
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
 
-    function postCardHTML(post) {
-        const d = new Date(post.date + 'T00:00:00');
-        const day = d.getDate();
-        const month = MONTHS[d.getMonth()];
-        const dow = post.day_of_week || DOW_SHORT[d.getDay()];
+        function postCardHTML(post) {
+            const d = new Date(post.date + 'T00:00:00');
+            const day = d.getDate();
+            const month = MONTHS[d.getMonth()];
+            const dow = post.day_of_week || DOW_SHORT[d.getDay()];
+            const platformBadges = (post.platforms || []).map(p => `<span class="badge platform">${escapeHtml(p)}</span>`).join('');
+            const hashtags = (post.hashtags || []).map(h => `<span class="hashtag">${escapeHtml(h.startsWith('#') ? h : '#' + h)}</span>`).join('');
+            const hasVideo = post.video_url && post.video_status === 'ready';
 
-        const platformBadges = (post.platforms || []).map(p =>
-            `<span class="badge platform">${escapeHtml(p)}</span>`).join('');
-
-        const hashtags = (post.hashtags || []).map(h =>
-            `<span class="hashtag">${escapeHtml(h.startsWith('#') ? h : '#' + h)}</span>`).join('');
-
-        const hasVideo = post.video_url && post.video_status === 'ready';
-        const isGenerating = post.video_status === 'generating' || post.video_status === 'processing';
-
-        return `
+            return `
         <article class="post-card" data-post-id="${escapeHtml(post.post_id)}">
             <header class="post-head">
                 <div class="post-date">
@@ -1036,7 +2224,7 @@
                     </div>
                 </div>
                 <div class="post-toggle">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
             </header>
             <div class="post-body">
@@ -1068,24 +2256,11 @@
                             <div class="image-preview" data-preview>
                                 ${hasVideo ? `<video src="${escapeHtml(post.video_url)}" controls style="width:100%;border-radius:10px;"></video>` : `
                                 <div class="image-placeholder">
-                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                                    <div>NO VIDEO YET</div>
+                                    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                    <div>Video pending admin review</div>
                                 </div>`}
-                                ${isGenerating ? `
-                                <div class="image-loading">
-                                    <div class="bar"></div>
-                                    <div class="text">GENERATING VIDEO</div>
-                                </div>` : ''}
                             </div>
-                            <div class="img-actions">
-                                <button class="img-btn" data-action="generate-video">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                                    ${hasVideo ? 'Regenerate' : 'Generate video'}
-                                </button>
-                                ${hasVideo ? `<a class="img-btn secondary" href="${escapeHtml(post.video_url)}" target="_blank" download>Download</a>` : ''}
-                            </div>
-                            <button class="prompt-toggle" data-action="toggle-prompt">View video prompt ↓</button>
-                            <div class="prompt-box" data-prompt-box>${escapeHtml(post.video_prompt || '')}</div>
+                            ${hasVideo ? `<div class="img-actions"><a class="img-btn secondary" href="${escapeHtml(post.video_url)}" target="_blank" download>Download</a></div>` : ''}
                             ${post.script ? `
                             <div style="margin-top:0.5rem">
                                 <button class="prompt-toggle" data-action="toggle-script">View script ↓</button>
@@ -1093,15 +2268,27 @@
                             </div>` : ''}
                         </div>
                     </div>
+            </div>
+            <div class="post-footer">
+                <div class="post-status-info">
+                    <span class="status-dot"></span>
+                    Ready to post
+                </div>
+                <div class="post-actions-row">
+                    <button class="action-btn feedback-btn" onclick="openFeedbackModal('${escapeHtml(post.post_id)}')">
+                        Needs changes
+                    </button>
+                    <button class="action-btn approve-btn" onclick="approvePost('${escapeHtml(post.post_id)}', this)">
+                        <span class="btn-text">✅ Approve</span>
+                    </button>
                 </div>
             </div>
         </article>`;
-    }
+        }
 
-    function renderPlan(plan) {
-        state.currentPlan = plan;
-
-        const meta = `
+        function renderPlan(plan) {
+            state.currentPlan = plan;
+            const meta = `
             <div class="plan-summary">
                 <div class="plan-summary-meta">
                     <span><strong>${plan.start_date}</strong> → <strong>${plan.end_date}</strong></span>
@@ -1114,257 +2301,204 @@
                     ${plan.themes.map(t => `<span class="chip active">${escapeHtml(t)}</span>`).join('')}
                 </div>` : ''}
             </div>`;
-
-        const header = `
+            const header = `
             <div class="timeline-header">
-                <h2>Your calendar</h2>
-                <span class="count">${plan.posts.length} POSTS · ${plan.start_date} → ${plan.end_date}</span>
+                <h2>Your video calendar</h2>
+                <span class="count">${plan.posts.length} posts · ${plan.start_date} → ${plan.end_date}</span>
             </div>`;
+            const cards = plan.posts.map(postCardHTML).join('');
+            resultsCol.innerHTML = meta + header + cards;
+            attachPostHandlers();
+        }
 
-        const cards = plan.posts.map(postCardHTML).join('');
-
-        resultsCol.innerHTML = meta + header + cards;
-        attachPostHandlers();
-    }
-
-    // ---- Per-card handlers ----
-    function attachPostHandlers() {
-        $$('.post-card').forEach(card => {
-            const head = card.querySelector('.post-head');
-            head.addEventListener('click', e => {
-                if (e.target.closest('.post-toggle') || e.target === head || e.target.closest('.post-info') || e.target.closest('.post-date')) {
+        // ---- Per-card handlers ----
+        function attachPostHandlers() {
+            $$('.post-card').forEach(card => {
+                const head = card.querySelector('.post-head');
+                head.addEventListener('click', e => {
+                    if (e.target.closest('button') || e.target.closest('a')) return;
                     card.classList.toggle('expanded');
+                });
+                card.querySelector('.post-body').addEventListener('click', e => e.stopPropagation());
+
+                const postId = card.dataset.postId;
+                const post = state.currentPlan.posts.find(p => p.post_id === postId);
+
+                // Copy buttons
+                card.querySelectorAll('.copy-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const which = btn.dataset.copy;
+                        let text = which === 'caption' ? (post.caption || '') : (post.hashtags || []).map(h => h.startsWith('#') ? h : '#' + h).join(' ');
+                        try {
+                            await navigator.clipboard.writeText(text);
+                            btn.textContent = 'Copied!';
+                            btn.classList.add('copied');
+                            setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+                        } catch { showToast('Copy failed', 'error'); }
+                    });
+                });
+
+                // Script toggle
+                const scriptToggle = card.querySelector('[data-action="toggle-script"]');
+                const scriptBox = card.querySelector('[data-script-box]');
+                if (scriptToggle && scriptBox) {
+                    scriptToggle.addEventListener('click', () => {
+                        const open = scriptBox.classList.toggle('show');
+                        scriptToggle.textContent = open ? 'Hide script ↑' : 'View script ↓';
+                    });
                 }
             });
+        }
 
-            // Stop body clicks from collapsing
-            card.querySelector('.post-body').addEventListener('click', e => e.stopPropagation());
-
-            const postId = card.dataset.postId;
-            const post = state.currentPlan.posts.find(p => p.post_id === postId);
-
-            // Copy buttons
-            card.querySelectorAll('.copy-btn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const which = btn.dataset.copy;
-                    let text = '';
-                    if (which === 'caption') text = post.caption || '';
-                    else if (which === 'hashtags') text = (post.hashtags || []).map(h => h.startsWith('#') ? h : '#' + h).join(' ');
-                    try {
-                        await navigator.clipboard.writeText(text);
-                        btn.textContent = 'Copied';
-                        btn.classList.add('copied');
-                        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
-                    } catch (err) {
-                        showToast('Copy failed', 'error');
-                    }
-                });
-            });
-
-            // Prompt toggle
-            const promptToggle = card.querySelector('[data-action="toggle-prompt"]');
-            const promptBox = card.querySelector('[data-prompt-box]');
-            if (promptToggle && promptBox) {
-                promptToggle.addEventListener('click', () => {
-                    const open = promptBox.classList.toggle('show');
-                    promptToggle.textContent = open ? 'Hide image prompt ↑' : 'View image prompt ↓';
-                });
+        // ---- Post Actions ----
+        window.approvePost = async function(postId, btn) {
+            if (btn.classList.contains('loading')) return;
+            
+            const btnText = btn.querySelector('.btn-text');
+            const originalText = btnText.textContent;
+            
+            try {
+                btn.classList.add('loading');
+                btn.disabled = true;
+                btnText.textContent = 'Posting...';
+                
+                const res = await apiPost(`/video/post/${postId}/approve/`, {});
+                showToast(res.message || '🎉 Video sent to Buffer!', 'success');
+                btnText.textContent = '✅ Published';
+                btn.style.background = 'var(--success)';
+                btn.style.borderColor = 'var(--success-border)';
+            } catch (err) {
+                console.error(err);
+                showToast(err.message || 'Failed to post to Buffer', 'error');
+                btnText.textContent = originalText;
+                btn.disabled = false;
+            } finally {
+                btn.classList.remove('loading');
             }
+        };
 
-            // Video generate
-            const genBtn = card.querySelector('[data-action="generate-video"]');
-            if (genBtn) {
-                genBtn.addEventListener('click', () => generateVideo(card, post));
-            }
+        let currentFeedbackPostId = null;
+        window.openFeedbackModal = function(postId) {
+            currentFeedbackPostId = postId;
+            $('#feedback-modal').classList.add('show');
+            $('#feedback-notes').value = '';
+            $$('#feedback-tags .tag-btn').forEach(b => b.classList.remove('active'));
+        };
 
-            // Script toggle
-            const scriptToggle = card.querySelector('[data-action="toggle-script"]');
-            const scriptBox = card.querySelector('[data-script-box]');
-            if (scriptToggle && scriptBox) {
-                scriptToggle.addEventListener('click', () => {
-                    const open = scriptBox.classList.toggle('show');
-                    scriptToggle.textContent = open ? 'Hide script ↑' : 'View script ↓';
-                });
+        window.closeFeedbackModal = function() {
+            $('#feedback-modal').classList.remove('show');
+            currentFeedbackPostId = null;
+        };
+
+        document.addEventListener('click', e => {
+            const tagBtn = e.target.closest('#feedback-tags .tag-btn');
+            if (tagBtn) {
+                tagBtn.classList.toggle('active');
             }
         });
-    }
 
-    async function generateVideo(card, post) {
-        const preview = card.querySelector('[data-preview]');
-        const genBtn = card.querySelector('[data-action="generate-video"]');
-
-        const oldOverlay = preview.querySelector('.image-loading');
-        if (oldOverlay) oldOverlay.remove();
-        const overlay = document.createElement('div');
-        overlay.className = 'image-loading';
-        overlay.innerHTML = '<div class="bar"></div><div class="text">GENERATING VIDEO</div>';
-        preview.appendChild(overlay);
-        genBtn.disabled = true;
-
-        try {
-            const res = await apiPost('/video/plan/generate-video/', {
-                plan_id: state.currentPlan.id,
-                post_id: post.post_id,
-            });
-
-            post.video_status = res.video_status || 'processing';
-            post.generation_task_id = res.generation_task_id || '';
-
-            if (res.video_url && res.video_status === 'ready') {
-                post.video_url = res.video_url;
-                preview.innerHTML = `<video src="${res.video_url}" controls style="width:100%;border-radius:10px;"></video>`;
-                showToast('Video ready!', 'success');
-            } else {
-                showToast('Video generation started. Polling for result...', 'success');
-                pollVideoStatus(card, post);
-            }
-        } catch (err) {
-            console.error(err);
-            const ovl = preview.querySelector('.image-loading');
-            if (ovl) ovl.remove();
-            showToast(err.message || 'Video generation failed', 'error');
-        } finally {
-            genBtn.disabled = false;
-        }
-    }
-
-    async function pollVideoStatus(card, post) {
-        const preview = card.querySelector('[data-preview]');
-        const maxAttempts = 60;
-        let attempts = 0;
-        const interval = setInterval(async () => {
-            attempts++;
-            try {
-                const r = await fetch(`/video/plan/${state.currentPlan.id}/post/${post.post_id}/status/`, { credentials: 'same-origin' });
-                const data = await r.json();
-                if (data.video_status === 'ready' && data.video_url) {
-                    clearInterval(interval);
-                    post.video_url = data.video_url;
-                    post.video_status = 'ready';
-                    preview.innerHTML = `<video src="${data.video_url}" controls style="width:100%;border-radius:10px;"></video>`;
-                    const actions = card.querySelector('.img-actions');
-                    const genBtn = card.querySelector('[data-action="generate-video"]');
-                    if (genBtn) genBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Regenerate';
-                    if (!actions.querySelector('.img-btn.secondary')) {
-                        const dl = document.createElement('a');
-                        dl.className = 'img-btn secondary'; dl.href = data.video_url; dl.target = '_blank'; dl.setAttribute('download', ''); dl.textContent = 'Download';
-                        actions.appendChild(dl);
-                    }
-                    showToast('Video ready!', 'success');
-                } else if (data.video_status === 'failed') {
-                    clearInterval(interval);
-                    const ovl = preview.querySelector('.image-loading');
-                    if (ovl) ovl.remove();
-                    showToast('Video generation failed', 'error');
-                }
-            } catch (_) {}
-            if (attempts >= maxAttempts) clearInterval(interval);
-        }, 10000);
-    }
-
-    // ---- Generate plan ----
-    generateBtn.addEventListener('click', async () => {
-        clearError();
-
-        if (!startDate.value || !endDate.value) {
-            showError('Please pick both dates.');
-            return;
-        }
-        if (startDate.value > endDate.value) {
-            showError('End date must be on or after start date.');
-            return;
-        }
-        if (state.platforms.length === 0) {
-            showError('Pick at least one platform.');
-            return;
-        }
-
-        const btnLabel = generateBtn.querySelector('.btn-label');
-        const oldLabel = btnLabel.textContent;
-        generateBtn.disabled = true;
-        generateBtn.innerHTML = '<span class="spinner"></span><span class="btn-label">Generating…</span>';
-
-        renderLoading();
-
-        try {
-            const plan = await apiPost('/video/plan/generate/', {
-                start_date: startDate.value,
-                end_date: endDate.value,
-                frequency: state.frequency,
-                platforms: state.platforms,
-                notes: $('#notes').value.trim(),
-            });
-            renderPlan(plan);
-            showToast(`Plan ready · ${plan.posts.length} posts`, 'success');
-            await refreshPastPlans();
-        } catch (err) {
-            console.error(err);
-            renderEmpty();
-            showError(err.message || 'Could not generate plan. Try again.');
-        } finally {
-            generateBtn.disabled = false;
-            generateBtn.innerHTML = `<span class="btn-label">${oldLabel}</span>`;
-        }
-    });
-
-    // ---- Past plans ----
-    async function refreshPastPlans() {
-        try {
-            const r = await fetch('/video/plan/list/', { credentials: 'same-origin' });
-            const data = await r.json();
-            const wrap = $('#past-plans-wrap');
-            const list = $('#past-plans-list');
-            if (!data.plans || !data.plans.length) {
-                wrap.style.display = 'none';
+        window.submitFeedback = async function() {
+            if (!currentFeedbackPostId) return;
+            const btn = $('#submit-feedback-btn');
+            const notes = $('#feedback-notes').value.trim();
+            const tags = $$('#feedback-tags .tag-btn.active').map(b => b.dataset.tag);
+            
+            if (!notes && !tags.length) {
+                showToast('Please add some notes or select a tag', 'error');
                 return;
             }
-            wrap.style.display = 'block';
-            list.innerHTML = data.plans.slice().reverse().map(p => `
+            
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Sending...';
+                await apiPost(`/video/post/${currentFeedbackPostId}/feedback/`, { notes, tags });
+                showToast('Feedback sent to our team! ✅', 'success');
+                closeFeedbackModal();
+            } catch (err) {
+                showToast('Could not send feedback', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Send Feedback';
+            }
+        };
+
+        // ---- Request plan ----
+        generateBtn.addEventListener('click', async () => {
+            clearError();
+            if (!startDate.value || !endDate.value) { showError('Please pick both dates.'); return; }
+            if (startDate.value > endDate.value) { showError('End date must be on or after start date.'); return; }
+            if (state.platforms.length === 0) { showError('Pick at least one platform.'); return; }
+
+            const btnLabel = generateBtn.querySelector('.btn-label');
+            const oldLabel = btnLabel.textContent;
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<span class="spinner"></span><span class="btn-label">Submitting…</span>';
+            renderLoading();
+            try {
+                const res = await apiPost('/video/plan/request/', {
+                    start_date: startDate.value,
+                    end_date: endDate.value,
+                    frequency: state.frequency,
+                    platforms: state.platforms,
+                    notes: $('#notes').value.trim(),
+                    video_counts: state.videoCounts,
+                });
+                renderPending(res);
+                showToast('Video plan requested — awaiting admin review', 'success');
+            } catch (err) {
+                renderEmpty();
+                showError(err.message || 'Could not submit request. Try again.');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg><span class="btn-label">${oldLabel}</span>`;
+            }
+        });
+
+        // ---- Past plans ----
+        async function refreshPastPlans() {
+            try {
+                const r = await fetch('/video/plan/list/', { credentials: 'same-origin' });
+                const data = await r.json();
+                const wrap = $('#past-plans-wrap');
+                const list = $('#past-plans-list');
+                if (!data.plans || !data.plans.length) { wrap.style.display = 'none'; return; }
+                wrap.style.display = 'block';
+                list.innerHTML = data.plans.slice().reverse().map(p => `
                 <div class="past-plan-item" data-plan-id="${escapeHtml(p.id)}">
                     <div>
                         <div class="pp-dates">${p.start_date} → ${p.end_date}</div>
                         <div class="pp-meta">${p.post_count} posts · ${p.frequency || ''}</div>
                     </div>
-                    <button class="past-plan-delete" data-plan-id="${escapeHtml(p.id)}" title="Delete">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-2 14H7L5 6"></path><path d="M10 11v6M14 11v6"></path></svg>
-                    </button>
                 </div>`).join('');
-        } catch (err) { /* silent */ }
-    }
+            } catch { }
+        }
 
-    document.addEventListener('click', async e => {
-        const delBtn = e.target.closest('.past-plan-delete');
-        if (delBtn) {
-            e.stopPropagation();
-            if (!confirm('Delete this plan?')) return;
+        document.addEventListener('click', async e => {
+            const item = e.target.closest('.past-plan-item');
+            if (item) await loadPastPlan(item.dataset.planId);
+        });
+
+        async function loadPastPlan(planId) {
             try {
-                await apiPost(`/video/plan/${delBtn.dataset.planId}/delete/`, {});
-                await refreshPastPlans();
-                showToast('Plan deleted', 'success');
-            } catch (err) {
-                showToast('Delete failed', 'error');
-            }
-            return;
+                renderLoading();
+                const r = await fetch(`/video/plan/${planId}/`, { credentials: 'same-origin' });
+                if (!r.ok) throw new Error('Could not load plan');
+                const plan = await r.json();
+                renderPlan(plan);
+                showToast('Plan loaded', 'success');
+            } catch (err) { renderEmpty(); showToast(err.message || 'Load failed', 'error'); }
         }
-        const item = e.target.closest('.past-plan-item');
-        if (item) {
-            await loadPastPlan(item.dataset.planId);
-        }
-    });
 
-    async function loadPastPlan(planId) {
-        try {
-            renderLoading();
-            const r = await fetch(`/video/plan/${planId}/`, { credentials: 'same-origin' });
-            if (!r.ok) throw new Error('Could not load plan');
-            const plan = await r.json();
-            renderPlan(plan);
-            showToast('Plan loaded', 'success');
-        } catch (err) {
-            renderEmpty();
-            showToast(err.message || 'Load failed', 'error');
+        // ---- Init ----
+        async function init() {
+            try {
+                const r = await fetch('/video/plan/request-status/', { credentials: 'same-origin' });
+                const data = await r.json();
+                if (data.requests && data.requests.length > 0) { renderPending(data.requests[0]); return; }
+                await refreshPastPlans();
+            } catch { }
         }
-    }
-})();
+        init();
+    })();
 </script>
 {% endblock %}

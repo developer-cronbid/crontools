@@ -26,7 +26,11 @@ SECRET_KEY = 'django-insecure-^put^tyh*3*rn81=x%gtk14%67(4q%$6u@d@lnqv&tm^v0p6ix
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+# Ngrok/Proxy settings for OAuth
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 
 
 # Application definition
